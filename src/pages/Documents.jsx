@@ -249,7 +249,7 @@ Do not include any text before or after the JSON.`
       if (!response.ok) throw new Error('Failed to fetch answer');
       const data = await response.json();
       setAskResponses(prev => [...prev, { role: 'assistant', content: data.choices[0].message.content }]);
-    } catch (error) {
+    } catch {
       setAskResponses(prev => [...prev, { role: 'assistant', content: 'Sorry, I encountered an error while analyzing the document.' }]);
     } finally {
       setIsAsking(false);
@@ -284,16 +284,16 @@ Do not include any text before or after the JSON.`
   };
 
   return (
-    <div className="flex flex-col min-h-full bg-zinc-950 pb-10 text-zinc-100">
+    <div className="flex flex-col min-h-full bg-zinc-950 pb-6 md:pb-10 text-zinc-100">
       {/* Top Header & Progress */}
-      <div className="bg-zinc-950 px-6 py-6 border-b border-zinc-800 sticky top-0 z-10">
-        <div className="max-w-7xl mx-auto flex flex-col md:flex-row md:items-center justify-between gap-4">
-          <div>
-            <h1 className="text-2xl font-bold text-white tracking-tight">Document Summarizer</h1>
-            <p className="text-zinc-400 text-sm mt-1">Upload long documents for instant LLaMA AI summaries & takeaways.</p>
+      <div className="bg-zinc-950 px-4 py-4 md:px-6 md:py-6 border-b border-zinc-800 sticky top-0 z-10 w-full overflow-hidden">
+        <div className="max-w-400 mx-auto flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div className="shrink-0">
+            <h1 className="text-xl md:text-2xl font-bold text-white tracking-tight">Document Summarizer</h1>
+            <p className="text-zinc-400 text-xs md:text-sm mt-1">Upload long documents for instant AI summaries.</p>
           </div>
           
-          <div className="flex items-center gap-2 overflow-x-auto py-2 flex-nowrap shrink-0">
+          <div className="flex items-center gap-2 overflow-x-auto py-2 flex-nowrap shrink-0 scrollbar-hide w-full md:w-auto pb-1 md:justify-end">
             {STEPS.map((s, idx) => {
               let statusClass = "text-zinc-500 border-zinc-800 bg-zinc-900";
               let lineClass = "bg-zinc-800";
@@ -321,14 +321,14 @@ Do not include any text before or after the JSON.`
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto w-full px-6 mt-8 flex flex-col lg:flex-row gap-8">
+      <div className="max-w-400 mx-auto w-full px-4 sm:px-6 lg:px-8 mt-6 md:mt-8 flex flex-col lg:flex-row gap-6 lg:gap-8">
         
         {/* LEFT COLUMN */}
-        <div className="w-full lg:w-2/3 flex flex-col gap-6">
+        <div className="w-full lg:w-[35%] xl:w-1/3 flex flex-col gap-6">
           
           {/* Upload Area */}
           <div 
-            className={`bg-zinc-900/50 rounded-2xl shadow-sm border ${isProcessing ? 'border-indigo-500/30 bg-indigo-500/5' : 'border-zinc-800 border-dashed hover:border-indigo-500/50 hover:bg-zinc-900'} p-8 flex flex-col items-center justify-center text-center transition-all cursor-pointer`}
+            className={`bg-zinc-900/50 rounded-2xl shadow-sm border ${isProcessing ? 'border-indigo-500/30 bg-indigo-500/5' : 'border-zinc-800 border-dashed hover:border-indigo-500/50 hover:bg-zinc-900'} p-6 md:p-8 flex flex-col items-center justify-center text-center transition-all cursor-pointer`}
             onClick={() => !isProcessing && fileInputRef.current?.click()}
             onDragOver={handleDragOver}
             onDrop={handleDrop}
@@ -427,11 +427,11 @@ Do not include any text before or after the JSON.`
         </div>
 
         {/* RIGHT COLUMN */}
-        <div className="w-full lg:w-2/3 flex flex-col h-full">
+        <div className="w-full lg:w-[65%] xl:w-2/3 flex flex-col h-full min-h-125 lg:min-h-[calc(100vh-12rem)]">
           {activeDoc && activeDoc.status !== 'processing' ? (
             <div className="bg-zinc-900 rounded-2xl border border-zinc-800 flex flex-col h-full overflow-hidden animate-in fade-in slide-in-from-bottom-4 duration-500 shadow-sm">
               
-              <div className="p-6 border-b border-zinc-800 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-zinc-900/50">
+              <div className="px-2 py-4 md:p-6 border-b border-zinc-800 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-zinc-900/50">
                 <div className="flex items-center gap-4">
                   <div className="w-12 h-12 bg-indigo-500/10 border border-indigo-500/20 rounded-xl flex items-center justify-center shrink-0">
                     <CheckCircle className="w-6 h-6 text-indigo-400" />
@@ -457,7 +457,7 @@ Do not include any text before or after the JSON.`
                 <div className="bg-emerald-500 h-0.5 w-full rounded-r-full shadow-[0_0_10px_rgba(16,185,129,0.5)]"></div>
               </div>
 
-              <div className="p-8 flex-1 overflow-y-auto">
+              <div className="p-2 md:p-8 flex-1 overflow-y-auto">
                 <div className="max-w-none">
                   <h3 className="text-lg font-semibold text-white mb-4 flex items-center gap-2 tracking-tight">
                     <BookOpen className="w-5 h-5 text-indigo-400" />
@@ -577,7 +577,7 @@ Do not include any text before or after the JSON.`
               </div>
             </div>
           ) : (
-            <div className="bg-zinc-900 border border-zinc-800 rounded-2xl flex-1 flex flex-col items-center justify-center p-12 text-center min-h-[500px] shadow-sm">
+            <div className="bg-zinc-900 border border-zinc-800 rounded-2xl flex-1 flex flex-col items-center justify-center p-8 md:p-12 text-center min-h-100 md:min-h-125 shadow-sm">
               {isProcessing ? (
                 <>
                   <div className="relative">
