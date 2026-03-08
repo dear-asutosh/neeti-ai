@@ -9,7 +9,6 @@ import {
 } from 'firebase/auth';
 import { doc, getDoc, setDoc, serverTimestamp } from 'firebase/firestore';
 import { auth, db } from '../services/firebase';
-import { useAuth } from '../hooks/useAuth';
 
 export default function Login() {
   const [isLogin, setIsLogin] = useState(true);
@@ -24,21 +23,15 @@ export default function Login() {
   const [department, setDepartment] = useState('');
 
   const navigate = useNavigate();
-  const { currentUser } = useAuth();
-
-  // Redirect if already logged in
+  // Redirect only on newly successful registrations
   useEffect(() => {
-    if (currentUser && !loading) {
-      if (successMsg) {
-        const timer = setTimeout(() => {
-          navigate('/');
-        }, 1500);
-        return () => clearTimeout(timer);
-      } else {
+    if (successMsg) {
+      const timer = setTimeout(() => {
         navigate('/');
-      }
+      }, 1500);
+      return () => clearTimeout(timer);
     }
-  }, [currentUser, loading, navigate, successMsg]);
+  }, [successMsg, navigate]);
 
   // Removed getRedirectResult useEffect as we will use signInWithPopup now
 
@@ -95,6 +88,7 @@ export default function Login() {
       if (isLogin) {
         await signInWithEmailAndPassword(auth, email, password);
         setLoading(false);
+        navigate('/');
       } else {
         const result = await createUserWithEmailAndPassword(auth, email, password);
         const user = result.user;
