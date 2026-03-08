@@ -5,12 +5,12 @@
   --color-gold: #C9A84C;
   --color-offwhite: #F5F7FA;
 
-  --font-heading: "Playfair Display", serif;
-  --font-body: "Source Serif 4", serif;
+  --font-sans: 'Plus Jakarta Sans', system-ui, sans-serif;
+  --font-heading: 'Outfit', system-ui, sans-serif;
 }
 
 body {
-  font-family: var(--font-body);
+  font-family: var(--font-sans);
   color: var(--color-navy);
   background-color: var(--color-offwhite);
   -webkit-font-smoothing: antialiased;
@@ -19,6 +19,7 @@ body {
 
 h1, h2, h3, h4, h5, h6 {
   font-family: var(--font-heading);
+  letter-spacing: -0.02em;
 }
 
 .fade-in-section {

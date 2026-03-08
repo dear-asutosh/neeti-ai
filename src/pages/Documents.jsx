@@ -7,6 +7,7 @@ import pdfWorker from 'pdfjs-dist/build/pdf.worker.min.mjs?worker';
 import mammoth from 'mammoth';
 import { UploadCloud, FileText, CheckCircle, Clock, Download, Share2, Send, Loader2, BookOpen, Book, File, CornerDownRight, MessageSquare, History } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
+import { createPortal } from 'react-dom';
 
 if (typeof window !== 'undefined' && !pdfjsLib.GlobalWorkerOptions.workerPort) {
   pdfjsLib.GlobalWorkerOptions.workerPort = new pdfWorker();
@@ -52,13 +53,9 @@ export default function Documents() {
   // ── NEW: Mobile top-level tab: 'upload' | 'summary' | 'history'
   const [activeMobileTab, setActiveMobileTab] = useState('upload');
   
-  // Measure header height for desktop calc
-  const headerRef = useRef(null);
-  const [headerHeight, setHeaderHeight] = useState(105);
+  const [headerNode, setHeaderNode] = useState(null);
   useEffect(() => {
-    if (headerRef.current) {
-      setHeaderHeight(headerRef.current.offsetHeight);
-    }
+    setHeaderNode(document.getElementById('page-header-content'));
   }, []);
 
   useEffect(() => {
@@ -511,16 +508,16 @@ Do not include any text before or after the JSON.`
   return (
     <div className="flex flex-col min-h-full bg-zinc-950 pb-6 md:pb-10 text-zinc-100">
 
-      {/* ── Top Header (always visible) */}
-      <div ref={headerRef} className="bg-zinc-950 px-4 py-4 md:px-6 md:py-6 border-b border-zinc-800 sticky top-0 z-10 w-full overflow-hidden">
-        <div className="max-w-400 mx-auto flex flex-col md:flex-row md:items-center justify-between gap-4">
-          <div className="shrink-0">
-            <h1 className="text-xl md:text-2xl font-bold text-white tracking-tight">Document Summarizer</h1>
-            <p className="text-zinc-400 text-xs md:text-sm mt-1">Upload long documents for instant AI summaries.</p>
+      {/* ── Top Header (Portaled to AppShell on Desktop) */}
+      {headerNode && createPortal(
+        <div className="flex items-center justify-between w-full h-full animate-in fade-in">
+          <div className="flex flex-col justify-center shrink-0">
+            <h1 className="text-base font-bold text-white tracking-tight leading-none">Document Summarizer</h1>
+            <p className="text-zinc-400 text-[10px] leading-none hidden md:block mt-1">Upload long documents for instant AI summaries.</p>
           </div>
 
-          {/* Step progress — hidden on mobile, shown on desktop */}
-          <div className="hidden lg:flex items-center gap-2 overflow-x-auto py-2 flex-nowrap shrink-0 scrollbar-hide md:justify-end">
+          {/* Step progress */}
+          <div className="flex items-center gap-1.5 overflow-x-auto flex-nowrap shrink-0 scrollbar-hide ml-auto pl-4 min-w-0">
             {STEPS.map((s, idx) => {
               let statusClass = "text-zinc-500 border-zinc-800 bg-zinc-900";
               let lineClass = "bg-zinc-800";
@@ -528,19 +525,27 @@ Do not include any text before or after the JSON.`
               else if (step === s.id) { statusClass = "text-indigo-300 border-indigo-500 bg-indigo-500/20 font-medium"; }
               return (
                 <div key={s.id} className="flex items-center shrink-0">
-                  <div className={`flex items-center justify-center w-8 h-8 rounded-full border text-sm transition-colors ${statusClass}`}>
-                    {step > s.id ? <CheckCircle className="w-4 h-4" /> : s.id}
+                  <div className={`flex items-center justify-center w-5 h-5 rounded-full border text-[10px] transition-colors ${statusClass}`}>
+                    {step > s.id ? <CheckCircle className="w-3 h-3" /> : s.id}
                   </div>
-                  <span className={`ml-2 text-sm whitespace-nowrap ${step === s.id ? 'text-indigo-300 font-medium' : 'text-zinc-500'}`}>{s.label}</span>
-                  {idx < STEPS.length - 1 && <div className={`w-8 md:w-12 h-0.5 mx-3 ${lineClass}`} />}
+                  <span className={`ml-1.5 text-[11px] whitespace-nowrap ${step === s.id ? 'text-indigo-300 font-medium block' : 'text-zinc-500 hidden lg:block'}`}>{s.label}</span>
+                  {idx < STEPS.length - 1 && <div className={`w-3 lg:w-6 h-px mx-1 lg:mx-2 ${lineClass}`} />}
                 </div>
               );
             })}
           </div>
-        </div>
+        </div>,
+        headerNode
+      )}
 
-        {/* ── Mobile 3-tab bar — only visible below lg breakpoint */}
-        <div className="lg:hidden mt-3 flex rounded-xl bg-zinc-900 border border-zinc-800 p-1 gap-1">
+      {/* ── Mobile Top Header (Visible only on small screens) */}
+      <div className="md:hidden px-4 pt-4 pb-2">
+        <h1 className="text-xl font-bold text-white tracking-tight leading-none">Document Summarizer</h1>
+        <p className="text-zinc-400 text-[11px] mt-1.5">Upload long documents for instant AI summaries.</p>
+      </div>
+
+      {/* ── Mobile 3-tab bar — only visible below lg breakpoint */}
+      <div className="lg:hidden mt-3 mx-4 flex rounded-xl bg-zinc-900 border border-zinc-800 p-1 gap-1">
           {[
             { key: 'upload', label: 'Upload', icon: <UploadCloud className="w-4 h-4" /> },
             { key: 'summary', label: 'Summary', icon: <BookOpen className="w-4 h-4" /> },
@@ -564,7 +569,6 @@ Do not include any text before or after the JSON.`
             </button>
           ))}
         </div>
-      </div>
 
       {/* ── MOBILE CONTENT (below lg) — show only the active tab */}
       <div className="lg:hidden px-4 pt-4 pb-6 flex flex-col gap-4">
@@ -573,8 +577,8 @@ Do not include any text before or after the JSON.`
         {activeMobileTab === 'history' && <HistoryList />}
       </div>
 
-      {/* ── DESKTOP CONTENT (lg and above) — explicit calc height anchored to header */}
-      <div className="hidden lg:flex w-full max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-6 gap-6 lg:gap-8" style={{ height: `calc(100vh - ${headerHeight}px)` }}>
+      {/* ── DESKTOP CONTENT (lg and above) */}
+      <div className="hidden lg:flex w-full max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-6 gap-6 lg:gap-8 flex-1 min-h-0">
 
         {/* LEFT COLUMN */}
         <div className="w-[35%] xl:w-1/3 flex flex-col gap-4 overflow-hidden">
