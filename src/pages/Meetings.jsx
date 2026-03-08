@@ -2,7 +2,10 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useAuth } from '../hooks/useAuth';
 import { db } from '../services/firebase';
 import { collection, addDoc, query, orderBy, limit, onSnapshot, doc, updateDoc } from 'firebase/firestore';
-import { Mic, FileAudio, CheckCircle, Clock, Download, Share2, Send, Loader2, Users, Target, MessageSquare, CornerDownRight, Square, BookOpen, Pencil, Check, History } from 'lucide-react';
+import { 
+  UploadCloud, FileText, CheckCircle, Clock, Save, FileAudio, 
+  Mic, Square, BookOpen, History, Pencil, Check, File, X
+} from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import { createPortal } from 'react-dom';
 
@@ -284,6 +287,25 @@ ${manualAgenda.trim() ? `\nMEETING AGENDA/CONTEXT (use this to help guide your s
     setIsRecording(false);
   };
 
+  // Cancel recording and discard data
+  const cancelRecording = () => {
+    if (mediaRecorderRef.current && mediaRecorderRef.current.state !== 'inactive') {
+      // Nullify the onstop handler so processFinalRecording is NOT called!
+      mediaRecorderRef.current.onstop = null;
+      mediaRecorderRef.current.stop();
+      mediaRecorderRef.current.stream.getTracks().forEach(track => track.stop());
+    }
+    clearInterval(timerIntervalRef.current);
+    setIsRecording(false);
+    setRecordingTime(0);
+    allChunksRef.current = [];
+    
+    // Reset state but don't process
+    setStep(1);
+    setIsProcessing(false);
+    setLiveAudioBlobUrl(null);
+  };
+
   const processFinalRecording = async () => {
     setStep(2);
     setProcessingStatus("Transcribing audio...");
@@ -548,13 +570,25 @@ ${manualAgenda.trim() ? `\nMEETING AGENDA/CONTEXT (use this to help guide your s
           </>
         ) : activeTab === 'live' ? (
           <>
-            <button
-              onClick={isRecording ? stopRecording : startRecording}
-              className={`relative w-24 h-24 rounded-full flex items-center justify-center transition-all shadow-lg ${isRecording ? 'bg-red-500/10 border-2 border-red-500 text-red-500' : 'bg-zinc-800/80 border border-zinc-700 hover:border-indigo-500/50 hover:bg-zinc-800 text-zinc-300'} z-10`}
-            >
-              {isRecording ? <Square className="w-8 h-8 fill-current" /> : <Mic className="w-10 h-10" />}
-              {isRecording && <span className="absolute inset-0 rounded-full border border-red-500 animate-ping opacity-75"></span>}
-            </button>
+            <div className="relative flex items-center justify-center">
+              {isRecording && (
+                <button
+                  onClick={cancelRecording}
+                  className="absolute -left-16 sm:-left-20 w-10 h-10 rounded-full bg-zinc-800 hover:bg-zinc-700 text-zinc-400 hover:text-white flex items-center justify-center transition-all shadow-md border border-zinc-700 animate-in fade-in zoom-in"
+                  title="Cancel Recording"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              )}
+              
+              <button
+                onClick={isRecording ? stopRecording : startRecording}
+                className={`relative w-24 h-24 rounded-full flex items-center justify-center transition-all shadow-lg ${isRecording ? 'bg-red-500/10 border-2 border-red-500 text-red-500' : 'bg-zinc-800/80 border border-zinc-700 hover:border-indigo-500/50 hover:bg-zinc-800 text-zinc-300'} z-10`}
+              >
+                {isRecording ? <Square className="w-8 h-8 fill-current" /> : <Mic className="w-10 h-10" />}
+                {isRecording && <span className="absolute inset-0 rounded-full border border-red-500 animate-ping opacity-75"></span>}
+              </button>
+            </div>
 
             <div className="mt-6 text-center">
               <div className="text-3xl font-mono font-medium text-white mb-1">
