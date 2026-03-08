@@ -4,7 +4,7 @@ import { auth } from '../services/firebase';
 import { useAuth } from '../hooks/useAuth';
 
 export default function Dashboard() {
-  const { currentUser, userRole } = useAuth();
+  const { currentUser, userRole, dbUser } = useAuth();
   const navigate = useNavigate();
 
   const handleLogout = async () => {
@@ -21,8 +21,8 @@ export default function Dashboard() {
       <div className="bg-white shadow rounded-lg p-6">
         <h1 className="text-3xl font-bold mb-4 text-gray-900">Dashboard</h1>
         <div className="mb-6 text-gray-700">
-          <p className="mb-2">Welcome, <span className="font-semibold">{currentUser?.displayName || currentUser?.email}</span></p>
-          <p>Role: <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-indigo-100 text-indigo-800 capitalize">{userRole ? userRole : 'No Role Assigned'}</span></p>
+          <p className="mb-2">Welcome, <span className="font-semibold">{dbUser?.displayName || currentUser?.displayName || currentUser?.email}</span></p>
+          <p>Role: <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-indigo-100 text-indigo-800 capitalize">{dbUser?.department || userRole || 'No Role Assigned'}</span></p>
         </div>
         <button 
           onClick={handleLogout}

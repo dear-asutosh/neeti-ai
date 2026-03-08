@@ -8,9 +8,11 @@ export default function Landing() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [featuresDropdownOpen, setFeaturesDropdownOpen] = useState(false);
+  const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
   const [mobileFeaturesExpanded, setMobileFeaturesExpanded] = useState(false);
   const dropdownRef = useRef(null);
-  const { currentUser } = useAuth();
+  const profileDropdownRef = useRef(null);
+  const { currentUser, dbUser } = useAuth();
   const navigate = useNavigate();
 
   // Handle scroll for sticky navbar styling
@@ -32,6 +34,9 @@ export default function Landing() {
     function handleClickOutside(event) {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
         setFeaturesDropdownOpen(false);
+      }
+      if (profileDropdownRef.current && !profileDropdownRef.current.contains(event.target)) {
+        setProfileDropdownOpen(false);
       }
     }
     document.addEventListener("mousedown", handleClickOutside);
@@ -81,6 +86,21 @@ export default function Landing() {
     { route: '/schedule', label: 'Schedule Management', icon: Calendar },
     { route: '/insights', label: 'Real-Time Insights', icon: Zap },
   ];
+
+  const handleLogout = async () => {
+    try {
+      setProfileDropdownOpen(false);
+      setMobileMenuOpen(false);
+      // Let AppShell or Firebase handle global logout
+      const { auth } = await import('../services/firebase');
+      await auth.signOut();
+    } catch (error) {
+      console.error("Error signing out:", error);
+    }
+  };
+
+  const displayName = dbUser?.displayName || currentUser?.displayName || 'Official';
+  const displayPhoto = dbUser?.photoURL || currentUser?.photoURL;
 
   return (
     <div className="min-h-screen bg-offwhite text-navy font-body overflow-x-hidden">
@@ -153,20 +173,65 @@ export default function Landing() {
             
             {currentUser ? (
               <div className="flex items-center gap-4 pl-4 border-l border-white/20">
-                <div className="flex items-center gap-2">
-                  <div className="w-8 h-8 rounded-full bg-navy border border-gold/50 flex items-center justify-center overflow-hidden">
-                    {currentUser.photoURL ? (
-                      <img src={currentUser.photoURL} alt="Avatar" className="w-full h-full object-cover" />
-                    ) : (
-                      <User className="w-4 h-4 text-white" />
-                    )}
+                <div className="relative" ref={profileDropdownRef}>
+                  <button 
+                    onClick={() => setProfileDropdownOpen(!profileDropdownOpen)}
+                    onMouseEnter={() => setProfileDropdownOpen(true)}
+                    className="flex items-center gap-2 focus:outline-none group"
+                  >
+                    <div className="w-9 h-9 rounded-full bg-navy border-2 border-transparent group-hover:border-gold/50 flex items-center justify-center overflow-hidden transition-colors shadow-sm">
+                      {displayPhoto ? (
+                        <img src={displayPhoto} alt="Avatar" className="w-full h-full object-cover" referrerPolicy="no-referrer" />
+                      ) : (
+                        <User className="w-4 h-4 text-white" />
+                      )}
+                    </div>
+                    <div className="hidden lg:flex items-center gap-1">
+                      <span className="text-white text-sm font-semibold truncate max-w-[120px]">
+                        {displayName.split(' ')[0]}
+                      </span>
+                      <ChevronDown size={14} className={`text-white/70 transition-transform duration-200 ${profileDropdownOpen ? 'rotate-180' : ''}`} />
+                    </div>
+                  </button>
+
+                  {/* Profile Dropdown */}
+                  <div 
+                    className={`absolute right-0 top-full mt-3 w-56 bg-white rounded-xl shadow-2xl border border-gray-100 overflow-hidden transition-all duration-300 origin-top-right ${
+                      profileDropdownOpen ? 'opacity-100 scale-100 visible' : 'opacity-0 scale-95 invisible'
+                    }`}
+                    onMouseLeave={() => setProfileDropdownOpen(false)}
+                  >
+                    <div className="px-4 py-3 border-b border-gray-100 bg-gray-50/50">
+                      <p className="text-sm font-bold text-navy truncate">{displayName}</p>
+                      <p className="text-xs text-gray-500 truncate">{currentUser.email}</p>
+                    </div>
+                    <div className="p-2 space-y-1">
+                      <Link 
+                        to="/dashboard" 
+                        onClick={() => setProfileDropdownOpen(false)}
+                        className="flex items-center px-3 py-2 text-sm text-navy hover:bg-offwhite rounded-md transition-colors font-medium"
+                      >
+                        Go to Dashboard
+                      </Link>
+                      <Link 
+                        to="/settings" 
+                        onClick={() => setProfileDropdownOpen(false)}
+                        className="flex items-center px-3 py-2 text-sm text-navy hover:bg-offwhite rounded-md transition-colors font-medium"
+                      >
+                        Profile Configuration
+                      </Link>
+                      <button 
+                        onClick={handleLogout}
+                        className="w-full text-left flex items-center px-3 py-2 text-sm text-red-600 hover:bg-red-50 rounded-md transition-colors font-medium border-t border-gray-100 mt-1 pt-2"
+                      >
+                        Sign Out
+                      </button>
+                    </div>
                   </div>
-                  <span className="text-white text-sm font-semibold hidden lg:block">
-                    {currentUser.displayName?.split(' ')[0] || 'Official'}
-                  </span>
                 </div>
-                <Link to="/dashboard" className="bg-gold hover:bg-gold/90 text-navy px-5 py-2 rounded-sm font-semibold transition-colors text-sm">
-                  Dashboard &rarr;
+                
+                <Link to="/dashboard" className="hidden sm:flex bg-gold hover:bg-gold/90 text-navy px-5 py-2.5 rounded-sm font-semibold transition-colors text-sm items-center shadow-lg shadow-gold/20">
+                  Dashboard
                 </Link>
               </div>
             ) : (
@@ -222,21 +287,29 @@ export default function Landing() {
               {currentUser ? (
                 <>
                   <div className="flex items-center gap-3 pt-4 border-t border-white/10 mt-4">
-                    <div className="w-10 h-10 rounded-full bg-navy border border-gold flex items-center justify-center overflow-hidden">
-                      {currentUser.photoURL ? (
-                        <img src={currentUser.photoURL} alt="Avatar" className="w-full h-full object-cover" />
+                    <div className="w-10 h-10 rounded-full bg-navy border border-gold flex items-center justify-center overflow-hidden shrink-0">
+                      {displayPhoto ? (
+                        <img src={displayPhoto} alt="Avatar" className="w-full h-full object-cover" referrerPolicy="no-referrer" />
                       ) : (
                         <User className="w-5 h-5 text-white" />
                       )}
                     </div>
-                    <div>
-                      <p className="text-white font-semibold">{currentUser.displayName || 'Verified Official'}</p>
-                      <p className="text-white/60 text-xs">{currentUser.email}</p>
+                    <div className="overflow-hidden">
+                      <p className="text-white font-semibold truncate">{displayName}</p>
+                      <p className="text-white/60 text-xs truncate">{currentUser.email}</p>
                     </div>
                   </div>
-                  <Link to="/dashboard" onClick={toggleMobileMenu} className="bg-gold text-navy px-4 py-3 text-center rounded-sm font-semibold mt-4">
-                    Go to Dashboard &rarr;
-                  </Link>
+                  <div className="flex flex-col gap-2 mt-4">
+                    <Link to="/dashboard" onClick={toggleMobileMenu} className="bg-gold text-navy px-4 py-3 text-center rounded-sm font-semibold">
+                      Go to Dashboard &rarr;
+                    </Link>
+                    <Link to="/settings" onClick={toggleMobileMenu} className="bg-white/10 text-white px-4 py-3 text-center rounded-sm font-semibold">
+                      Profile Configuration
+                    </Link>
+                    <button onClick={handleLogout} className="text-red-400 py-3 text-center border border-red-500/30 rounded-sm font-semibold mt-2">
+                      Sign Out
+                    </button>
+                  </div>
                 </>
               ) : (
                 <Link to="/login" onClick={toggleMobileMenu} className="bg-gold text-navy px-4 py-3 text-center rounded-sm font-semibold mt-4">

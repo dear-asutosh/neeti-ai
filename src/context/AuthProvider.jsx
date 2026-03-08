@@ -7,6 +7,7 @@ import { AuthContext } from './AuthContext';
 export const AuthProvider = ({ children }) => {
   const [currentUser, setCurrentUser] = useState(null);
   const [userRole, setUserRole] = useState(null);
+  const [dbUser, setDbUser] = useState(null);
   const [jwtToken, setJwtToken] = useState(() => sessionStorage.getItem('neeti_jwt_token') || null);
   const [loading, setLoading] = useState(true);
 
@@ -30,8 +31,10 @@ export const AuthProvider = ({ children }) => {
         unsubscribeDoc = onSnapshot(docRef, (docSnap) => {
           if (docSnap.exists()) {
             setUserRole(docSnap.data().role);
+            setDbUser(docSnap.data());
           } else {
             setUserRole(null);
+            setDbUser(null);
           }
           setLoading(false);
         }, (error) => {
@@ -41,6 +44,7 @@ export const AuthProvider = ({ children }) => {
       } else {
         setCurrentUser(null);
         setUserRole(null);
+        setDbUser(null);
         
         // Clear JWT on sign out / lost session
         sessionStorage.removeItem('neeti_jwt_token');
@@ -63,6 +67,7 @@ export const AuthProvider = ({ children }) => {
   const value = {
     currentUser,
     userRole,
+    dbUser,
     jwtToken, // Exposed for API calls
     loading
   };

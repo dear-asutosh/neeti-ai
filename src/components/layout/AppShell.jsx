@@ -8,7 +8,7 @@ import { auth } from '../../services/firebase';
 export default function AppShell() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
-  const { currentUser } = useAuth();
+  const { currentUser, dbUser } = useAuth();
   const navigate = useNavigate();
 
   const handleLogout = async () => {
@@ -19,6 +19,8 @@ export default function AppShell() {
       console.error("Error signing out:", error);
     }
   };
+
+  const displayPhoto = dbUser?.photoURL || currentUser?.photoURL;
 
   return (
     <div className="flex h-screen bg-gray-50 overflow-hidden font-sans">
@@ -50,12 +52,12 @@ export default function AppShell() {
               className="flex items-center gap-3 px-2 py-1.5 rounded-md hover:bg-zinc-900 transition-colors border border-transparent focus:outline-none"
             >
               <div className="hidden md:flex flex-col items-end">
-                <span className="text-sm font-semibold text-zinc-100">{currentUser?.displayName || 'Official'}</span>
-                <span className="text-xs text-zinc-500 capitalize">{currentUser?.role || 'Leader'}</span>
+                <span className="text-sm font-semibold text-zinc-100">{dbUser?.displayName || currentUser?.displayName || 'Official'}</span>
+                <span className="text-xs text-zinc-500 capitalize">{dbUser?.department || dbUser?.role || 'Leader'}</span>
               </div>
               <div className="w-8 h-8 rounded-full bg-zinc-800 border border-gold/30 flex items-center justify-center overflow-hidden">
-                {currentUser?.photoURL ? (
-                  <img src={currentUser.photoURL} alt="Avatar" className="w-full h-full object-cover" />
+                {displayPhoto ? (
+                  <img src={displayPhoto} alt="Avatar" className="w-full h-full object-cover" referrerPolicy="no-referrer" />
                 ) : (
                   <User className="w-4 h-4 text-zinc-300" />
                 )}
@@ -72,7 +74,7 @@ export default function AppShell() {
                 ></div>
                 <div className="absolute right-0 mt-2 w-48 bg-zinc-900 border border-zinc-800 rounded-md shadow-xl py-1 z-50">
                   <div className="px-4 py-2 border-b border-zinc-800 mb-1">
-                    <p className="text-sm text-white font-medium truncate">{currentUser?.displayName}</p>
+                    <p className="text-sm text-white font-medium truncate">{dbUser?.displayName || currentUser?.displayName}</p>
                     <p className="text-xs text-zinc-400 truncate">{currentUser?.email}</p>
                   </div>
                   <button

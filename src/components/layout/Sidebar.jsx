@@ -23,7 +23,7 @@ import { useAuth } from '../../hooks/useAuth';
 export default function Sidebar({ mobileOpen, setMobileOpen }) {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const navigate = useNavigate();
-  const { currentUser } = useAuth();
+  const { currentUser, dbUser } = useAuth();
 
   const handleLogout = async () => {
     try {
@@ -33,6 +33,8 @@ export default function Sidebar({ mobileOpen, setMobileOpen }) {
       console.error("Error signing out:", error);
     }
   };
+
+  const displayPhoto = dbUser?.photoURL || currentUser?.photoURL;
 
   const navSections = [
     {
@@ -172,15 +174,15 @@ export default function Sidebar({ mobileOpen, setMobileOpen }) {
               className={`flex items-center gap-3 w-full px-2 py-2 rounded-md text-zinc-300 hover:bg-zinc-800 hover:text-zinc-50 transition-colors mt-1 ${isCollapsed ? 'justify-center' : ''}`}
             >
               <div className="w-8 h-8 rounded-md bg-zinc-800 border border-zinc-700 flex items-center justify-center shrink-0 overflow-hidden shadow-sm">
-                {currentUser?.photoURL ? (
-                  <img src={currentUser.photoURL} alt="Avatar" className="h-full w-full object-cover" />
+                {displayPhoto ? (
+                  <img src={displayPhoto} alt="Avatar" className="h-full w-full object-cover" referrerPolicy="no-referrer" />
                 ) : (
                   <User className="w-4 h-4 text-zinc-400" />
                 )}
               </div>
               {!isCollapsed && (
                 <div className="flex flex-col items-start overflow-hidden">
-                  <span className="text-sm font-medium text-zinc-50 truncate w-full text-left">{currentUser?.displayName || 'Leader'}</span>
+                  <span className="text-sm font-medium text-zinc-50 truncate w-full text-left">{dbUser?.displayName || currentUser?.displayName || 'Leader'}</span>
                   <span className="text-xs text-zinc-500 truncate w-full text-left">{currentUser?.email || 'No email provided'}</span>
                 </div>
               )}

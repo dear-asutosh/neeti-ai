@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { 
-  signInWithRedirect, 
-  getRedirectResult, 
+  signInWithPopup, 
   GoogleAuthProvider,
   signInWithEmailAndPassword,
-  createUserWithEmailAndPassword
+  createUserWithEmailAndPassword,
+  updateProfile
 } from 'firebase/auth';
 import { doc, getDoc, setDoc, serverTimestamp } from 'firebase/firestore';
 import { auth, db } from '../services/firebase';
@@ -40,37 +40,7 @@ export default function Login() {
     }
   }, [currentUser, loading, navigate, successMsg]);
 
-  // Handle Google Redirect Result
-  useEffect(() => {
-    const handleRedirectResult = async () => {
-      try {
-        setLoading(true);
-        const result = await getRedirectResult(auth);
-        if (result) {
-          const user = result.user;
-          const userRef = doc(db, 'users', user.uid);
-          const userSnap = await getDoc(userRef);
-
-          if (!userSnap.exists()) {
-            await setDoc(userRef, {
-              email: user.email,
-              role: 'leader',
-              displayName: user.displayName,
-              createdAt: serverTimestamp()
-            });
-          }
-          // The other useEffect handles navigation
-        }
-      } catch (err) {
-        console.error("Redirect login error:", err);
-        setError(err.message || 'Failed to sign in with Google.');
-      } finally {
-        setLoading(false);
-      }
-    };
-    
-    handleRedirectResult();
-  }, []);
+  // Removed getRedirectResult useEffect as we will use signInWithPopup now
 
   const handleGoogleSignIn = async () => {
     if (loading) return;
@@ -78,11 +48,37 @@ export default function Login() {
       setError('');
       setLoading(true);
       const provider = new GoogleAuthProvider();
-      await signInWithRedirect(auth, provider);
-      // It will redirect the page, so no code runs after this
+      const result = await signInWithPopup(auth, provider);
+      
+      const user = result.user;
+      const userRef = doc(db, 'users', user.uid);
+      const userSnap = await getDoc(userRef);
+
+      if (!userSnap.exists()) {
+        await setDoc(userRef, {
+          email: user.email,
+          role: 'leader',
+          displayName: user.displayName,
+          photoURL: user.photoURL || null,
+          createdAt: serverTimestamp()
+        });
+      } else {
+        // Update photoURL if they log in and it's missing or changed in db
+        await setDoc(userRef, {
+          photoURL: user.photoURL || null
+        }, { merge: true });
+      }
+      
+      setLoading(false);
+      navigate('/');
+      
+      // Success will natively trigger navigation in the dependency array useEffect
     } catch (err) {
-      console.error("Login redirect trigger error:", err);
-      setError(err.message || 'Failed to start Google sign in.');
+      console.error("Google sign in error:", err);
+      // Ignore popup closed errors without displaying a scary message
+      if (err.code !== 'auth/popup-closed-by-user') {
+        setError(err.message || 'Failed to sign in with Google.');
+      }
       setLoading(false);
     }
   };
@@ -102,6 +98,8 @@ export default function Login() {
       } else {
         const result = await createUserWithEmailAndPassword(auth, email, password);
         const user = result.user;
+        
+        await updateProfile(user, { displayName: fullName });
         
         const userRef = doc(db, 'users', user.uid);
         await setDoc(userRef, {
