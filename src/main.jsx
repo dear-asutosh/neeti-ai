@@ -7,6 +7,7 @@ import { PrivateRoute } from './components/PrivateRoute';
 import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
 import AppShell from './components/layout/AppShell';
+import Landing from './pages/Landing';
 
 // Placeholder Pages
 import Documents from './pages/Documents';
@@ -38,7 +39,7 @@ createRoot(document.getElementById('root')).render(
             <Route path="/assistant" element={<AIAssistant />} />
           </Route>
           
-          <Route path="/" element={<Navigate to="/dashboard" replace />} />
+          <Route path="/" element={<Landing />} />
           {/* <Route path="*" element={<Navigate to="/dashboard" replace />} /> */}
         </Routes>
       </Router>

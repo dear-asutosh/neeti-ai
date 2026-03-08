@@ -1,22 +1,76 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { signInWithPopup, GoogleAuthProvider } from 'firebase/auth';
+import { 
+  signInWithRedirect, 
+  getRedirectResult, 
+  GoogleAuthProvider,
+  signInWithEmailAndPassword,
+  createUserWithEmailAndPassword
+} from 'firebase/auth';
 import { doc, getDoc, setDoc, serverTimestamp } from 'firebase/firestore';
 import { auth, db } from '../services/firebase';
 import { useAuth } from '../hooks/useAuth';
 
 export default function Login() {
+  const [isLogin, setIsLogin] = useState(true);
   const [error, setError] = useState('');
+  const [successMsg, setSuccessMsg] = useState('');
   const [loading, setLoading] = useState(false);
+  
+  // Form States
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [fullName, setFullName] = useState('');
+  const [department, setDepartment] = useState('');
+
   const navigate = useNavigate();
   const { currentUser } = useAuth();
 
-  // Redirect if already logged in and not in the middle of auth processing
-  React.useEffect(() => {
+  // Redirect if already logged in
+  useEffect(() => {
     if (currentUser && !loading) {
-      navigate('/dashboard');
+      if (successMsg) {
+        const timer = setTimeout(() => {
+          navigate('/');
+        }, 1500);
+        return () => clearTimeout(timer);
+      } else {
+        navigate('/');
+      }
     }
-  }, [currentUser, loading, navigate]);
+  }, [currentUser, loading, navigate, successMsg]);
+
+  // Handle Google Redirect Result
+  useEffect(() => {
+    const handleRedirectResult = async () => {
+      try {
+        setLoading(true);
+        const result = await getRedirectResult(auth);
+        if (result) {
+          const user = result.user;
+          const userRef = doc(db, 'users', user.uid);
+          const userSnap = await getDoc(userRef);
+
+          if (!userSnap.exists()) {
+            await setDoc(userRef, {
+              email: user.email,
+              role: 'leader',
+              displayName: user.displayName,
+              createdAt: serverTimestamp()
+            });
+          }
+          // The other useEffect handles navigation
+        }
+      } catch (err) {
+        console.error("Redirect login error:", err);
+        setError(err.message || 'Failed to sign in with Google.');
+      } finally {
+        setLoading(false);
+      }
+    };
+    
+    handleRedirectResult();
+  }, []);
 
   const handleGoogleSignIn = async () => {
     if (loading) return;
@@ -24,62 +78,276 @@ export default function Login() {
       setError('');
       setLoading(true);
       const provider = new GoogleAuthProvider();
-      const result = await signInWithPopup(auth, provider);
-      const user = result.user;
-
-      // Check if user exists in the database
-      const userRef = doc(db, 'users', user.uid);
-      const userSnap = await getDoc(userRef);
-
-      if (!userSnap.exists()) {
-        // Create new user document in Firestore
-        await setDoc(userRef, {
-          email: user.email,
-          role: 'leader',
-          displayName: user.displayName,
-          createdAt: serverTimestamp()
-        });
-      }
-
-      // We don't navigate here, we let the useEffect above handle it
-      // once loading is set back to false and currentUser is updated.
+      await signInWithRedirect(auth, provider);
+      // It will redirect the page, so no code runs after this
     } catch (err) {
-      console.error("Login error:", err);
-      // Let's show a more specific error if it's a generic Firestore issue
-      setError(err.message || 'Failed to sign in. Please try again.');
-    } finally {
+      console.error("Login redirect trigger error:", err);
+      setError(err.message || 'Failed to start Google sign in.');
       setLoading(false);
     }
   };
 
-  return (
-    <div className="min-h-screen bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
-      <div className="sm:mx-auto sm:w-full sm:max-w-md">
-        <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
-          Sign in to Neeti AI
-        </h2>
-        <p className="mt-2 text-center text-sm text-gray-600">
-          AI Co-Pilot for Public Leaders & Administrators
-        </p>
-      </div>
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (loading) return;
+    
+    setError('');
+    setSuccessMsg('');
+    setLoading(true);
 
-      <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
-        <div className="bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10">
-          {error && (
-            <div className="mb-4 bg-red-50 border-l-4 border-red-400 p-4">
-              <p className="text-sm text-red-700">{error}</p>
-            </div>
-          )}
-          <div>
-            <button
-              onClick={handleGoogleSignIn}
-              disabled={loading}
-              className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50"
+    try {
+      if (isLogin) {
+        await signInWithEmailAndPassword(auth, email, password);
+        setLoading(false);
+      } else {
+        const result = await createUserWithEmailAndPassword(auth, email, password);
+        const user = result.user;
+        
+        const userRef = doc(db, 'users', user.uid);
+        await setDoc(userRef, {
+          email: user.email,
+          role: 'leader',
+          department: department,
+          displayName: fullName,
+          createdAt: serverTimestamp()
+        });
+        setSuccessMsg('Registration successful! Redirecting to dashboard...');
+        setLoading(false);
+      }
+    } catch (err) {
+      console.error("Auth submit error:", err);
+      if (err.code === 'auth/invalid-credential') {
+        setError("Invalid email or password. If you don't have an account, please switch to Sign Up.");
+      } else if (err.code === 'auth/email-already-in-use') {
+        setError("That email is already registered. Please sign in instead.");
+      } else if (err.code === 'auth/weak-password') {
+        setError("Password should be at least 6 characters.");
+      } else {
+        setError(err.message || `Failed to ${isLogin ? 'sign in' : 'register'}. Please try again.`);
+      }
+      setLoading(false);
+    }
+  };
+
+  const toggleMode = () => {
+    setIsLogin(!isLogin);
+    setError('');
+    setSuccessMsg('');
+  };
+
+  return (
+    <div className="min-h-screen bg-offwhite flex items-center justify-center p-4 font-body overflow-hidden">
+      
+      {/* Main Container */}
+      <div className="relative w-full max-w-5xl h-[650px] bg-white rounded-xl shadow-2xl overflow-hidden flex flex-col md:flex-row">
+        
+        {/* Navy Overlay Panel that slides */}
+        <div 
+          className={`hidden md:flex absolute top-0 w-1/2 h-full bg-navy text-white flex-col justify-center items-center p-12 transition-transform duration-700 ease-in-out z-20 ${
+            isLogin ? 'translate-x-full' : 'translate-x-0'
+          }`}
+        >
+          {/* Subtle background pattern */}
+          <div className="absolute inset-0 opacity-[0.05]" 
+               style={{ backgroundImage: 'linear-gradient(#ffffff 1px, transparent 1px), linear-gradient(90deg, #ffffff 1px, transparent 1px)', backgroundSize: '20px 20px' }}>
+          </div>
+          
+          <div className="relative z-10 text-center flex flex-col items-center">
+            <h1 className="text-4xl font-heading font-medium mb-6">
+              {isLogin ? "Join Neeti AI." : "Welcome Back."}
+            </h1>
+            <p className="text-white/80 mb-10 text-lg leading-relaxed max-w-sm">
+              {isLogin 
+                ? "Experience India's first AI Co-Pilot built exclusively for tracking, drafting, and leading in public administration." 
+                : "Log in to access your intelligent dashboard, review key documents, and continue your governance efforts."}
+            </p>
+            
+            <button 
+              onClick={toggleMode}
+              className="px-8 py-3 border-2 border-white/30 hover:border-gold hover:text-gold rounded-sm uppercase tracking-widest text-sm font-semibold transition-colors duration-300"
             >
-              {loading ? 'Signing in...' : 'Sign in with Google'}
+              {isLogin ? "Create Official Account" : "Sign In to Dashboard"}
             </button>
           </div>
         </div>
+
+        {/* Forms Container */}
+        <div className="w-full h-full relative flex md:w-full z-10">
+
+          {/* S I G N   U P   F O R M (Left Side structurally, positioned relative) */}
+          <div 
+            className={`w-full md:w-1/2 h-full p-8 md:p-12 flex flex-col justify-center absolute top-0 left-0 transition-all duration-700 ease-in-out ${
+              isLogin ? 'opacity-0 -translate-x-1/5 pointer-events-none' : 'opacity-100 translate-x-0 md:translate-x-full'
+            }`}
+          >
+            <div className="max-w-sm mx-auto w-full">
+              {/* Mobile toggler */}
+              <div className="md:hidden text-center mb-8">
+                <h2 className="text-2xl font-heading text-navy">Join Neeti AI</h2>
+                <button onClick={toggleMode} className="text-gold text-sm font-semibold mt-2">
+                  Already have an account? Sign In
+                </button>
+              </div>
+
+              <h2 className="hidden md:block text-3xl font-heading font-bold text-navy mb-8">Official Registration</h2>
+              
+              {error && !isLogin && (
+                <div className="mb-4 bg-red-50 text-red-600 p-3 rounded text-sm">{error}</div>
+              )}
+              {successMsg && !isLogin && (
+                <div className="mb-4 bg-green-50 text-green-600 p-3 rounded text-sm">{successMsg}</div>
+              )}
+
+              <form onSubmit={handleSubmit} className="space-y-4">
+                <div>
+                  <label className="block text-sm font-semibold text-navy mb-1 uppercase tracking-wider">Full Name *</label>
+                  <input 
+                    type="text" 
+                    required 
+                    value={fullName}
+                    onChange={(e) => setFullName(e.target.value)}
+                    className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-sm focus:outline-none focus:border-gold focus:ring-1 focus:ring-gold transition-colors"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-semibold text-navy mb-1 uppercase tracking-wider">Official Email *</label>
+                  <input 
+                    type="email" 
+                    required 
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-sm focus:outline-none focus:border-gold focus:ring-1 focus:ring-gold transition-colors"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-semibold text-navy mb-1 uppercase tracking-wider">Department / Role</label>
+                  <input 
+                    type="text" 
+                    value={department}
+                    onChange={(e) => setDepartment(e.target.value)}
+                    className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-sm focus:outline-none focus:border-gold focus:ring-1 focus:ring-gold transition-colors"
+                    placeholder="e.g. District Magistrate, MLA"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-semibold text-navy mb-1 uppercase tracking-wider">Password *</label>
+                  <input 
+                    type="password" 
+                    required 
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-sm focus:outline-none focus:border-gold focus:ring-1 focus:ring-gold transition-colors"
+                  />
+                </div>
+
+                <div className="pt-2">
+                  <button 
+                    type="submit" 
+                    disabled={loading}
+                    className="w-full bg-navy hover:bg-navy/90 text-white font-semibold py-3 rounded-sm shadow-md transition-colors disabled:opacity-50"
+                  >
+                    {loading ? 'Processing...' : 'Register Securely'}
+                  </button>
+                </div>
+              </form>
+
+              <div className="mt-6 flex items-center justify-between">
+                <hr className="w-full border-gray-200" />
+                <span className="p-2 text-xs text-gray-400 uppercase tracking-widest bg-white">OR</span>
+                <hr className="w-full border-gray-200" />
+              </div>
+
+              <div className="mt-6">
+                <button
+                  onClick={handleGoogleSignIn}
+                  disabled={loading}
+                  className="w-full flex items-center justify-center gap-3 px-4 py-3 border border-gray-200 rounded-sm hover:bg-gray-50 transition-colors font-semibold text-navy disabled:opacity-50"
+                >
+                  <img src="https://www.svgrepo.com/show/475656/google-color.svg" alt="Google" className="w-5 h-5" />
+                  Continue with Google
+                </button>
+              </div>
+            </div>
+          </div>
+
+
+          {/* L O G I N   F O R M (Right Side structurally, positioned relative) */}
+          <div 
+            className={`w-full md:w-1/2 h-full p-8 md:p-12 flex flex-col justify-center absolute top-0 left-0 md:left-1/2 transition-all duration-700 ease-in-out ${
+              !isLogin ? 'opacity-0 translate-x-1/5 pointer-events-none' : 'opacity-100 translate-x-0 md:-translate-x-full'
+            }`}
+          >
+             <div className="max-w-sm mx-auto w-full">
+              {/* Mobile toggler */}
+              <div className="md:hidden text-center mb-8">
+                <h2 className="text-2xl font-heading text-navy">Welcome Back</h2>
+                <button onClick={toggleMode} className="text-gold text-sm font-semibold mt-2">
+                  Need an account? Sign Up
+                </button>
+              </div>
+
+              <h2 className="hidden md:block text-3xl font-heading font-bold text-navy mb-8">Official Access</h2>
+              
+              {error && isLogin && (
+                <div className="mb-4 bg-red-50 text-red-600 p-3 rounded text-sm">{error}</div>
+              )}
+
+              <form onSubmit={handleSubmit} className="space-y-5">
+                <div>
+                  <label className="block text-sm font-semibold text-navy mb-1 uppercase tracking-wider">Official Email *</label>
+                  <input 
+                    type="email" 
+                    required 
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-sm focus:outline-none focus:border-gold focus:ring-1 focus:ring-gold transition-colors"
+                  />
+                </div>
+                <div>
+                  <div className="flex justify-between items-center mb-1">
+                    <label className="block text-sm font-semibold text-navy uppercase tracking-wider">Password *</label>
+                    <a href="#" className="text-xs text-gold hover:underline">Forgot?</a>
+                  </div>
+                  <input 
+                    type="password" 
+                    required 
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-sm focus:outline-none focus:border-gold focus:ring-1 focus:ring-gold transition-colors"
+                  />
+                </div>
+
+                <div className="pt-2">
+                  <button 
+                    type="submit" 
+                    disabled={loading}
+                    className="w-full bg-navy hover:bg-navy/90 text-white font-semibold py-3 rounded-sm shadow-md transition-colors disabled:opacity-50"
+                  >
+                    {loading ? 'Authenticating...' : 'Secure Sign In'}
+                  </button>
+                </div>
+              </form>
+
+              <div className="mt-8 flex items-center justify-between">
+                <hr className="w-full border-gray-200" />
+                <span className="p-2 text-xs text-gray-400 uppercase tracking-widest bg-white">OR</span>
+                <hr className="w-full border-gray-200" />
+              </div>
+
+              <div className="mt-8">
+                <button
+                  onClick={handleGoogleSignIn}
+                  disabled={loading}
+                  className="w-full flex items-center justify-center gap-3 px-4 py-3 border border-gray-200 rounded-sm hover:bg-gray-50 transition-colors font-semibold text-navy disabled:opacity-50"
+                >
+                  <img src="https://www.svgrepo.com/show/475656/google-color.svg" alt="Google" className="w-5 h-5" />
+                  Sign In with Google
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
       </div>
     </div>
   );

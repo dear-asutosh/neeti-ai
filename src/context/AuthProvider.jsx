@@ -7,14 +7,24 @@ import { AuthContext } from './AuthContext';
 export const AuthProvider = ({ children }) => {
   const [currentUser, setCurrentUser] = useState(null);
   const [userRole, setUserRole] = useState(null);
+  const [jwtToken, setJwtToken] = useState(() => sessionStorage.getItem('neeti_jwt_token') || null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     let unsubscribeDoc = null;
 
-    const unsubscribeAuth = onAuthStateChanged(auth, (user) => {
+    const unsubscribeAuth = onAuthStateChanged(auth, async (user) => {
       if (user) {
         setCurrentUser(user);
+        
+        // Retrieve and store JWT (ID Token)
+        try {
+          const token = await user.getIdToken();
+          sessionStorage.setItem('neeti_jwt_token', token);
+          setJwtToken(token);
+        } catch (tokenError) {
+          console.error("Error retrieving JWT token:", tokenError);
+        }
         
         const docRef = doc(db, 'users', user.uid);
         unsubscribeDoc = onSnapshot(docRef, (docSnap) => {
@@ -31,6 +41,11 @@ export const AuthProvider = ({ children }) => {
       } else {
         setCurrentUser(null);
         setUserRole(null);
+        
+        // Clear JWT on sign out / lost session
+        sessionStorage.removeItem('neeti_jwt_token');
+        setJwtToken(null);
+        
         if (unsubscribeDoc) {
           unsubscribeDoc();
           unsubscribeDoc = null;
@@ -48,12 +63,18 @@ export const AuthProvider = ({ children }) => {
   const value = {
     currentUser,
     userRole,
+    jwtToken, // Exposed for API calls
     loading
   };
 
+  // Only render children when NOT loading AND 
+  // either we have no user (public routes) OR we have a user WITH a JWT token (private routes)
+  // This strictness prevents rendering authenticated views without a valid JWT in session.
+  const isAuthResolved = !loading && ((currentUser && jwtToken) || !currentUser);
+
   return (
     <AuthContext.Provider value={value}>
-      {!loading && children}
+      {isAuthResolved && children}
     </AuthContext.Provider>
   );
 };
