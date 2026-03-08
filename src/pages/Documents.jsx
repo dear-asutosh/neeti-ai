@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useAuth } from '../hooks/useAuth';
 import { db } from '../services/firebase';
-import { collection, addDoc, query, orderBy, limit, onSnapshot, serverTimestamp } from 'firebase/firestore';
+import { collection, addDoc, query, orderBy, limit, onSnapshot } from 'firebase/firestore';
 import * as pdfjsLib from 'pdfjs-dist';
 import pdfWorker from 'pdfjs-dist/build/pdf.worker.min.mjs?worker';
 import mammoth from 'mammoth';
@@ -193,7 +193,7 @@ Do not include any text before or after the JSON.`
 
       const docRef = await addDoc(collection(db, 'users', currentUser.uid, 'documents'), {
         ...summaryData,
-        createdAt: serverTimestamp()
+        createdAt: new Date()
       });
 
       setActiveDoc({ id: docRef.id, ...summaryData });

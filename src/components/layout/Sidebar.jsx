@@ -6,15 +6,16 @@ import {
   Mic,
   MessageSquare,
   Calendar, 
-  BarChart3, 
+  BarChart3,
   Map,
   Settings,
-  LogOut, 
-  ChevronLeft, 
+  LogOut,
+  ChevronLeft,
   ChevronRight,
   Landmark,
   X,
-  User
+  User,
+  Image as ImageIcon, // Added Image as ImageIcon
 } from 'lucide-react';
 import { auth } from '../../services/firebase';
 import { useAuth } from '../../hooks/useAuth';
@@ -44,8 +45,8 @@ export default function Sidebar({ mobileOpen, setMobileOpen }) {
       title: 'AI Tools',
       items: [
         { name: 'Document Summarizer', path: '/documents', icon: FileText },
-        { name: 'Meeting Summarizer', path: '/meetings', icon: MessageSquare },
-        { name: 'Speech & Drafts', path: '/speeches', icon: Mic },
+        { name: 'Meeting Summarizer', path: '/meetings', icon: Mic }, // Modified: Changed icon to Mic as per instruction, kept path as /meetings
+        { name: 'Speech & Drafts', path: '/speeches', icon: ImageIcon }, // Modified: Changed icon to ImageIcon as per instruction, kept path as /speeches
       ]
     },
     {
@@ -77,7 +78,7 @@ export default function Sidebar({ mobileOpen, setMobileOpen }) {
         {/* Header */}
         <div className={`flex items-center justify-between h-14 px-4 border-b border-zinc-800 ${isCollapsed ? 'justify-center' : ''}`}>
           <div className="flex items-center gap-3 overflow-hidden">
-            <div className="bg-indigo-600 rounded-md p-1.5 shrink-0 flex items-center justify-center">
+            <div className="bg-[#09090B] rounded-md p-1.5 shrink-0 flex items-center justify-center">
                <Landmark className="text-white w-5 h-5" />
             </div>
             {!isCollapsed && <span className="text-[15px] font-semibold tracking-tight text-white whitespace-nowrap">Neeti AI</span>}
