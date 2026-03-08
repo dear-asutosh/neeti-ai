@@ -79,12 +79,12 @@ export default function Sidebar({ mobileOpen, setMobileOpen }) {
       <div className={sidebarClasses}>
         {/* Header */}
         <div className={`flex items-center justify-between h-14 px-4 border-b border-zinc-800 ${isCollapsed ? 'justify-center' : ''}`}>
-          <div className="flex items-center gap-3 overflow-hidden">
+          <NavLink to="/" onClick={() => setMobileOpen(false)} className="flex items-center gap-3 overflow-hidden cursor-pointer hover:opacity-80 transition-opacity">
             <div className="bg-[#09090B] rounded-md p-1.5 shrink-0 flex items-center justify-center">
                <Landmark className="text-white w-5 h-5" />
             </div>
             {!isCollapsed && <span className="text-[15px] font-semibold tracking-tight text-white whitespace-nowrap">Neeti AI</span>}
-          </div>
+          </NavLink>
           {/* Mobile Close Button */}
           {mobileOpen && (
             <button onClick={() => setMobileOpen(false)} className="md:hidden text-zinc-400 hover:text-zinc-100">
