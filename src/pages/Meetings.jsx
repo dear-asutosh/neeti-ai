@@ -539,7 +539,7 @@ ${manualAgenda.trim() ? `\nMEETING AGENDA/CONTEXT (use this to help guide your s
       </div>
 
       {/* Tab Contents */}
-      <div className="p-6 md:p-8 flex flex-col items-center justify-center min-h-[250px] relative">
+      <div className="p-4 md:p-5 flex flex-col items-center justify-center min-h-[250px] relative">
         {isProcessing && activeTab === 'live' ? (
           <>
             <Loader2 className="w-12 h-12 text-indigo-400 animate-spin mb-4" />
@@ -747,7 +747,7 @@ ${manualAgenda.trim() ? `\nMEETING AGENDA/CONTEXT (use this to help guide your s
         </div>
 
         {/* Scrollable Results Body */}
-        <div className="p-4 md:p-8 flex-1 overflow-y-auto bg-zinc-950/20">
+        <div className="p-4 md:p-5 flex-1 overflow-y-auto bg-zinc-950/20">
           <div className="max-w-none space-y-8">
 
             {/* Summary */}
@@ -1013,7 +1013,7 @@ ${manualAgenda.trim() ? `\nMEETING AGENDA/CONTEXT (use this to help guide your s
       </div>
 
       {/* ── DESKTOP CONTENT */}
-      <div className="hidden lg:flex w-full max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-6 gap-6 lg:gap-8 flex-1 min-h-0">
+      <div className="hidden lg:flex w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 gap-6 lg:gap-8 flex-1 min-h-0">
 
         {/* LEFT COLUMN: RecordPanel only */}
         <div className="w-[35%] xl:w-1/3 flex flex-col gap-4 overflow-hidden">
