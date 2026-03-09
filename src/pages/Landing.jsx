@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Menu, X, FileText, Mic, PenTool, Map, Calendar, Zap, Quote, User, ChevronDown } from 'lucide-react';
+import { Menu, X, FileText, Mic, PenTool, Map, Calendar, Zap, Quote, User, ChevronDown, Sparkles } from 'lucide-react';
 import FadeInSection from '../components/FadeInSection';
 import { useAuth } from '../hooks/useAuth';
 
@@ -84,7 +84,7 @@ export default function Landing() {
     { route: '/speeches', label: 'Speech & Response Drafting', icon: PenTool },
     { route: '/constituency', label: 'Constituency Tracking', icon: Map },
     { route: '/schedule', label: 'Schedule Management', icon: Calendar },
-    { route: '/insights', label: 'Real-Time Insights', icon: Zap },
+    { route: '/assistant', label: 'AI Assistant', icon: Sparkles },
   ];
 
   const handleLogout = async () => {
@@ -187,7 +187,7 @@ export default function Landing() {
                       )}
                     </div>
                     <div className="hidden lg:flex items-center gap-1">
-                      <span className="text-white text-sm font-semibold truncate max-w-[120px]">
+                      <span className="text-white text-sm font-semibold truncate max-w-30">
                         {displayName.split(' ')[0]}
                       </span>
                       <ChevronDown size={14} className={`text-white/70 transition-transform duration-200 ${profileDropdownOpen ? 'rotate-180' : ''}`} />
@@ -436,10 +436,10 @@ export default function Landing() {
               description="Intelligently organise your calendar, flag urgent matters, and ensure no critical appointment, deadline, or follow-up ever goes unattended."
             />
             <FeatureCard 
-              id="feature-insights"
-              icon={<Zap className="text-gold" size={32} />}
-              title="Real-Time Policy & Regulatory Insights"
-              description="Stay ahead with instant access to relevant government orders, policy updates, and regulatory changes — summarised and delivered contextually."
+              id="feature-assistant"
+              icon={<Sparkles className="text-gold" size={32} />}
+              title="Workplace AI Assistant & Copilot"
+              description="Interact with your documents, transcriptions, and constituency data using natural language. Draft responses, ask questions, and get intelligent insights across your entire workspace."
             />
           </div>
         </div>
@@ -462,7 +462,7 @@ export default function Landing() {
           <FadeInSection>
             <div className="relative">
               {/* Connecting Line between steps (desktop only) */}
-              <div className="hidden lg:block absolute top-6 left-[10%] right-[10%] h-[1px] bg-gold/50 z-0"></div>
+              <div className="hidden lg:block absolute top-6 left-[10%] right-[10%] h-px bg-gold/50 z-0"></div>
               
               <div className="grid grid-cols-1 lg:grid-cols-4 gap-12 lg:gap-6 relative z-10">
                 <StepCard 
@@ -567,11 +567,11 @@ export default function Landing() {
             </div>
 
             <div className="flex flex-wrap justify-center md:justify-end gap-6 text-sm text-white/80">
-              <a href="#" className="hover:text-white hover:text-gold transition-colors">About Us</a>
-              <a href="#features" className="hover:text-white hover:text-gold transition-colors">Features</a>
-              <a href="#" className="hover:text-white hover:text-gold transition-colors">Security & Privacy</a>
-              <a href="#" className="hover:text-white hover:text-gold transition-colors">Contact Us</a>
-              <a href="#" className="hover:text-white hover:text-gold transition-colors">Terms of Use</a>
+              <a href="#" className="hover:text-gold transition-colors">About Us</a>
+              <a href="#features" className="hover:text-gold transition-colors">Features</a>
+              <a href="#" className="hover:text-gold transition-colors">Security & Privacy</a>
+              <a href="#" className="hover:text-gold transition-colors">Contact Us</a>
+              <a href="#" className="hover:text-gold transition-colors">Terms of Use</a>
             </div>
           </div>
 
@@ -595,7 +595,7 @@ function FeatureCard({ id, icon, title, description }) {
             {icon}
           </div>
           <h3 className="text-xl font-bold text-navy mb-4 font-heading">{title}</h3>
-          <p className="text-gray-600 leading-relaxed flex-grow">{description}</p>
+          <p className="text-gray-600 leading-relaxed grow">{description}</p>
         </div>
       </FadeInSection>
     </div>
@@ -618,7 +618,7 @@ function TestimonialCard({ quote, author }) {
   return (
     <div className="bg-[#0f213a] p-8 border-t-2 border-gold rounded-sm h-full flex flex-col relative">
       <Quote className="text-gold/20 absolute top-6 right-6" size={48} />
-      <p className="text-white text-lg italic leading-relaxed mb-8 flex-grow relative z-10">"{quote}"</p>
+      <p className="text-white text-lg italic leading-relaxed mb-8 grow relative z-10">"{quote}"</p>
       <p className="text-white/50 text-sm font-semibold tracking-wider uppercase">{author}</p>
     </div>
   );
