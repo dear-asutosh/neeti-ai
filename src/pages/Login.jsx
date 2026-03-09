@@ -61,9 +61,8 @@ export default function Login() {
           photoURL: user.photoURL || null
         }, { merge: true });
       }
-      
+      setSuccessMsg(isLogin ? 'Login successful! Redirecting to dashboard...' : 'Registration successful! Redirecting to dashboard...');
       setLoading(false);
-      navigate('/');
       
       // Success will natively trigger navigation in the dependency array useEffect
     } catch (err) {
@@ -87,8 +86,8 @@ export default function Login() {
     try {
       if (isLogin) {
         await signInWithEmailAndPassword(auth, email, password);
+        setSuccessMsg('Login successful! Redirecting to dashboard...');
         setLoading(false);
-        navigate('/');
       } else {
         const result = await createUserWithEmailAndPassword(auth, email, password);
         const user = result.user;
@@ -282,6 +281,9 @@ export default function Login() {
               
               {error && isLogin && (
                 <div className="mb-4 bg-red-50 text-red-600 p-3 rounded text-sm">{error}</div>
+              )}
+              {successMsg && isLogin && (
+                <div className="mb-4 bg-green-50 text-green-600 p-3 rounded text-sm">{successMsg}</div>
               )}
 
               <form onSubmit={handleSubmit} className="space-y-5">
