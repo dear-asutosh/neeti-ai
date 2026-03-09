@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { Outlet, useNavigate } from 'react-router-dom';
-import { Menu, User, LogOut, ChevronDown } from 'lucide-react';
+import { Outlet, useNavigate, useLocation } from 'react-router-dom';
+import { Menu, User, LogOut, ChevronDown, Map, Sparkles, FileText, Calendar, BarChart3 } from 'lucide-react';
 import Sidebar from './Sidebar';
 import { useAuth } from '../../hooks/useAuth';
 import { auth } from '../../services/firebase';
@@ -10,6 +10,7 @@ export default function AppShell() {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const { currentUser, dbUser } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
 
   const handleLogout = async () => {
     try {
@@ -21,6 +22,51 @@ export default function AppShell() {
   };
 
   const displayPhoto = dbUser?.photoURL || currentUser?.photoURL;
+
+  // Render context-aware titles based on the route path
+  const renderHeaderContext = () => {
+    let context = {
+      icon: null,
+      title: "",
+      subtitle: ""
+    };
+
+    if (location.pathname === '/') {
+      context = { icon: BarChart3, title: "Overview Dashboard", subtitle: "Constituency snapshot and key metrics." };
+    } else if (location.pathname.startsWith('/constituency')) {
+      context = { icon: Map, title: "Constituency Tracker", subtitle: "Manage complaints, projects, and stakeholders." };
+    } else if (location.pathname.startsWith('/documents')) {
+      context = { icon: FileText, title: "Document Summarizer", subtitle: "AI-assisted document analysis and briefs." };
+    } else if (location.pathname.startsWith('/meetings')) {
+      context = { icon: Calendar, title: "Meeting Summarizer", subtitle: "Transcribe and extract key action items." };
+    } else if (location.pathname.startsWith('/speeches')) {
+      context = { icon: FileText, title: "Speech & Drafts", subtitle: "Draft and archive public addresses." };
+    } else if (location.pathname.startsWith('/schedule')) {
+      context = { icon: Calendar, title: "Schedule Manager", subtitle: "Manage appointments and events." };
+    } else if (location.pathname.startsWith('/insights')) {
+      context = { icon: Sparkles, title: "Real-time Insights", subtitle: "Live sentiment and trend analysis." };
+    } else if (location.pathname.startsWith('/assistant')) {
+      context = { icon: Sparkles, title: "Neeti AI Assistant", subtitle: "Your legislative and administrative copilot." };
+    } else if (location.pathname.startsWith('/settings')) {
+      context = { icon: User, title: "Account Settings", subtitle: "Manage your profile and preferences." };
+    } else {
+      return null;
+    }
+
+    const Icon = context.icon;
+
+    return (
+      <div className="flex items-center gap-3 ml-4">
+        <div className="bg-zinc-800/80 p-1.5 rounded-md hidden sm:block">
+          <Icon className="w-4 h-4 text-zinc-300" />
+        </div>
+        <div>
+          <h1 className="text-sm md:text-base font-bold text-zinc-100 leading-tight">{context.title}</h1>
+          <p className="text-[10px] md:text-xs text-zinc-400 leading-none mt-0.5 hidden sm:block">{context.subtitle}</p>
+        </div>
+      </div>
+    );
+  };
 
   return (
     <div className="flex h-screen bg-gray-50 overflow-hidden font-sans">
@@ -37,11 +83,11 @@ export default function AppShell() {
             >
               <Menu className="w-6 h-6" />
             </button>
-            <span className="md:hidden text-[15px] font-semibold tracking-tight text-white shrink-0">Neeti AI</span>
+            <span className="md:hidden text-[15px] font-semibold tracking-tight text-white shrink-0 ml-2">Neeti AI</span>
             
-            {/* Desktop Page Context Portal Target */}
-            <div id="page-header-content" className="hidden md:flex flex-1 items-center overflow-hidden">
-               {/* Dynamic page context will be portaled here */}
+            {/* Context Title Target */}
+            <div className="flex-1 flex items-center pr-4 ml-2 min-w-0">
+               {renderHeaderContext()}
             </div>
           </div>
 
