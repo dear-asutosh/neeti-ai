@@ -52,120 +52,99 @@ export default function AllComplaints() {
 
   return (
     <div className="p-6 max-w-7xl mx-auto space-y-6">
-      <div className="flex items-center gap-4 text-zinc-400 mb-2">
-        <Link to="/constituency" className="hover:text-zinc-100 transition-colors flex items-center gap-1 text-sm">
+      <div className="flex items-center gap-4 text-zinc-500 dark:text-zinc-400 mb-2 transition-colors">
+        <Link to="/constituency" className="hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors flex items-center gap-1 text-sm font-bold">
           <ChevronLeft className="w-4 h-4" />
           Dashboard
         </Link>
-        <span>/</span>
-        <span className="text-zinc-100 text-sm">All Complaints</span>
+        <span className="opacity-50">/</span>
+        <span className="text-zinc-900 dark:text-zinc-100 text-sm font-black transition-colors">All Complaints</span>
       </div>
 
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-        <h1 className="text-2xl font-bold text-zinc-100">All Complaints</h1>
+        <h1 className="text-3xl font-black text-zinc-900 dark:text-zinc-100 tracking-tight transition-colors">All Complaints</h1>
         <Link 
           to="/constituency/complaints/new" 
-          className="bg-zinc-100 hover:bg-white text-zinc-900 px-4 py-2 rounded-md text-sm font-medium transition-colors flex items-center gap-2"
+          className="bg-indigo-600 hover:bg-indigo-500 text-white px-5 py-2.5 rounded-xl text-sm font-bold transition-all flex items-center gap-2 shadow-lg shadow-indigo-900/20"
         >
           <Plus className="w-4 h-4" />
           Add New Complaint
         </Link>
       </div>
 
-      <div className="bg-zinc-900 border border-zinc-800 rounded-lg p-4 space-y-4">
+      <div className="bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 rounded-2xl p-5 space-y-5 shadow-sm transition-all">
         {/* Filters and Search */}
         <div className="flex flex-col lg:flex-row gap-4">
           <div className="flex-1 relative">
-            <Search className="w-5 h-5 absolute left-3 top-1/2 -translate-y-1/2 text-zinc-500" />
+            <Search className="w-5 h-5 absolute left-3.5 top-1/2 -translate-y-1/2 text-zinc-400 dark:text-zinc-500 transition-colors" />
             <input 
               type="text" 
               placeholder="Search by Citizen Name or ID..." 
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full bg-zinc-950 border border-zinc-800 rounded-md py-2 pl-10 pr-4 text-sm text-zinc-100 focus:outline-none focus:border-zinc-700"
+              className="w-full bg-gray-50 dark:bg-zinc-950 border border-gray-200 dark:border-zinc-800 rounded-xl py-2.5 pl-11 pr-4 text-sm text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 transition-all shadow-xs"
             />
           </div>
           <div className="flex flex-wrap gap-2">
-            <select 
-              value={statusFilter} 
-              onChange={(e) => setStatusFilter(e.target.value)}
-              className="bg-zinc-950 border border-zinc-800 rounded-md py-2 px-3 text-sm text-zinc-300 focus:outline-none focus:border-zinc-700 cursor-pointer"
-            >
-              <option value="">All Statuses</option>
-              <option value="Pending">Pending</option>
-              <option value="In Progress">In Progress</option>
-              <option value="Resolved">Resolved</option>
-            </select>
-            <select 
-              value={wardFilter} 
-              onChange={(e) => setWardFilter(e.target.value)}
-              className="bg-zinc-950 border border-zinc-800 rounded-md py-2 px-3 text-sm text-zinc-300 focus:outline-none focus:border-zinc-700 cursor-pointer"
-            >
-              <option value="">All Wards</option>
-              {[...Array(10)].map((_, i) => (
-                <option key={i} value={`Ward ${i + 1}`}>Ward {i + 1}</option>
-              ))}
-            </select>
-            <select 
-              value={typeFilter} 
-              onChange={(e) => setTypeFilter(e.target.value)}
-              className="bg-zinc-950 border border-zinc-800 rounded-md py-2 px-3 text-sm text-zinc-300 focus:outline-none focus:border-zinc-700 cursor-pointer"
-            >
-              <option value="">All Issue Types</option>
-              {['Road', 'Water', 'Electricity', 'Sanitation', 'Healthcare', 'Education', 'Other'].map(t => (
-                <option key={t} value={t}>{t}</option>
-              ))}
-            </select>
-            <select 
-              value={priorityFilter} 
-              onChange={(e) => setPriorityFilter(e.target.value)}
-              className="bg-zinc-950 border border-zinc-800 rounded-md py-2 px-3 text-sm text-zinc-300 focus:outline-none focus:border-zinc-700 cursor-pointer"
-            >
-              <option value="">All Priorities</option>
-              <option value="High">High</option>
-              <option value="Medium">Medium</option>
-              <option value="Low">Low</option>
-            </select>
+            {[
+              { value: statusFilter, setter: setStatusFilter, placeholder: 'All Statuses', options: ['Pending', 'In Progress', 'Resolved'] },
+              { value: wardFilter, setter: setWardFilter, placeholder: 'All Wards', options: [...Array(10)].map((_, i) => `Ward ${i + 1}`) },
+              { value: typeFilter, setter: setTypeFilter, placeholder: 'All Issue Types', options: ['Road', 'Water', 'Electricity', 'Sanitation', 'Healthcare', 'Education', 'Other'] },
+              { value: priorityFilter, setter: setPriorityFilter, placeholder: 'All Priorities', options: ['High', 'Medium', 'Low'] },
+            ].map((f, idx) => (
+              <select 
+                key={idx}
+                value={f.value} 
+                onChange={(e) => f.setter(e.target.value)}
+                className="bg-gray-50 dark:bg-zinc-950 border border-gray-200 dark:border-zinc-800 rounded-xl py-2.5 px-4 text-sm font-bold text-zinc-600 dark:text-zinc-300 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 transition-all cursor-pointer shadow-xs"
+              >
+                <option value="">{f.placeholder}</option>
+                {f.options.map(opt => (
+                  <option key={opt} value={opt}>{opt}</option>
+                ))}
+              </select>
+            ))}
           </div>
         </div>
 
         {/* Table */}
-        <div className="overflow-x-auto rounded-md border border-zinc-800">
-          <table className="w-full text-left text-sm text-zinc-400">
-            <thead className="text-xs uppercase bg-zinc-950/50 text-zinc-500 border-b border-zinc-800">
+        <div className="overflow-x-auto rounded-xl border border-gray-100 dark:border-zinc-800 transition-colors">
+          <table className="w-full text-left text-sm text-zinc-500 dark:text-zinc-400">
+            <thead className="text-[10px] uppercase font-black tracking-widest bg-gray-50 dark:bg-zinc-950/50 text-zinc-400 dark:text-zinc-600 border-b border-gray-100 dark:border-zinc-800 transition-colors">
               <tr>
-                <th className="px-4 py-3 font-medium whitespace-nowrap">ID</th>
-                <th className="px-4 py-3 font-medium whitespace-nowrap">Citizen Name</th>
-                <th className="px-4 py-3 font-medium whitespace-nowrap">Ward</th>
-                <th className="px-4 py-3 font-medium whitespace-nowrap">Issue Type</th>
-                <th className="px-4 py-3 font-medium whitespace-nowrap">Priority</th>
-                <th className="px-4 py-3 font-medium whitespace-nowrap">Date Raised</th>
-                <th className="px-4 py-3 font-medium whitespace-nowrap">Assigned To</th>
-                <th className="px-4 py-3 font-medium whitespace-nowrap">Status</th>
+                <th className="px-5 py-4 whitespace-nowrap">ID</th>
+                <th className="px-5 py-4 whitespace-nowrap">Citizen Name</th>
+                <th className="px-5 py-4 whitespace-nowrap">Ward</th>
+                <th className="px-5 py-4 whitespace-nowrap">Issue Type</th>
+                <th className="px-5 py-4 whitespace-nowrap">Priority</th>
+                <th className="px-5 py-4 whitespace-nowrap">Date Raised</th>
+                <th className="px-5 py-4 whitespace-nowrap">Assigned To</th>
+                <th className="px-5 py-4 whitespace-nowrap text-right">Status</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-zinc-800">
+            <tbody className="divide-y divide-gray-100 dark:divide-zinc-800 transition-colors">
               {filteredComplaints.map(complaint => (
-                <tr key={complaint.id} className="hover:bg-zinc-800/50 transition-colors cursor-pointer" onClick={() => navigate(`/constituency/complaints/${complaint.id}`)}>
-                  <td className="px-4 py-3 font-mono text-zinc-500">{complaint.id.substring(0, 6)}</td>
-                  <td className="px-4 py-3 text-zinc-200 font-medium">{complaint.citizenName}</td>
-                  <td className="px-4 py-3">{complaint.ward}</td>
-                  <td className="px-4 py-3">{complaint.issueType}</td>
-                  <td className="px-4 py-3">
-                    <span className={`flex items-center gap-1.5
-                      ${complaint.priority === 'High' ? 'text-red-400' : 
-                        complaint.priority === 'Medium' ? 'text-amber-400' : 'text-emerald-400'}
+                <tr key={complaint.id} className="hover:bg-gray-50 dark:hover:bg-zinc-800/50 transition-colors cursor-pointer group" onClick={() => navigate(`/constituency/complaints/${complaint.id}`)}>
+                  <td className="px-5 py-4 font-mono text-zinc-400 dark:text-zinc-600 text-xs transition-colors">{complaint.id.substring(0, 6).toUpperCase()}</td>
+                  <td className="px-5 py-4 text-zinc-900 dark:text-zinc-200 font-bold transition-colors group-hover:text-indigo-600 dark:group-hover:text-indigo-400">{complaint.citizenName}</td>
+                  <td className="px-5 py-4 font-medium">{complaint.ward}</td>
+                  <td className="px-5 py-4">{complaint.issueType}</td>
+                  <td className="px-5 py-4">
+                    <span className={`flex items-center gap-1.5 font-bold text-xs uppercase transition-colors
+                      ${complaint.priority === 'High' ? 'text-red-600 dark:text-red-400' : 
+                        complaint.priority === 'Medium' ? 'text-amber-600 dark:text-amber-400' : 'text-emerald-600 dark:text-emerald-400'}
                     `}>
-                      <span className={`w-2 h-2 rounded-full ${complaint.priority === 'High' ? 'bg-red-400' : complaint.priority === 'Medium' ? 'bg-amber-400' : 'bg-emerald-400'}`}></span>
+                      <span className={`w-1.5 h-1.5 rounded-full transition-colors ${complaint.priority === 'High' ? 'bg-red-500' : complaint.priority === 'Medium' ? 'bg-amber-500' : 'bg-emerald-500'}`}></span>
                       {complaint.priority}
                     </span>
                   </td>
-                  <td className="px-4 py-3">{new Date(complaint.createdAt).toLocaleDateString()}</td>
-                  <td className="px-4 py-3">{complaint.assignedTo}</td>
-                  <td className="px-4 py-3">
-                    <span className={`px-2 py-1 rounded-full text-xs font-medium
-                      ${complaint.status === 'Resolved' ? 'bg-emerald-500/10 text-emerald-500' : 
-                        complaint.status === 'In Progress' ? 'bg-blue-500/10 text-blue-500' : 'bg-amber-500/10 text-amber-500'}
+                  <td className="px-5 py-4 font-medium">{new Date(complaint.createdAt).toLocaleDateString()}</td>
+                  <td className="px-5 py-4 font-medium">{complaint.assignedTo}</td>
+                  <td className="px-5 py-4 text-right">
+                    <span className={`px-2.5 py-1 rounded-lg text-[10px] font-black uppercase tracking-wider border transition-all
+                      ${complaint.status === 'Resolved' ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-500 border-emerald-500/20' : 
+                        complaint.status === 'In Progress' ? 'bg-indigo-500/10 text-indigo-600 dark:text-indigo-500 border-indigo-500/20' : 
+                        'bg-amber-500/10 text-amber-600 dark:text-amber-500 border-amber-500/20'}
                     `}>
                       {complaint.status}
                     </span>

@@ -352,22 +352,22 @@ Always prioritize providing actionable insights based on this context.`;
 
   if (initialLoading) {
     return (
-      <div className="flex h-full items-center justify-center bg-zinc-950">
+      <div className="flex h-full items-center justify-center bg-gray-50 dark:bg-zinc-950">
         <Loader2 className="w-8 h-8 text-zinc-500 animate-spin" />
       </div>
     );
   }
 
   return (
-    <div className="flex h-full bg-zinc-950 font-sans text-zinc-100 overflow-hidden relative">
+    <div className="flex h-full bg-gray-50 dark:bg-zinc-950 font-sans text-zinc-900 dark:text-zinc-100 overflow-hidden relative transition-colors duration-300">
       
       {/* ── Sidebar (Desktop) / Drawer (Mobile) ── */}
       <aside className={`
-        fixed inset-y-0 left-0 z-40 w-72 bg-zinc-950 border-r border-zinc-900 transition-transform duration-300 lg:relative lg:translate-x-0
+        fixed inset-y-0 left-0 z-40 w-72 bg-white dark:bg-zinc-950 border-r border-gray-200 dark:border-zinc-900 transition-transform duration-300 lg:relative lg:translate-x-0
         ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'}
       `}>
         <div className="flex flex-col h-full">
-          <div className="p-4 flex items-center justify-between border-b border-zinc-900">
+          <div className="p-4 flex items-center justify-between border-b border-gray-100 dark:border-zinc-900">
             <h2 className="text-sm font-bold uppercase tracking-widest text-zinc-500">History</h2>
             <button onClick={() => setIsSidebarOpen(false)} className="lg:hidden p-1 text-zinc-500 hover:text-white">
               <X className="w-5 h-5" />
@@ -377,7 +377,7 @@ Always prioritize providing actionable insights based on this context.`;
           <div className="p-4">
             <button 
               onClick={handleNewChat}
-              className="w-full flex items-center justify-center gap-2 py-3 px-4 bg-zinc-900 border border-zinc-800 hover:border-zinc-700 rounded-xl text-sm font-semibold transition-all active:scale-95"
+              className="w-full flex items-center justify-center gap-2 py-3 px-4 bg-gray-50 dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 hover:border-gray-300 dark:hover:border-zinc-700 rounded-xl text-sm font-semibold transition-all active:scale-95 text-zinc-900 dark:text-white"
             >
               <Plus className="w-4 h-4" /> New Chat
             </button>
@@ -389,7 +389,7 @@ Always prioritize providing actionable insights based on this context.`;
                 key={thread.id}
                 onClick={() => { setActiveThreadId(thread.id); setIsSidebarOpen(false); }}
                 className={`w-full text-left p-3 rounded-xl transition-all group relative flex gap-3 cursor-pointer ${
-                  activeThreadId === thread.id ? 'bg-zinc-900 border border-zinc-800' : 'hover:bg-zinc-900/50'
+                  activeThreadId === thread.id ? 'bg-gray-100 dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800' : 'hover:bg-gray-100/50 dark:hover:bg-zinc-900/50'
                 }`}
               >
                 <div className="mt-1 shrink-0">
@@ -416,7 +416,7 @@ Always prioritize providing actionable insights based on this context.`;
                     </div>
                   ) : (
                     <>
-                      <p className={`text-sm font-medium truncate ${activeThreadId === thread.id ? 'text-white' : 'text-zinc-400'}`}>
+                      <p className={`text-sm font-medium truncate ${activeThreadId === thread.id ? 'text-zinc-900 dark:text-white' : 'text-zinc-500 dark:text-zinc-400'}`}>
                         {thread.title || 'Conversation'}
                       </p>
                       <p className="text-[10px] text-zinc-600 font-medium flex items-center gap-1 mt-0.5">
@@ -459,10 +459,10 @@ Always prioritize providing actionable insights based on this context.`;
       )}
 
       {/* ── Main Chat Area ── */}
-      <main className="flex-1 flex flex-col min-w-0 bg-zinc-950">
+      <main className="flex-1 flex flex-col min-w-0 bg-gray-50 dark:bg-zinc-950">
         
         {/* Header (Title + Mobile Menu) */}
-        <header className="h-14 border-b border-zinc-900 flex items-center justify-between px-4 sticky top-0 bg-zinc-950/80 backdrop-blur-md z-10">
+        <header className="h-14 border-b border-gray-200 dark:border-zinc-900 flex items-center justify-between px-4 sticky top-0 bg-white/80 dark:bg-zinc-950/80 backdrop-blur-md z-10">
           <div className="flex items-center gap-3">
             <button onClick={() => setIsSidebarOpen(true)} className="lg:hidden p-2 text-zinc-400 hover:text-white hover:bg-zinc-900 rounded-lg transition-colors">
               <Menu className="w-5 h-5" />
@@ -471,7 +471,7 @@ Always prioritize providing actionable insights based on this context.`;
               <Sparkles className="w-4 h-4 text-blue-500" />
               <h1 className="text-sm font-bold tracking-tight">AI Assistant</h1>
               {activeThreadId && (
-                <span className="hidden sm:inline text-[10px] bg-zinc-900 text-zinc-500 border border-zinc-800 px-2 py-0.5 rounded-full font-bold uppercase tracking-wider ml-2">Active session</span>
+                <span className="hidden sm:inline text-[10px] bg-gray-100 dark:bg-zinc-900 text-zinc-500 border border-gray-200 dark:border-zinc-800 px-2 py-0.5 rounded-full font-bold uppercase tracking-wider ml-2">Active session</span>
               )}
             </div>
           </div>
@@ -479,7 +479,7 @@ Always prioritize providing actionable insights based on this context.`;
           <div className="flex items-center gap-2">
             <button 
               onClick={handleNewChat}
-              className="p-2 text-zinc-400 hover:text-blue-400 hover:bg-blue-900/10 rounded-lg transition-all"
+              className="p-2 text-zinc-500 dark:text-zinc-400 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/10 rounded-lg transition-all"
               title="New Chat"
             >
               <Plus className="w-5 h-5" />
@@ -493,7 +493,7 @@ Always prioritize providing actionable insights based on this context.`;
             {messages.map((msg, idx) => (
               <div key={idx} className={`flex gap-4 ${msg.role === 'user' ? 'flex-row-reverse' : ''}`}>
                 <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 mt-1 overflow-hidden shadow-lg ${
-                  msg.role === 'user' ? 'bg-zinc-800 border border-zinc-700' : 'bg-blue-900/20 border border-blue-800/30'
+                  msg.role === 'user' ? 'bg-white dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700' : 'bg-blue-900/20 border border-blue-800/30'
                 }`}>
                   {msg.role === 'user' ? (
                     displayPhoto ? <img src={displayPhoto} alt="U" className="w-full h-full object-cover" /> : <User className="w-4 h-4 text-zinc-400" />
@@ -503,8 +503,8 @@ Always prioritize providing actionable insights based on this context.`;
                 </div>
                 <div className={`max-w-[85%] px-5 py-3.5 rounded-2xl text-[15px] leading-relaxed transition-all duration-300 ${
                   msg.role === 'user' 
-                    ? 'bg-zinc-800 text-zinc-100' 
-                    : 'bg-zinc-900/50 text-zinc-200 border border-zinc-800/50'
+                    ? 'bg-blue-600 text-white shadow-sm' 
+                    : 'bg-white dark:bg-zinc-900/50 text-zinc-900 dark:text-zinc-200 border border-gray-200 dark:border-zinc-800/50 shadow-sm'
                 }`}>
                   <div className="markdown-style overflow-hidden">
                     <ReactMarkdown
@@ -517,8 +517,8 @@ Always prioritize providing actionable insights based on this context.`;
                         h2: ({...props}) => <h2 className="text-lg font-black mb-3 text-white" {...props} />,
                         code: ({inline, ...props}) => (
                           inline 
-                            ? <code className="bg-zinc-950 px-1.5 py-0.5 rounded text-blue-400 font-bold" {...props} />
-                            : <code className="block bg-zinc-950 p-4 rounded-xl text-blue-400 overflow-x-auto my-4 text-sm font-mono border border-zinc-800/50" {...props} />
+                            ? <code className="bg-gray-100 dark:bg-zinc-950 px-1.5 py-0.5 rounded text-blue-600 dark:text-blue-400 font-bold" {...props} />
+                            : <code className="block bg-gray-100 dark:bg-zinc-950 p-4 rounded-xl text-blue-600 dark:text-blue-400 overflow-x-auto my-4 text-sm font-mono border border-gray-200 dark:border-zinc-800/50" {...props} />
                         )
                       }}
                     >
@@ -534,7 +534,7 @@ Always prioritize providing actionable insights based on this context.`;
                 <div className="w-8 h-8 rounded-lg bg-blue-900/20 border border-blue-800/30 flex items-center justify-center shrink-0">
                   <Sparkles className="w-4 h-4 text-blue-500 animate-pulse" />
                 </div>
-                <div className="bg-zinc-900/50 border border-zinc-800/50 px-5 py-3.5 rounded-2xl flex items-center gap-2">
+                <div className="bg-white dark:bg-zinc-900/50 border border-gray-200 dark:border-zinc-800/50 px-5 py-3.5 rounded-2xl flex items-center gap-2 shadow-sm">
                   <span className="w-1.5 h-1.5 bg-blue-500 rounded-full animate-bounce [animation-delay:-0.3s]"></span>
                   <span className="w-1.5 h-1.5 bg-blue-500 rounded-full animate-bounce [animation-delay:-0.15s]"></span>
                   <span className="w-1.5 h-1.5 bg-blue-500 rounded-full animate-bounce"></span>
@@ -546,7 +546,7 @@ Always prioritize providing actionable insights based on this context.`;
         </div>
 
         {/* Input Bar */}
-        <footer className="shrink-0 p-4 md:p-6 bg-linear-to-t from-zinc-950 via-zinc-950 to-transparent">
+        <footer className="shrink-0 p-4 md:p-6 bg-linear-to-t from-gray-50 dark:from-zinc-950 via-gray-50 dark:via-zinc-950 to-transparent">
           <div className="max-w-3xl mx-auto space-y-4">
             {!activeThreadId && messages.length <= 1 && !isLoading && (
               <div className="flex flex-wrap gap-2 justify-center animate-in slide-in-from-bottom-2 duration-500">
@@ -554,7 +554,7 @@ Always prioritize providing actionable insights based on this context.`;
                   <button
                     key={prompt}
                     onClick={() => handleSend(prompt)}
-                    className="px-4 py-2 bg-zinc-900/50 border border-zinc-800 hover:border-blue-500/50 hover:bg-zinc-900 text-zinc-400 hover:text-blue-400 text-xs font-bold rounded-full transition-all flex items-center gap-2 group"
+                    className="px-4 py-2 bg-white dark:bg-zinc-900/50 border border-gray-200 dark:border-zinc-800 hover:border-blue-500/50 hover:bg-gray-100 dark:hover:bg-zinc-900 text-zinc-500 dark:text-zinc-400 hover:text-blue-600 dark:hover:text-blue-400 text-xs font-bold rounded-full transition-all flex items-center gap-2 group shadow-sm"
                   >
                     {prompt}
                     <ChevronRight className="w-3 h-3 opacity-0 group-hover:opacity-100 -translate-x-1 group-hover:translate-x-0 transition-transform" />
@@ -565,7 +565,7 @@ Always prioritize providing actionable insights based on this context.`;
 
             <div className="relative group">
               <div className="absolute -inset-0.5 bg-linear-to-r from-blue-600/20 to-indigo-600/20 rounded-2xl blur-md opacity-0 group-focus-within:opacity-100 transition duration-1000"></div>
-              <div className="relative flex items-end gap-2 bg-zinc-900 border border-zinc-800 focus-within:border-zinc-700/50 p-2.5 rounded-2xl transition-all shadow-2xl">
+              <div className="relative flex items-end gap-2 bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 focus-within:border-blue-500/50 dark:focus-within:border-zinc-700/50 p-2.5 rounded-2xl transition-all shadow-2xl">
                 <textarea
                   ref={textareaRef}
                   value={input}
@@ -573,15 +573,15 @@ Always prioritize providing actionable insights based on this context.`;
                   onKeyDown={handleKeyDown}
                   placeholder="Ask Neeti AI Assistant anything..."
                   rows={1}
-                  className="flex-1 bg-transparent border-none focus:ring-0 focus:outline-none text-zinc-100 text-[15px] py-2 px-3 resize-none max-h-48 min-h-12 scrollbar-hide placeholder:text-zinc-600 leading-relaxed"
+                  className="flex-1 bg-transparent border-none focus:ring-0 focus:outline-none text-zinc-900 dark:text-zinc-100 text-[15px] py-2 px-3 resize-none max-h-48 min-h-12 scrollbar-hide placeholder:text-zinc-400 dark:placeholder:text-zinc-600 leading-relaxed"
                 />
                 <button
                   onClick={() => handleSend()}
                   disabled={!input.trim() || isLoading}
                   className={`p-3 rounded-xl transition-all duration-300 ${
                     input.trim() && !isLoading 
-                      ? 'bg-blue-600 text-white shadow-lg shadow-blue-900/30 hover:scale-105 active:scale-95' 
-                      : 'bg-zinc-800 text-zinc-600 cursor-not-allowed'
+                      ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/30 hover:scale-105 active:scale-95' 
+                      : 'bg-gray-100 dark:bg-zinc-800 text-zinc-400 dark:text-zinc-600 cursor-not-allowed'
                   }`}
                 >
                   <Send className="w-5 h-5" />

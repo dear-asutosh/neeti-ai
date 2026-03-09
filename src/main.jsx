@@ -3,6 +3,7 @@ import { createRoot } from 'react-dom/client'
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import './index.css'
 import { AuthProvider } from './context/AuthProvider';
+import { ThemeProvider } from './context/ThemeContext';
 import { PrivateRoute } from './components/PrivateRoute';
 import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
@@ -35,7 +36,8 @@ import Settings from './pages/Settings';
 createRoot(document.getElementById('root')).render(
   // <StrictMode>
     <AuthProvider>
-      <Router>
+      <ThemeProvider>
+        <Router>
         <Routes>
           <Route path="/login" element={<Login />} />
           
@@ -73,6 +75,7 @@ createRoot(document.getElementById('root')).render(
           {/* <Route path="*" element={<Navigate to="/dashboard" replace />} /> */}
         </Routes>
       </Router>
-    </AuthProvider>
+    </ThemeProvider>
+  </AuthProvider>
   // </StrictMode>
 )

@@ -7,17 +7,17 @@ import { Plus, ChevronLeft, ChevronRight, Calendar, Clock, Trash2, X, AlertCircl
 import { useNotifications } from '../hooks/useNotifications';
 
 const CATEGORY_STYLES = {
-  'Meeting': 'bg-indigo-500/20 text-indigo-400 border-indigo-500/40',
-  'Deadline': 'bg-rose-500/20 text-rose-400 border-rose-500/40',
-  'Public Event': 'bg-amber-500/20 text-amber-400 border-amber-500/40',
-  'Personal': 'bg-emerald-500/20 text-emerald-400 border-emerald-500/40'
+  'Meeting': 'bg-indigo-500/10 dark:bg-indigo-500/20 text-indigo-600 dark:text-indigo-400 border-indigo-200 dark:border-indigo-500/40',
+  'Deadline': 'bg-rose-500/10 dark:bg-rose-500/20 text-rose-600 dark:text-rose-400 border-rose-200 dark:border-rose-500/40',
+  'Public Event': 'bg-amber-500/10 dark:bg-amber-500/20 text-amber-600 dark:text-amber-400 border-amber-200 dark:border-amber-500/40',
+  'Personal': 'bg-emerald-500/10 dark:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 border-emerald-200 dark:border-emerald-500/40'
 };
 
 const CATEGORY_DOT_STYLES = {
-  'Meeting': 'bg-indigo-500',
-  'Deadline': 'bg-rose-500',
-  'Public Event': 'bg-amber-500',
-  'Personal': 'bg-emerald-500'
+  'Meeting': 'bg-indigo-600 dark:bg-indigo-500',
+  'Deadline': 'bg-rose-600 dark:bg-rose-500',
+  'Public Event': 'bg-amber-600 dark:bg-amber-500',
+  'Personal': 'bg-emerald-600 dark:bg-emerald-500'
 };
 
 export default function Schedule() {
@@ -236,20 +236,20 @@ export default function Schedule() {
     }
 
     return (
-      <div className="bg-zinc-900 border border-zinc-800 rounded-xl overflow-hidden shadow-sm animate-in fade-in duration-300">
+      <div className="bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 rounded-xl overflow-hidden shadow-sm animate-in fade-in duration-300 transition-all">
         {/* Month Navigation */}
-        <div className="flex items-center justify-between p-4 border-b border-zinc-800 bg-zinc-900/50">
-          <h2 className="text-xl font-bold text-zinc-100 dark:text-white">
+        <div className="flex items-center justify-between p-4 border-b border-gray-100 dark:border-zinc-800 bg-gray-50/50 dark:bg-zinc-900/50 transition-colors">
+          <h2 className="text-xl font-bold text-zinc-900 dark:text-white transition-colors">
             {currentDate.toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
           </h2>
           <div className="flex gap-2">
-            <button onClick={decreaseMonthLocal} className="p-2 rounded-lg hover:bg-zinc-800 text-zinc-400 hover:text-zinc-100 transition-colors">
+            <button onClick={decreaseMonthLocal} className="p-2 rounded-lg hover:bg-gray-200 dark:hover:bg-zinc-800 text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors">
               <ChevronLeft className="w-5 h-5" />
             </button>
-            <button onClick={() => setCurrentDate(new Date())} className="px-3 py-1.5 text-sm font-medium rounded-lg hover:bg-zinc-800 text-zinc-300 transition-colors">
+            <button onClick={() => setCurrentDate(new Date())} className="px-3 py-1.5 text-sm font-medium rounded-lg hover:bg-gray-200 dark:hover:bg-zinc-800 text-zinc-600 dark:text-zinc-300 transition-colors border border-gray-200 dark:border-zinc-700">
               Today
             </button>
-            <button onClick={increaseMonthLocal} className="p-2 rounded-lg hover:bg-zinc-800 text-zinc-400 hover:text-zinc-100 transition-colors">
+            <button onClick={increaseMonthLocal} className="p-2 rounded-lg hover:bg-gray-200 dark:hover:bg-zinc-800 text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors">
               <ChevronRight className="w-5 h-5" />
             </button>
           </div>
@@ -258,9 +258,9 @@ export default function Schedule() {
         {/* Calendar Grid Container (no forced scroll) */}
         <div className="w-full">
           {/* Days Header */}
-          <div className="grid grid-cols-7 border-b border-zinc-800 bg-zinc-950/50">
+          <div className="grid grid-cols-7 border-b border-gray-200 dark:border-zinc-800 bg-gray-50/50 dark:bg-zinc-950/50 transition-colors">
             {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(day => (
-              <div key={day} className="py-2 md:py-3 text-center text-[10px] md:text-xs font-semibold text-zinc-500 uppercase tracking-wider">
+              <div key={day} className="py-2 md:py-3 text-center text-[10px] md:text-xs font-semibold text-zinc-500 dark:text-zinc-500 uppercase tracking-wider">
                 <span className="md:hidden">{day.charAt(0)}</span>
                 <span className="hidden md:inline">{day}</span>
               </div>
@@ -279,7 +279,7 @@ export default function Schedule() {
               return (
                 <div 
                   key={idx} 
-                  className={`min-h-[80px] md:min-h-[120px] p-1 md:p-2 border-r border-b border-zinc-800/50 group relative ${!cell.isCurrentMonth ? 'bg-zinc-950/30' : 'bg-zinc-900 hover:bg-zinc-800/30'} flex flex-col gap-1 transition-colors`}
+                  className={`min-h-[80px] md:min-h-[120px] p-1 md:p-2 border-r border-b border-gray-100 dark:border-zinc-800/50 group relative ${!cell.isCurrentMonth ? 'bg-gray-50/50 dark:bg-zinc-950/30' : 'bg-white dark:bg-zinc-900 hover:bg-gray-50 dark:hover:bg-zinc-800/30'} flex flex-col gap-1 transition-colors`}
                   onClick={() => {
                     // Quick add on mobile by tapping cell (if it's the current month)
                     if (window.innerWidth < 768 && cell.isCurrentMonth) {
@@ -290,15 +290,15 @@ export default function Schedule() {
                   }}
                 >
                   <div className="flex justify-center md:justify-between items-start mb-1 cursor-pointer">
-                    <span className={`w-6 h-6 md:w-7 md:h-7 flex items-center justify-center rounded-full text-xs md:text-sm font-medium
-                      ${!cell.isCurrentMonth ? 'text-zinc-600' : 'text-zinc-300'}
-                      ${isTodayCell ? 'bg-indigo-600 text-white shadow-md shadow-indigo-900/50' : ''}
+                    <span className={`w-6 h-6 md:w-7 md:h-7 flex items-center justify-center rounded-full text-xs md:text-sm font-bold transition-all
+                      ${!cell.isCurrentMonth ? 'text-zinc-300 dark:text-zinc-600' : 'text-zinc-900 dark:text-zinc-300'}
+                      ${isTodayCell ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/20' : ''}
                     `}>
                       {cell.dayNum}
                     </span>
                     {cell.isCurrentMonth && (
                       <button 
-                        className="hidden md:block opacity-0 group-hover:opacity-100 p-1 rounded-md hover:bg-zinc-700 text-zinc-400 hover:text-zinc-200 transition-all"
+                        className="hidden md:block opacity-0 group-hover:opacity-100 p-1 rounded-md hover:bg-gray-200 dark:hover:bg-zinc-700 text-zinc-400 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-200 transition-all border border-transparent hover:border-gray-300 dark:hover:border-zinc-600"
                         onClick={(e) => {
                           e.stopPropagation();
                           const localDateStr = new Date(cell.date.getTime() - (cell.date.getTimezoneOffset() * 60000)).toISOString().split('T')[0];
@@ -322,14 +322,14 @@ export default function Schedule() {
                             e.stopPropagation();
                             setSelectedEvent(evt);
                           }}
-                          className={`text-xs truncate px-1.5 py-1 rounded-md border cursor-pointer hover:opacity-80 transition-opacity ${CATEGORY_STYLES[evt.category] || CATEGORY_STYLES['Meeting']} ${isPast ? 'opacity-40 grayscale-[50%]' : ''}`}
+                          className={`text-[10px] md:text-xs truncate px-1.5 py-1 rounded-md border cursor-pointer hover:opacity-80 transition-all shadow-xs ${CATEGORY_STYLES[evt.category] || CATEGORY_STYLES['Meeting']} ${isPast ? 'opacity-40 grayscale-[50%] border-dashed' : ''}`}
                         >
                           {formatTime(evt.startTime)} - {evt.title}
                         </div>
                       );
                     })}
                     {hasMoreEvents && (
-                      <div className="text-[10px] text-zinc-500 px-1 font-medium cursor-pointer hover:text-zinc-400 transition-colors">
+                      <div className="text-[10px] text-zinc-400 dark:text-zinc-500 px-1 font-bold cursor-pointer hover:text-indigo-600 dark:hover:text-zinc-400 transition-colors">
                         +{dayEvents.length - 3} more
                       </div>
                     )}
@@ -353,7 +353,7 @@ export default function Schedule() {
                       );
                     })}
                     {dayEvents.length > 4 && (
-                      <div className="w-1.5 h-1.5 rounded-full bg-zinc-600" />
+                      <div className="w-1.5 h-1.5 rounded-full bg-gray-300 dark:bg-zinc-600" />
                     )}
                   </div>
                 </div>
@@ -390,27 +390,27 @@ export default function Schedule() {
     const HOUR_HEIGHT = 60; // pax
 
     return (
-      <div className="bg-zinc-900 border border-zinc-800 rounded-xl overflow-hidden shadow-sm flex flex-col h-[700px] animate-in fade-in duration-300">
+      <div className="bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 rounded-xl overflow-hidden shadow-sm flex flex-col h-[700px] animate-in fade-in duration-300 transition-all">
          {/* Week Navigation */}
-         <div className="flex items-center justify-between p-4 border-b border-zinc-800 bg-zinc-900/50 shrink-0">
-          <h2 className="text-lg md:text-xl font-bold text-zinc-100">
+         <div className="flex items-center justify-between p-4 border-b border-gray-100 dark:border-zinc-800 bg-gray-50/50 dark:bg-zinc-900/50 shrink-0 transition-colors">
+          <h2 className="text-lg md:text-xl font-bold text-zinc-900 dark:text-zinc-100 transition-colors">
             {startOfWeek.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} – {endOfWeek.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
           </h2>
           <div className="flex gap-2">
-            <button onClick={decreaseWeekLocal} className="p-2 rounded-lg hover:bg-zinc-800 text-zinc-400 hover:text-zinc-100 transition-colors">
+            <button onClick={decreaseWeekLocal} className="p-2 rounded-lg hover:bg-gray-200 dark:hover:bg-zinc-800 text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors">
               <ChevronLeft className="w-5 h-5" />
             </button>
-            <button onClick={() => setCurrentDate(new Date())} className="px-3 py-1.5 text-sm font-medium rounded-lg hover:bg-zinc-800 text-zinc-300 transition-colors">
+            <button onClick={() => setCurrentDate(new Date())} className="px-3 py-1.5 text-sm font-medium rounded-lg hover:bg-gray-200 dark:hover:bg-zinc-800 text-zinc-600 dark:text-zinc-300 transition-colors border border-gray-200 dark:border-zinc-700">
               Today
             </button>
-            <button onClick={increaseWeekLocal} className="p-2 rounded-lg hover:bg-zinc-800 text-zinc-400 hover:text-zinc-100 transition-colors">
+            <button onClick={increaseWeekLocal} className="p-2 rounded-lg hover:bg-gray-200 dark:hover:bg-zinc-800 text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors">
               <ChevronRight className="w-5 h-5" />
             </button>
           </div>
         </div>
 
         {/* Scrollable Area */}
-        <div className="flex flex-1 overflow-x-auto overflow-y-auto relative bg-zinc-950">
+        <div className="flex flex-1 overflow-x-auto overflow-y-auto relative bg-gray-50 dark:bg-zinc-950 transition-colors">
           <div className="flex-1 flex min-w-[900px]">
             {/* Day Columns */}
             {weekDays.map(dayObj => {
@@ -419,13 +419,13 @@ export default function Schedule() {
               const today = isToday(dayObj);
 
               return (
-                <div key={dayObj.getDay()} className={`flex-1 flex flex-col min-w-0 border-r border-zinc-800/50 ${today ? 'bg-indigo-500/5' : ''}`}>
+                <div key={dayObj.getDay()} className={`flex-1 flex flex-col min-w-0 border-r border-gray-100 dark:border-zinc-800/50 ${today ? 'bg-indigo-500/5' : ''} transition-colors`}>
                   {/* Day Header */}
-                  <div className="p-3 text-center border-b border-zinc-800 sticky top-0 bg-zinc-900/90 backdrop-blur-md z-10 shrink-0">
-                    <span className={`block text-[10px] font-semibold uppercase tracking-wider ${today ? 'text-indigo-400' : 'text-zinc-400'}`}>
+                  <div className="p-3 text-center border-b border-gray-100 dark:border-zinc-800 sticky top-0 bg-white/90 dark:bg-zinc-900/90 backdrop-blur-md z-10 shrink-0 transition-all">
+                    <span className={`block text-[10px] font-bold uppercase tracking-wider ${today ? 'text-indigo-600 dark:text-indigo-400' : 'text-zinc-400 dark:text-zinc-400'}`}>
                       {dayObj.toLocaleDateString('en-US', { weekday: 'short' })}
                     </span>
-                    <span className={`block text-lg font-bold mt-0.5 ${today ? 'text-indigo-300' : 'text-zinc-200'}`}>
+                    <span className={`block text-lg font-black mt-0.5 ${today ? 'text-indigo-500 dark:text-indigo-300' : 'text-zinc-900 dark:text-zinc-200'}`}>
                       {dayObj.getDate()}
                     </span>
                   </div>
@@ -437,10 +437,10 @@ export default function Schedule() {
                       return (
                         <div
                           key={evt.id}
-                          className={`rounded-lg p-2.5 border cursor-pointer hover:shadow-lg hover:-translate-y-0.5 transition-all flex flex-col gap-1.5 ${CATEGORY_STYLES[evt.category] || CATEGORY_STYLES['Meeting']} ${isPast ? 'opacity-50 grayscale bg-zinc-950/40 border-dashed' : ''}`}
+                          className={`rounded-lg p-2.5 border cursor-pointer hover:shadow-lg hover:-translate-y-0.5 transition-all flex flex-col gap-1.5 shadow-xs ${CATEGORY_STYLES[evt.category] || CATEGORY_STYLES['Meeting']} ${isPast ? 'opacity-50 grayscale bg-gray-50 dark:bg-zinc-950/40 border-dashed border-gray-300 dark:border-zinc-700' : ''}`}
                           onClick={() => setSelectedEvent(evt)}
                         >
-                          <div className={`text-xs font-bold leading-tight ${isPast ? 'text-zinc-400 line-through decoration-zinc-500/50' : 'text-white'}`}>
+                          <div className={`text-xs font-bold leading-tight ${isPast ? 'text-zinc-400 dark:text-zinc-400 line-through decoration-zinc-500/50' : 'text-inherit'}`}>
                             {evt.title}
                           </div>
                           <div className={`flex items-center gap-1.5 text-[10px] font-medium ${isPast ? 'text-zinc-500' : 'opacity-90'}`}>
@@ -493,16 +493,16 @@ export default function Schedule() {
     const upcomingGroups = groupEvents(upcomingEvents);
 
     return (
-      <div className="bg-zinc-900 border border-zinc-800 rounded-xl overflow-hidden shadow-sm p-4 md:p-6 animate-in fade-in duration-300">
-        <h2 className="text-xl font-bold text-white mb-6 tracking-tight">Upcoming Schedule</h2>
+      <div className="bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 rounded-xl overflow-hidden shadow-sm p-4 md:p-6 animate-in fade-in duration-300 transition-all">
+        <h2 className="text-xl font-bold text-zinc-900 dark:text-white mb-6 tracking-tight transition-colors">Upcoming Schedule</h2>
         
         {upcomingEvents.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-16 text-center border border-dashed border-zinc-800 rounded-xl bg-zinc-950/20">
-            <div className="w-16 h-16 bg-zinc-800/50 rounded-2xl flex items-center justify-center mb-4">
-              <Calendar className="w-8 h-8 text-zinc-500" />
+          <div className="flex flex-col items-center justify-center py-16 text-center border border-dashed border-gray-200 dark:border-zinc-800 rounded-xl bg-gray-100/30 dark:bg-zinc-950/20 transition-all">
+            <div className="w-16 h-16 bg-gray-100 dark:bg-zinc-800/50 rounded-2xl flex items-center justify-center mb-4 transition-colors">
+              <Calendar className="w-8 h-8 text-zinc-400 dark:text-zinc-500" />
             </div>
-            <h3 className="text-lg font-medium text-zinc-300 mb-2">No upcoming events</h3>
-            <p className="text-zinc-500 max-w-sm mb-6">Your schedule is clear. Enjoy the free time or add a new event to stay organized.</p>
+            <h3 className="text-lg font-bold text-zinc-900 dark:text-zinc-300 mb-2 transition-colors">No upcoming events</h3>
+            <p className="text-zinc-500 dark:text-zinc-500 max-w-sm mb-6 transition-colors">Your schedule is clear. Enjoy the free time or add a new event to stay organized.</p>
             <button 
               onClick={() => setShowModal(true)}
               className="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg font-medium transition-colors shadow-lg shadow-indigo-900/20 flex items-center gap-2"
@@ -514,11 +514,11 @@ export default function Schedule() {
           <div className="space-y-8">
             {Object.keys(upcomingGroups).map(dateKey => (
               <div key={dateKey} className="space-y-4">
-                <div className="sticky top-0 bg-zinc-900/90 backdrop-blur-md py-2 z-10 border-b border-zinc-800/50 flex items-center gap-3">
-                  <h3 className={`text-sm font-semibold uppercase tracking-wider ${dateKey === 'Today' ? 'text-indigo-400' : 'text-zinc-400'}`}>
+                <div className="sticky top-0 bg-white/90 dark:bg-zinc-900/90 backdrop-blur-md py-2 z-10 border-b border-gray-100 dark:border-zinc-800/50 flex items-center gap-3 transition-colors">
+                  <h3 className={`text-sm font-bold uppercase tracking-wider transition-colors ${dateKey === 'Today' ? 'text-indigo-600 dark:text-indigo-400' : 'text-zinc-500 dark:text-zinc-400'}`}>
                     {dateKey}
                   </h3>
-                  <div className="h-px flex-1 bg-zinc-800/50"></div>
+                  <div className="h-px flex-1 bg-gray-100 dark:bg-zinc-800/50 transition-colors"></div>
                 </div>
                 
                 <div className="grid gap-3">
@@ -526,21 +526,21 @@ export default function Schedule() {
                     <div 
                       key={evt.id} 
                       onClick={() => setSelectedEvent(evt)}
-                      className="group bg-zinc-950/40 hover:bg-zinc-800 border border-zinc-800 hover:border-zinc-700 p-4 rounded-xl flex items-start gap-4 transition-all cursor-pointer"
+                      className="group bg-gray-50 dark:bg-zinc-950/40 hover:bg-white dark:hover:bg-zinc-800 border border-gray-200 dark:border-zinc-800 hover:border-gray-300 dark:hover:border-zinc-700 p-4 rounded-xl flex items-start gap-4 transition-all cursor-pointer shadow-xs"
                     >
                       <div className="flex-shrink-0 w-16 text-center">
-                        <div className="text-sm font-bold text-zinc-200">{formatTime(evt.startTime)}</div>
-                        <div className="text-[10px] text-zinc-500 mt-1 uppercase font-medium">{formatTime(evt.endTime)}</div>
+                        <div className="text-sm font-black text-zinc-900 dark:text-zinc-200 transition-colors">{formatTime(evt.startTime)}</div>
+                        <div className="text-[10px] text-zinc-500 dark:text-zinc-500 mt-1 uppercase font-bold transition-colors">{formatTime(evt.endTime)}</div>
                       </div>
                       
-                      <div className="flex-1 min-w-0 border-l border-zinc-800/60 pl-4 py-0.5">
+                      <div className="flex-1 min-w-0 border-l border-gray-100 dark:border-zinc-800/60 pl-4 py-0.5 transition-colors">
                         <div className="flex items-center gap-2 mb-1">
-                          <span className={`w-2 h-2 rounded-full ${CATEGORY_DOT_STYLES[evt.category] || CATEGORY_DOT_STYLES['Meeting']}`}></span>
-                          <span className="text-xs font-semibold text-zinc-400 uppercase tracking-wider">{evt.category}</span>
+                          <span className={`w-2 h-2 rounded-full transition-colors ${CATEGORY_DOT_STYLES[evt.category] || CATEGORY_DOT_STYLES['Meeting']}`}></span>
+                          <span className="text-xs font-bold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider transition-colors">{evt.category}</span>
                         </div>
-                        <h4 className="text-base font-semibold text-white truncate group-hover:text-indigo-300 transition-colors">{evt.title}</h4>
+                        <h4 className="text-base font-bold text-zinc-900 dark:text-white truncate group-hover:text-indigo-600 dark:group-hover:text-indigo-300 transition-colors">{evt.title}</h4>
                         {evt.description && (
-                          <p className="text-xs text-zinc-500 mt-1.5 line-clamp-2 leading-relaxed">{evt.description}</p>
+                          <p className="text-xs text-zinc-500 dark:text-zinc-500 mt-1.5 line-clamp-2 leading-relaxed transition-colors">{evt.description}</p>
                         )}
                       </div>
                     </div>
@@ -553,20 +553,20 @@ export default function Schedule() {
 
         {/* Short Past section */}
         {pastEvents.length > 0 && (
-          <div className="mt-12 pt-8 border-t border-zinc-800">
+          <div className="mt-12 pt-8 border-t border-gray-100 dark:border-zinc-800 transition-colors">
             <details className="group">
-              <summary className="text-sm font-semibold text-zinc-500 hover:text-zinc-300 cursor-pointer list-none flex items-center gap-2 tracking-wider uppercase transition-colors">
+              <summary className="text-sm font-bold text-zinc-400 dark:text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-300 cursor-pointer list-none flex items-center gap-2 tracking-wider uppercase transition-all duration-300">
                 <ChevronRight className="w-4 h-4 group-open:rotate-90 transition-transform" />
                 Past Events ({pastEvents.length})
               </summary>
               <div className="mt-4 space-y-3 pl-6">
                 {pastEvents.slice(0, 10).map(evt => (
-                  <div key={evt.id} className="flex items-center justify-between text-sm p-3 bg-zinc-950/20 border border-zinc-800/50 rounded-lg hover:border-zinc-700 transition-colors cursor-pointer" onClick={() => setSelectedEvent(evt)}>
+                  <div key={evt.id} className="flex items-center justify-between text-sm p-3 bg-gray-50/50 dark:bg-zinc-950/20 border border-gray-100 dark:border-zinc-800/50 rounded-lg hover:border-gray-200 dark:hover:border-zinc-700 transition-all cursor-pointer shadow-xs" onClick={() => setSelectedEvent(evt)}>
                     <div className="flex items-center gap-3">
                        <span className={`w-2 h-2 rounded-full opacity-50 ${CATEGORY_DOT_STYLES[evt.category] || CATEGORY_DOT_STYLES['Meeting']}`}></span>
-                       <span className="text-zinc-400 font-medium">{evt.title}</span>
+                       <span className="text-zinc-600 dark:text-zinc-400 font-bold">{evt.title}</span>
                     </div>
-                    <span className="text-zinc-600 text-xs">{evt.startTime.toLocaleDateString()}</span>
+                    <span className="text-zinc-400 dark:text-zinc-600 text-xs font-medium">{evt.startTime.toLocaleDateString()}</span>
                   </div>
                 ))}
                 {pastEvents.length > 10 && <p className="text-xs text-zinc-600 italic">...and {pastEvents.length - 10} more older events.</p>}
@@ -582,7 +582,7 @@ export default function Schedule() {
   // MAIN RENDER
   // ------------------------------------------------------------------
   return (
-    <div className="min-h-full bg-zinc-950 text-zinc-100 p-4 md:p-6 font-sans">
+    <div className="min-h-full bg-gray-50 dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100 p-4 md:p-6 font-sans transition-colors duration-300">
       <div className="max-w-6xl mx-auto space-y-6">
 
         {/* 1. Notifications Banner */}
@@ -608,7 +608,7 @@ export default function Schedule() {
 
         {/* 2. Top Bar (Tabs + Add Button) */}
         <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
-          <div className="bg-zinc-900 p-1.5 rounded-xl flex border border-zinc-800 w-full sm:w-auto overflow-x-auto hide-scrollbar">
+          <div className="bg-white dark:bg-zinc-900 p-1.5 rounded-xl flex border border-gray-100 dark:border-zinc-800 w-full sm:w-auto overflow-x-auto hide-scrollbar transition-colors shadow-xs">
             {[
               { id: 'month', label: 'Month' },
               { id: 'week', label: 'Week' },
@@ -617,10 +617,10 @@ export default function Schedule() {
               <button
                 key={tab.id}
                 onClick={() => setView(tab.id)}
-                className={`flex-1 sm:flex-none px-5 py-2 text-sm font-medium rounded-lg transition-all ${
+                className={`flex-1 sm:flex-none px-5 py-2 text-sm font-bold rounded-lg transition-all ${
                   view === tab.id 
-                    ? 'bg-zinc-800/80 text-white shadow-sm' 
-                    : 'text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800/40'
+                    ? 'bg-gray-100 dark:bg-zinc-800/80 text-zinc-900 dark:text-white shadow-xs' 
+                    : 'text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-200 hover:bg-gray-50 dark:hover:bg-zinc-800/40'
                 }`}
               >
                 {tab.label}
@@ -649,11 +649,11 @@ export default function Schedule() {
 
       {/* CREATE EVENT MODAL */}
       {showModal && createPortal(
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-zinc-950/80 backdrop-blur-sm animate-in fade-in duration-200">
-          <div className="bg-zinc-900 w-full max-w-lg rounded-2xl border border-zinc-800 shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200 flex flex-col max-h-[90vh]">
-            <div className="flex items-center justify-between px-6 py-4 border-b border-zinc-800 bg-zinc-900/50 shrink-0">
-              <h3 className="text-xl font-bold text-white tracking-tight">Create Event</h3>
-              <button onClick={closeCreateModal} className="p-2 -mr-2 text-zinc-400 hover:text-white rounded-lg hover:bg-zinc-800 transition-colors">
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 dark:bg-zinc-950/80 backdrop-blur-sm animate-in fade-in duration-200">
+          <div className="bg-white dark:bg-zinc-900 w-full max-w-lg rounded-2xl border border-gray-200 dark:border-zinc-800 shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200 flex flex-col max-h-[90vh] transition-all">
+            <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100 dark:border-zinc-800 bg-gray-50/50 dark:bg-zinc-900/50 shrink-0 transition-colors">
+              <h3 className="text-xl font-bold text-zinc-900 dark:text-white tracking-tight">Create Event</h3>
+              <button onClick={closeCreateModal} className="p-2 -mr-2 text-zinc-400 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white rounded-lg hover:bg-gray-200 dark:hover:bg-zinc-800 transition-colors">
                 <X className="w-5 h-5" />
               </button>
             </div>
@@ -669,37 +669,37 @@ export default function Schedule() {
               <form id="create-event-form" onSubmit={handleCreateEvent} className="space-y-5">
                 {/* Title */}
                 <div>
-                  <label className="block text-sm font-semibold text-zinc-300 mb-1.5">Event Title *</label>
+                  <label className="block text-sm font-bold text-zinc-600 dark:text-zinc-300 mb-1.5 transition-colors">Event Title *</label>
                   <input
                     type="text"
                     required
                     value={form.title}
                     onChange={(e) => setForm({...form, title: e.target.value})}
                     placeholder="e.g. Weekly Strategy Meeting"
-                    className="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-4 py-2.5 text-zinc-100 placeholder:text-zinc-600 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 transition-all"
+                    className="w-full bg-gray-50 dark:bg-zinc-950 border border-gray-200 dark:border-zinc-800 rounded-lg px-4 py-2.5 text-zinc-900 dark:text-zinc-100 placeholder:text-zinc-400 dark:placeholder:text-zinc-600 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 transition-all shadow-xs"
                   />
                 </div>
 
                 {/* Description */}
                 <div>
-                  <label className="block text-sm font-semibold text-zinc-300 mb-1.5">Description</label>
+                  <label className="block text-sm font-bold text-zinc-600 dark:text-zinc-300 mb-1.5 transition-colors">Description</label>
                   <textarea
                     rows={3}
                     value={form.description}
                     onChange={(e) => setForm({...form, description: e.target.value})}
                     placeholder="Agenda or notes..."
-                    className="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-4 py-2.5 text-zinc-100 placeholder:text-zinc-600 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 transition-all resize-none"
+                    className="w-full bg-gray-50 dark:bg-zinc-950 border border-gray-200 dark:border-zinc-800 rounded-lg px-4 py-2.5 text-zinc-900 dark:text-zinc-100 placeholder:text-zinc-400 dark:placeholder:text-zinc-600 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 transition-all resize-none shadow-xs"
                   />
                 </div>
 
                 <div className="grid grid-cols-2 gap-4">
                   {/* Category */}
                   <div>
-                    <label className="block text-sm font-semibold text-zinc-300 mb-1.5">Category</label>
+                    <label className="block text-sm font-bold text-zinc-600 dark:text-zinc-300 mb-1.5 transition-colors">Category</label>
                     <select
                       value={form.category}
                       onChange={(e) => setForm({...form, category: e.target.value})}
-                      className="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-4 py-2.5 text-zinc-100 appearance-none focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 transition-all"
+                      className="w-full bg-gray-50 dark:bg-zinc-950 border border-gray-200 dark:border-zinc-800 rounded-lg px-4 py-2.5 text-zinc-900 dark:text-zinc-100 appearance-none focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 transition-all shadow-xs"
                     >
                       {Object.keys(CATEGORY_STYLES).map(cat => (
                         <option key={cat} value={cat}>{cat}</option>
@@ -709,13 +709,13 @@ export default function Schedule() {
                   
                   {/* Date */}
                   <div>
-                    <label className="block text-sm font-semibold text-zinc-300 mb-1.5">Date *</label>
+                    <label className="block text-sm font-bold text-zinc-600 dark:text-zinc-300 mb-1.5 transition-colors">Date *</label>
                     <input
                       type="date"
                       required
                       value={form.date}
                       onChange={(e) => setForm({...form, date: e.target.value})}
-                      className="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-4 py-2.5 text-zinc-100 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 transition-all appearance-none"
+                      className="w-full bg-gray-50 dark:bg-zinc-950 border border-gray-200 dark:border-zinc-800 rounded-lg px-4 py-2.5 text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 transition-all appearance-none shadow-xs"
                     />
                   </div>
                 </div>
@@ -723,25 +723,25 @@ export default function Schedule() {
                 {/* Time range */}
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                     <label className="block text-sm font-semibold text-zinc-300 mb-1.5">Start Time *</label>
+                     <label className="block text-sm font-bold text-zinc-600 dark:text-zinc-300 mb-1.5 transition-colors">Start Time *</label>
                      <div className="flex gap-2">
-                       <select value={form.startHour} onChange={e => setForm({...form, startHour: e.target.value})} className="w-1/2 bg-zinc-950 border border-zinc-800 rounded-lg px-3 py-2.5 text-zinc-100 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all">
+                       <select value={form.startHour} onChange={e => setForm({...form, startHour: e.target.value})} className="w-1/2 bg-gray-50 dark:bg-zinc-950 border border-gray-200 dark:border-zinc-800 rounded-lg px-3 py-2.5 text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all shadow-xs">
                          {Array.from({length: 24}).map((_, i) => <option key={`sh-${i}`} value={padTo2(i)}>{padTo2(i)}</option>)}
                        </select>
-                       <span className="self-center font-bold text-zinc-500">:</span>
-                       <select value={form.startMinute} onChange={e => setForm({...form, startMinute: e.target.value})} className="w-1/2 bg-zinc-950 border border-zinc-800 rounded-lg px-3 py-2.5 text-zinc-100 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all">
+                       <span className="self-center font-bold text-zinc-400 dark:text-zinc-500 transition-colors">:</span>
+                       <select value={form.startMinute} onChange={e => setForm({...form, startMinute: e.target.value})} className="w-1/2 bg-gray-50 dark:bg-zinc-950 border border-gray-200 dark:border-zinc-800 rounded-lg px-3 py-2.5 text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all shadow-xs">
                          {Array.from({length: 12}).map((_, i) => <option key={`sm-${i}`} value={padTo2(i * 5)}>{padTo2(i * 5)}</option>)}
                        </select>
                      </div>
                   </div>
                   <div>
-                     <label className="block text-sm font-semibold text-zinc-300 mb-1.5">End Time *</label>
+                     <label className="block text-sm font-bold text-zinc-600 dark:text-zinc-300 mb-1.5 transition-colors">End Time *</label>
                      <div className="flex gap-2">
-                       <select value={form.endHour} onChange={e => setForm({...form, endHour: e.target.value})} className="w-1/2 bg-zinc-950 border border-zinc-800 rounded-lg px-3 py-2.5 text-zinc-100 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all">
+                       <select value={form.endHour} onChange={e => setForm({...form, endHour: e.target.value})} className="w-1/2 bg-gray-50 dark:bg-zinc-950 border border-gray-200 dark:border-zinc-800 rounded-lg px-3 py-2.5 text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all shadow-xs">
                          {Array.from({length: 24}).map((_, i) => <option key={`eh-${i}`} value={padTo2(i)}>{padTo2(i)}</option>)}
                        </select>
-                       <span className="self-center font-bold text-zinc-500">:</span>
-                       <select value={form.endMinute} onChange={e => setForm({...form, endMinute: e.target.value})} className="w-1/2 bg-zinc-950 border border-zinc-800 rounded-lg px-3 py-2.5 text-zinc-100 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all">
+                       <span className="self-center font-bold text-zinc-400 dark:text-zinc-500 transition-colors">:</span>
+                       <select value={form.endMinute} onChange={e => setForm({...form, endMinute: e.target.value})} className="w-1/2 bg-gray-50 dark:bg-zinc-950 border border-gray-200 dark:border-zinc-800 rounded-lg px-3 py-2.5 text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all shadow-xs">
                          {Array.from({length: 12}).map((_, i) => <option key={`em-${i}`} value={padTo2(i * 5)}>{padTo2(i * 5)}</option>)}
                        </select>
                      </div>
@@ -750,13 +750,13 @@ export default function Schedule() {
 
                 {/* Reminder */}
                 <div>
-                    <label className="block text-sm font-semibold text-zinc-300 mb-1.5">Reminder</label>
+                    <label className="block text-sm font-bold text-zinc-600 dark:text-zinc-300 mb-1.5 transition-colors">Reminder</label>
                     <div className="relative">
-                      <Clock className="w-4 h-4 absolute left-3.5 top-[13px] text-zinc-500 pointer-events-none" />
+                      <Clock className="w-4 h-4 absolute left-3.5 top-[13px] text-zinc-400 dark:text-zinc-500 pointer-events-none transition-colors" />
                       <select
                         value={form.reminder}
                         onChange={(e) => setForm({...form, reminder: e.target.value})}
-                        className="w-full bg-zinc-950 border border-zinc-800 rounded-lg pl-10 pr-4 py-2.5 text-zinc-100 appearance-none focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 transition-all"
+                        className="w-full bg-gray-50 dark:bg-zinc-950 border border-gray-200 dark:border-zinc-800 rounded-lg pl-10 pr-4 py-2.5 text-zinc-900 dark:text-zinc-100 appearance-none focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 transition-all shadow-xs"
                       >
                         <option value="15min">15 minutes before</option>
                         <option value="1hr">1 hour before</option>
@@ -769,11 +769,11 @@ export default function Schedule() {
               </form>
             </div>
             
-            <div className="px-6 py-4 border-t border-zinc-800 bg-zinc-900/50 flex justify-end gap-3 shrink-0">
+            <div className="px-6 py-4 border-t border-gray-100 dark:border-zinc-800 bg-gray-50/50 dark:bg-zinc-900/50 flex justify-end gap-3 shrink-0 transition-colors">
                <button 
                 type="button" 
                 onClick={closeCreateModal}
-                className="px-4 py-2 text-sm font-medium text-zinc-300 hover:text-white rounded-lg hover:bg-zinc-800 transition-colors"
+                className="px-4 py-2 text-sm font-bold text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white rounded-lg hover:bg-gray-200 dark:hover:bg-zinc-800 transition-all"
                >
                  Cancel
                </button>
@@ -796,34 +796,34 @@ export default function Schedule() {
 
       {/* EVENT DETAIL POPUP */}
       {selectedEvent && createPortal(
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-zinc-950/80 backdrop-blur-sm animate-in fade-in duration-200">
-           <div className="bg-zinc-900 w-full max-w-md rounded-2xl border border-zinc-800 shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200">
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 dark:bg-zinc-950/80 backdrop-blur-sm animate-in fade-in duration-200">
+           <div className="bg-white dark:bg-zinc-900 w-full max-w-md rounded-2xl border border-gray-200 dark:border-zinc-800 shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200 transition-all">
               
               {/* Header Colored Banner */}
               <div className={`h-2 w-full ${CATEGORY_DOT_STYLES[selectedEvent.category] || CATEGORY_DOT_STYLES['Meeting']}`}></div>
 
               <div className="p-6">
                  <div className="flex justify-between items-start mb-4">
-                    <span className={`px-2.5 py-1 rounded-md text-[10px] font-bold uppercase tracking-wider ${CATEGORY_STYLES[selectedEvent.category] || CATEGORY_STYLES['Meeting']}`}>
+                    <span className={`px-2.5 py-1 rounded-md text-[10px] font-bold uppercase tracking-wider shadow-xs ${CATEGORY_STYLES[selectedEvent.category] || CATEGORY_STYLES['Meeting']}`}>
                       {selectedEvent.category}
                     </span>
-                    <button onClick={() => setSelectedEvent(null)} className="p-1 -mr-1 -mt-1 text-zinc-500 hover:text-white rounded-md hover:bg-zinc-800 transition-colors">
+                    <button onClick={() => setSelectedEvent(null)} className="p-1 -mr-1 -mt-1 text-zinc-400 dark:text-zinc-500 hover:text-zinc-900 dark:hover:text-white rounded-md hover:bg-gray-100 dark:hover:bg-zinc-800 transition-colors">
                       <X className="w-5 h-5" />
                     </button>
                  </div>
 
-                 <h2 className="text-2xl font-bold text-white tracking-tight mb-2 leading-tight pr-4">
+                 <h2 className="text-2xl font-black text-zinc-900 dark:text-white tracking-tight mb-2 leading-tight pr-4 transition-colors">
                    {selectedEvent.title}
                  </h2>
                  
                  <div className="space-y-4 mt-6">
                     <div className="flex items-start gap-3">
-                       <Calendar className="w-5 h-5 text-zinc-500 shrink-0 mt-0.5" />
+                       <Calendar className="w-5 h-5 text-zinc-400 dark:text-zinc-500 shrink-0 mt-0.5 transition-colors" />
                        <div>
-                         <p className="text-sm font-medium text-zinc-200">
+                         <p className="text-sm font-bold text-zinc-900 dark:text-zinc-200 transition-colors">
                             {selectedEvent.startTime.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' })}
                          </p>
-                         <p className="text-sm text-zinc-400 mt-0.5">
+                         <p className="text-sm text-zinc-500 dark:text-zinc-400 mt-0.5 transition-colors">
                             {formatTime(selectedEvent.startTime)} – {formatTime(selectedEvent.endTime)}
                          </p>
                        </div>
@@ -831,24 +831,24 @@ export default function Schedule() {
 
                     {selectedEvent.description && (
                       <div className="flex items-start gap-3">
-                         <MapPin className="w-5 h-5 text-zinc-500 shrink-0 mt-0.5 opacity-0" /> {/* Spacer */}
-                         <div className="bg-zinc-950/50 border border-zinc-800/80 rounded-lg p-3 w-full">
-                           <p className="text-sm text-zinc-300 leading-relaxed whitespace-pre-wrap">{selectedEvent.description}</p>
+                         <div className="w-5 shrink-0" /> {/* Spacer instead of icon if we want clean look, or use MapPin hidden */}
+                         <div className="bg-gray-50 dark:bg-zinc-950/50 border border-gray-200 dark:border-zinc-800/80 rounded-xl p-4 w-full transition-colors">
+                           <p className="text-sm font-medium text-zinc-700 dark:text-zinc-300 leading-relaxed whitespace-pre-wrap transition-colors">{selectedEvent.description}</p>
                          </div>
                       </div>
                     )}
 
                     <div className="flex items-center gap-3">
-                       <Clock className="w-5 h-5 text-zinc-500 shrink-0" />
-                       <p className="text-sm text-zinc-400">
-                          Reminder: <span className="text-zinc-300 font-medium capitalize">{selectedEvent.reminder === 'none' ? 'None' : selectedEvent.reminder.replace('hr', ' hour').replace('min', ' mins').replace('day', ' day(s)')} before</span>
+                       <Clock className="w-5 h-5 text-zinc-400 dark:text-zinc-500 shrink-0 transition-colors" />
+                       <p className="text-sm text-zinc-500 dark:text-zinc-400 transition-colors">
+                          Reminder: <span className="text-zinc-900 dark:text-zinc-300 font-bold capitalize">{selectedEvent.reminder === 'none' ? 'None' : selectedEvent.reminder.replace('hr', ' hour').replace('min', ' mins').replace('day', ' day(s)')} before</span>
                        </p>
                     </div>
                  </div>
               </div>
 
-              <div className="p-4 border-t border-zinc-800 bg-zinc-900/50 flex justify-between items-center">
-                 <p className="text-[10px] text-zinc-600 uppercase font-medium tracking-wider">
+              <div className="p-4 border-t border-gray-100 dark:border-zinc-800 bg-gray-50/50 dark:bg-zinc-900/50 flex justify-between items-center transition-colors">
+                 <p className="text-[10px] text-zinc-500 dark:text-zinc-600 uppercase font-black tracking-wider transition-colors">
                    Created: {selectedEvent.createdAt.toLocaleDateString()}
                  </p>
                  <button 

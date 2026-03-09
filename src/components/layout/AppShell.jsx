@@ -59,11 +59,11 @@ export default function AppShell() {
 
     return (
       <div className="flex items-center gap-3 ml-4">
-        <div className="bg-zinc-800/80 p-1.5 rounded-md hidden sm:block">
-          <Icon className="w-4 h-4 text-zinc-300" />
+        <div className="bg-gray-100 dark:bg-zinc-800/80 p-1.5 rounded-md hidden sm:block">
+          <Icon className="w-4 h-4 text-zinc-500 dark:text-zinc-400" />
         </div>
         <div>
-          <h1 className="text-sm md:text-base font-bold text-zinc-100 leading-tight">{context.title}</h1>
+          <h1 className="text-sm md:text-base font-bold text-zinc-900 dark:text-zinc-100 leading-tight">{context.title}</h1>
           <p className="text-[10px] md:text-xs text-zinc-400 leading-none mt-0.5 hidden sm:block">{context.subtitle}</p>
         </div>
       </div>
@@ -71,12 +71,12 @@ export default function AppShell() {
   };
 
   return (
-    <div className="flex h-screen bg-gray-50 overflow-hidden font-sans">
+    <div className="flex h-screen bg-gray-50 dark:bg-zinc-950 overflow-hidden font-sans">
       <Sidebar mobileOpen={mobileOpen} setMobileOpen={setMobileOpen} />
       
       <div className="flex flex-col flex-1 w-0 min-w-0 overflow-hidden">
         {/* Header - shown on all screen sizes but layout changes */}
-        <header className="bg-zinc-950 px-4 py-3 border-b border-zinc-800 shrink-0 flex items-center justify-between shadow-sm z-20">
+        <header className="bg-white dark:bg-zinc-950 px-4 py-3 border-b border-gray-200 dark:border-zinc-800 shrink-0 flex items-center justify-between shadow-sm z-20">
           <div className="flex items-center gap-4 flex-1 overflow-hidden pr-4">
             {/* Mobile Sidebar Toggle */}
             <button 
@@ -85,7 +85,7 @@ export default function AppShell() {
             >
               <Menu className="w-6 h-6" />
             </button>
-            <span className="md:hidden text-[15px] font-semibold tracking-tight text-white shrink-0 ml-2">Neeti AI</span>
+            <span className="md:hidden text-[15px] font-semibold tracking-tight text-zinc-900 dark:text-white shrink-0 ml-2">Neeti AI</span>
             
             {/* Context Title Target */}
             <div className="flex-1 flex items-center pr-4 ml-2 min-w-0">
@@ -97,13 +97,13 @@ export default function AppShell() {
           <div className="relative shrink-0">
             <button 
               onClick={() => setDropdownOpen(!dropdownOpen)}
-              className="flex items-center gap-3 px-2 py-1.5 rounded-md hover:bg-zinc-900 transition-colors border border-transparent focus:outline-none"
+              className="flex items-center gap-3 px-2 py-1.5 rounded-md hover:bg-gray-100 dark:hover:bg-zinc-900 transition-colors border border-transparent focus:outline-none"
             >
               <div className="hidden md:flex flex-col items-end">
-                <span className="text-sm font-semibold text-zinc-100">{dbUser?.displayName || currentUser?.displayName || 'Official'}</span>
+                <span className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">{dbUser?.displayName || currentUser?.displayName || 'Official'}</span>
                 <span className="text-xs text-zinc-500 capitalize">{dbUser?.department || dbUser?.role || 'Leader'}</span>
               </div>
-              <div className="w-8 h-8 rounded-full bg-zinc-800 border border-gold/30 flex items-center justify-center overflow-hidden">
+              <div className="w-8 h-8 rounded-full bg-gray-100 dark:bg-zinc-800 border border-gray-200 dark:border-gold/30 flex items-center justify-center overflow-hidden">
                 {displayPhoto ? (
                   <img src={displayPhoto} alt="Avatar" className="w-full h-full object-cover" referrerPolicy="no-referrer" />
                 ) : (
@@ -120,9 +120,9 @@ export default function AppShell() {
                   className="fixed inset-0 z-40" 
                   onClick={() => setDropdownOpen(false)}
                 ></div>
-                <div className="absolute right-0 mt-2 w-48 bg-zinc-900 border border-zinc-800 rounded-md shadow-xl py-1 z-50">
-                  <div className="px-4 py-2 border-b border-zinc-800 mb-1">
-                    <p className="text-sm text-white font-medium truncate">{dbUser?.displayName || currentUser?.displayName}</p>
+                <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 rounded-md shadow-xl py-1 z-50">
+                  <div className="px-4 py-2 border-b border-gray-100 dark:border-zinc-800 mb-1">
+                    <p className="text-sm text-zinc-900 dark:text-white font-medium truncate">{dbUser?.displayName || currentUser?.displayName}</p>
                     <p className="text-xs text-zinc-400 truncate">{currentUser?.email}</p>
                   </div>
                   <button
@@ -131,14 +131,14 @@ export default function AppShell() {
                       // Navigate to settings or profile page here if implemented
                       navigate('/settings');
                     }}
-                    className="w-full text-left px-4 py-2 text-sm text-zinc-300 hover:bg-zinc-800 hover:text-white transition-colors flex items-center gap-2"
+                    className="w-full text-left px-4 py-2 text-sm text-zinc-600 dark:text-zinc-300 hover:bg-gray-100 dark:hover:bg-zinc-800 hover:text-zinc-900 dark:hover:text-white transition-colors flex items-center gap-2"
                   >
                     <User className="w-4 h-4" />
                     Profile
                   </button>
                   <button
                     onClick={handleLogout}
-                    className="w-full text-left px-4 py-2 text-sm text-red-500 hover:bg-zinc-800 hover:text-red-400 transition-colors flex items-center gap-2"
+                    className="w-full text-left px-4 py-2 text-sm text-red-500 hover:bg-gray-100 dark:hover:bg-zinc-800 hover:text-red-400 transition-colors flex items-center gap-2"
                   >
                     <LogOut className="w-4 h-4" />
                     Sign Out
@@ -149,7 +149,7 @@ export default function AppShell() {
           </div>
         </header>
 
-        <main className="flex-1 relative z-0 overflow-y-auto focus:outline-none bg-zinc-950">
+        <main className="flex-1 relative z-0 overflow-y-auto focus:outline-none bg-gray-50 dark:bg-zinc-950">
           <Outlet />
         </main>
       </div>

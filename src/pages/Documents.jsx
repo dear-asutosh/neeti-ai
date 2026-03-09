@@ -292,7 +292,7 @@ Do not include any text before or after the JSON.`
 
   const uploadPanelContent = (
     <div
-      className={`bg-zinc-900/50 rounded-2xl shadow-sm border ${isProcessing ? 'border-indigo-500/30 bg-indigo-500/5' : 'border-zinc-800 border-dashed hover:border-indigo-500/50 hover:bg-zinc-900'} p-4 md:p-5 flex flex-col items-center justify-center text-center transition-all cursor-pointer`}
+      className={`bg-white dark:bg-zinc-900/50 rounded-2xl shadow-sm border ${isProcessing ? 'border-indigo-500/30 bg-indigo-500/5' : 'border-gray-200 dark:border-zinc-800 border-dashed hover:border-indigo-500/50 hover:bg-gray-50 dark:hover:bg-zinc-900'} p-4 md:p-5 flex flex-col items-center justify-center text-center transition-all cursor-pointer shadow-xs`}
       onClick={() => !isProcessing && fileInputRef.current?.click()}
       onDragOver={handleDragOver}
       onDrop={handleDrop}
@@ -300,15 +300,15 @@ Do not include any text before or after the JSON.`
       {isProcessing ? (
         <Loader2 className="w-12 h-12 text-indigo-400 animate-spin mb-4" />
       ) : (
-        <div className="w-12 h-12 bg-zinc-800/80 text-zinc-300 rounded-xl flex items-center justify-center mb-4 shadow-sm border border-zinc-700/50">
+        <div className="w-12 h-12 bg-gray-50 dark:bg-zinc-800/80 text-zinc-500 dark:text-zinc-300 rounded-xl flex items-center justify-center mb-4 shadow-sm border border-gray-100 dark:border-zinc-700/50">
           <UploadCloud className="w-6 h-6" />
         </div>
       )}
 
-      <h3 className="text-lg font-medium text-white">
+      <h3 className="text-lg font-medium text-zinc-900 dark:text-white">
         {isProcessing ? 'Processing Document' : 'Upload Document'}
       </h3>
-      <p className="text-sm text-zinc-400 mt-1">
+      <p className="text-sm text-zinc-500 dark:text-zinc-400 mt-1">
         {isProcessing ? processingStatus : 'Supports PDF, DOCX, TXT · Max 50MB'}
       </p>
 
@@ -321,17 +321,17 @@ Do not include any text before or after the JSON.`
       />
 
       {!isProcessing && (
-        <button className="mt-6 px-4 py-2 bg-zinc-800 border border-zinc-700 rounded-lg text-sm font-medium text-zinc-200 hover:bg-zinc-700 hover:text-white transition-colors shadow-sm">
+        <button className="mt-6 px-4 py-2 bg-white dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 rounded-lg text-sm font-medium text-zinc-700 dark:text-zinc-200 hover:bg-gray-50 dark:hover:bg-zinc-700 hover:text-zinc-900 dark:hover:text-white transition-colors shadow-sm">
           Browse Files
         </button>
       )}
 
       {activeDoc && isProcessing && (
-        <div className="mt-4 p-3 bg-zinc-800/80 rounded-lg w-full text-left flex items-center gap-3 border border-zinc-700">
+        <div className="mt-4 p-3 bg-white dark:bg-zinc-800/80 rounded-lg w-full text-left flex items-center gap-3 border border-gray-200 dark:border-zinc-700 shadow-sm">
           <FileText className="w-5 h-5 text-indigo-400 shrink-0" />
           <div className="overflow-hidden">
-            <p className="text-sm font-medium text-white truncate">{activeDoc.filename}</p>
-            <p className="text-xs text-zinc-400">{formatBytes(activeDoc.fileSize)}</p>
+            <p className="text-sm font-medium text-zinc-900 dark:text-white truncate">{activeDoc.filename}</p>
+            <p className="text-xs text-zinc-500 dark:text-zinc-400">{formatBytes(activeDoc.fileSize)}</p>
           </div>
         </div>
       )}
@@ -339,9 +339,9 @@ Do not include any text before or after the JSON.`
   );
 
   const historyListContent = (
-    <div className="flex-1 overflow-y-auto min-h-0 bg-zinc-900 rounded-2xl border border-zinc-800 shadow-sm flex flex-col">
-      <div className="px-5 py-4 border-b border-zinc-800 bg-zinc-900/50 shrink-0">
-        <h3 className="text-xs font-semibold text-zinc-400 uppercase tracking-wider">Recent Documents</h3>
+    <div className="flex-1 overflow-y-auto min-h-0 bg-white dark:bg-zinc-900 rounded-2xl border border-gray-200 dark:border-zinc-800 shadow-sm flex flex-col">
+      <div className="px-5 py-4 border-b border-gray-100 dark:border-zinc-800 bg-gray-50 dark:bg-zinc-900/50 shrink-0">
+        <h3 className="text-xs font-semibold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">Recent Documents</h3>
       </div>
       <div className="flex-1 overflow-y-auto p-2">
         {recentDocs.length === 0 ? (
@@ -354,15 +354,15 @@ Do not include any text before or after the JSON.`
             {recentDocs.map((doc) => (
               <div
                 key={doc.id}
-                className="p-4 bg-zinc-950/50 border border-zinc-800/60 rounded-xl hover:bg-zinc-800 hover:border-zinc-700 transition-all cursor-pointer group flex flex-col"
+                className="p-4 bg-gray-50 dark:bg-zinc-950/50 border border-gray-200 dark:border-zinc-800/60 rounded-xl hover:bg-gray-100 dark:hover:bg-zinc-800 hover:border-gray-300 dark:hover:border-zinc-700 transition-all cursor-pointer group flex flex-col shadow-xs"
                 onClick={() => handleSelectDoc(doc)}
               >
                 <div className="flex items-start gap-3 mb-3">
-                  <div className="w-10 h-10 rounded-full bg-zinc-800/80 flex items-center justify-center shrink-0 group-hover:bg-indigo-500/20 group-hover:text-indigo-400 transition-colors border border-zinc-700/50 text-xl pt-0.5">
+                  <div className="w-10 h-10 rounded-full bg-white dark:bg-zinc-800/80 flex items-center justify-center shrink-0 group-hover:bg-indigo-500/20 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors border border-gray-200 dark:border-zinc-700/50 text-xl pt-0.5 shadow-xs">
                     {getFileEmoji(doc.filename)}
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className={`text-sm font-semibold truncate group-hover:text-indigo-400 transition-colors ${activeDoc?.id === doc.id ? 'text-indigo-400' : 'text-zinc-200'}`}>
+                    <p className={`text-sm font-semibold truncate group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors ${activeDoc?.id === doc.id ? 'text-indigo-600 dark:text-indigo-400' : 'text-zinc-900 dark:text-zinc-200'}`}>
                       {doc.filename}
                     </p>
                     <div className="flex flex-wrap items-center gap-2 mt-1.5 text-[11px] font-medium text-zinc-500">
@@ -376,8 +376,8 @@ Do not include any text before or after the JSON.`
                     {doc.summary}
                   </p>
                 )}
-                <div className="mt-3 flex items-center justify-between pt-3 border-t border-zinc-800/50">
-                  <span className="text-[10px] uppercase font-bold tracking-wider text-zinc-600 group-hover:text-indigo-500 transition-colors text-right w-full flex items-center justify-end gap-1">
+                <div className="mt-3 flex items-center justify-between pt-3 border-t border-gray-100 dark:border-zinc-800/50">
+                  <span className="text-[10px] uppercase font-bold tracking-wider text-zinc-500 dark:text-zinc-600 group-hover:text-indigo-600 dark:group-hover:text-indigo-500 transition-colors text-right w-full flex items-center justify-end gap-1">
                     View Details
                   </span>
                 </div>
@@ -391,18 +391,18 @@ Do not include any text before or after the JSON.`
 
   const summaryPanelContent = (
     activeDoc && activeDoc.status === 'summarized' ? (
-      <div className="bg-zinc-900 rounded-2xl border border-zinc-800 flex flex-col h-full overflow-hidden animate-in fade-in slide-in-from-bottom-4 duration-500 shadow-sm">
+      <div className="bg-white dark:bg-zinc-900 rounded-2xl border border-gray-200 dark:border-zinc-800 flex flex-col h-full overflow-hidden animate-in fade-in slide-in-from-bottom-4 duration-500 shadow-sm">
 
-        <div className="px-5 py-4 border-b border-zinc-800 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-zinc-900/50">
+        <div className="px-5 py-4 border-b border-gray-100 dark:border-zinc-800 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-white dark:bg-zinc-900/50">
           <div className="flex items-center gap-4">
             <div className="w-12 h-12 bg-indigo-500/10 border border-indigo-500/20 rounded-xl flex items-center justify-center shrink-0">
               <CheckCircle className="w-6 h-6 text-indigo-400" />
             </div>
             <div>
-              <h2 className="text-lg font-semibold text-white truncate max-w-sm" title={activeDoc.filename}>
+              <h2 className="text-lg font-semibold text-zinc-900 dark:text-white truncate max-w-sm" title={activeDoc.filename}>
                 {activeDoc.filename}
               </h2>
-              <div className="flex items-center gap-2 text-xs text-zinc-400 mt-1.5">
+              <div className="flex items-center gap-2 text-xs text-zinc-500 dark:text-zinc-400 mt-1.5">
                 {activeDoc.pageCount && <span className="flex items-center gap-1"><File className="w-3.5 h-3.5" /> {activeDoc.pageCount} Pages</span>}
                 {activeDoc.pageCount && activeDoc.fileSize && <span>·</span>}
                 {activeDoc.fileSize && <span>{formatBytes(activeDoc.fileSize)}</span>}
@@ -414,28 +414,28 @@ Do not include any text before or after the JSON.`
           </span>
         </div>
 
-        <div className="w-full bg-zinc-800 h-0.5">
+        <div className="w-full bg-gray-100 dark:bg-zinc-800 h-0.5">
           <div className="bg-emerald-500 h-0.5 w-full rounded-r-full shadow-[0_0_10px_rgba(16,185,129,0.5)]"></div>
         </div>
 
         <div className="p-4 md:p-5 flex-1 overflow-y-auto">
           <div className="max-w-none">
-            <h3 className="text-lg font-semibold text-white mb-4 flex items-center gap-2 tracking-tight">
-              <BookOpen className="w-5 h-5 text-indigo-400" /> Executive Summary
+            <h3 className="text-lg font-semibold text-zinc-900 dark:text-white mb-4 flex items-center gap-2 tracking-tight">
+              <BookOpen className="w-5 h-5 text-indigo-500 dark:text-indigo-400" /> Executive Summary
             </h3>
-            <p className="text-zinc-300 leading-relaxed whitespace-pre-wrap text-[15px]">{activeDoc.summary}</p>
+            <p className="text-zinc-700 dark:text-zinc-300 leading-relaxed whitespace-pre-wrap text-[15px]">{activeDoc.summary}</p>
 
-            <hr className="my-8 border-zinc-800" />
+            <hr className="my-8 border-gray-100 dark:border-zinc-800" />
 
-            <h3 className="text-lg font-semibold text-white mb-4 flex items-center gap-2 tracking-tight">
-              <Clock className="w-5 h-5 text-indigo-400" /> Key Points Extracted
+            <h3 className="text-lg font-semibold text-zinc-900 dark:text-white mb-4 flex items-center gap-2 tracking-tight">
+              <Clock className="w-5 h-5 text-indigo-500 dark:text-indigo-400" /> Key Points Extracted
             </h3>
             <ul className="space-y-3">
               {activeDoc.keyPoints?.length > 0 ? (
                 activeDoc.keyPoints.map((point, idx) => (
-                  <li key={idx} className="flex gap-4 p-4 bg-zinc-950/50 rounded-xl border border-zinc-800/80 hover:border-zinc-700 transition-colors">
-                    <span className="text-lg font-bold text-indigo-400 shrink-0 font-mono mt-0.5">{idx + 1}.</span>
-                    <span className="text-zinc-300 leading-relaxed text-[15px]">{point}</span>
+                  <li key={idx} className="flex gap-4 p-4 bg-gray-50 dark:bg-zinc-950/50 rounded-xl border border-gray-200 dark:border-zinc-800/80 hover:border-gray-300 dark:hover:border-zinc-700 transition-colors shadow-xs">
+                    <span className="text-lg font-bold text-indigo-600 dark:text-indigo-400 shrink-0 font-mono mt-0.5">{idx + 1}.</span>
+                    <span className="text-zinc-700 dark:text-zinc-300 leading-relaxed text-[15px]">{point}</span>
                   </li>
                 ))
               ) : (
@@ -447,7 +447,7 @@ Do not include any text before or after the JSON.`
           </div>
         </div>
 
-        <div className="p-4 border-t border-zinc-800 flex flex-wrap gap-3 bg-zinc-900/50">
+        <div className="p-4 border-t border-gray-100 dark:border-zinc-800 flex flex-wrap gap-3 bg-gray-50 dark:bg-zinc-900/50 shadow-sm">
           <button
             onClick={handleDownload}
             className="inline-flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white text-sm font-medium rounded-lg hover:bg-indigo-500 transition-colors shadow-sm"
@@ -456,17 +456,17 @@ Do not include any text before or after the JSON.`
           </button>
           <button
             onClick={handleShare}
-            className="inline-flex items-center gap-2 px-4 py-2 bg-zinc-800 border border-zinc-700 text-zinc-200 text-sm font-medium rounded-lg hover:bg-zinc-700 hover:text-white transition-colors shadow-sm"
+            className="inline-flex items-center gap-2 px-4 py-2 bg-white dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 text-zinc-700 dark:text-zinc-200 text-sm font-medium rounded-lg hover:bg-gray-50 dark:hover:bg-zinc-700 hover:text-zinc-900 dark:hover:text-white transition-colors shadow-sm"
           >
             <Share2 className="w-4 h-4" /> Share
           </button>
         </div>
 
         {/* Ask AI Section */}
-        <div className="border-t border-zinc-800 bg-zinc-950/50">
-          <div className="px-5 py-3 border-b border-zinc-800/60 flex items-center gap-2">
-            <MessageSquare className="w-4 h-4 text-indigo-400" />
-            <span className="text-[13px] font-medium text-zinc-300 uppercase tracking-widest">Ask AI about this document</span>
+        <div className="border-t border-gray-200 dark:border-zinc-800 bg-gray-50 dark:bg-zinc-950/50">
+          <div className="px-5 py-3 border-b border-gray-100 dark:border-zinc-800/60 flex items-center gap-2">
+            <MessageSquare className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
+            <span className="text-[13px] font-medium text-zinc-600 dark:text-zinc-300 uppercase tracking-widest">Ask AI about this document</span>
           </div>
 
           {askResponses.length > 0 && (
@@ -474,7 +474,7 @@ Do not include any text before or after the JSON.`
               {askResponses.map((msg, i) => (
                 <div key={i} className={`flex flex-col ${msg.role === 'user' ? 'items-end' : 'items-start'}`}>
                   <span className="text-[11px] text-zinc-500 mb-1 ml-1">{msg.role === 'user' ? 'You' : 'Neeti AI'}</span>
-                  <div className={`max-w-[85%] px-4 py-2.5 rounded-2xl text-[14px] leading-relaxed ${msg.role === 'user' ? 'bg-indigo-600 text-white rounded-tr-sm shadow-sm' : 'bg-zinc-800 border border-zinc-700/50 text-zinc-200 rounded-tl-sm shadow-sm'}`}>
+                  <div className={`max-w-[85%] px-4 py-2.5 rounded-2xl text-[14px] leading-relaxed ${msg.role === 'user' ? 'bg-indigo-600 text-white rounded-tr-sm shadow-sm' : 'bg-white dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700/50 text-zinc-800 dark:text-zinc-200 rounded-tl-sm shadow-sm'}`}>
                     {msg.role === 'user' ? msg.content : <ReactMarkdown>{msg.content}</ReactMarkdown>}
                   </div>
                 </div>
@@ -490,9 +490,9 @@ Do not include any text before or after the JSON.`
                 onChange={(e) => setAskQuery(e.target.value)}
                 placeholder={fullText ? "Ask anything about this document..." : "No document context available"}
                 disabled={!fullText || isAsking}
-                className="w-full pl-4 pr-10 py-2 bg-zinc-950 border border-zinc-800 text-zinc-100 text-sm rounded-xl focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all disabled:opacity-50 placeholder-zinc-500"
+                className="w-full pl-4 pr-10 py-2 bg-white dark:bg-zinc-950 border border-gray-200 dark:border-zinc-800 text-zinc-900 dark:text-zinc-100 text-sm rounded-xl focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all disabled:opacity-50 placeholder-zinc-400 dark:placeholder-zinc-500"
               />
-              <CornerDownRight className="w-4 h-4 text-zinc-600 absolute right-4 top-1/2 -translate-y-1/2" />
+              <CornerDownRight className="w-4 h-4 text-zinc-400 dark:text-zinc-600 absolute right-4 top-1/2 -translate-y-1/2" />
             </div>
             <button
               type="submit"
@@ -513,30 +513,30 @@ Do not include any text before or after the JSON.`
   // RENDER
   // --------------------------------------------------------------------------
   return (
-    <div className="flex flex-col min-h-full bg-zinc-950 pb-6 md:pb-10 text-zinc-100">
+    <div className="flex flex-col min-h-full bg-gray-50 dark:bg-zinc-950 pb-6 md:pb-10 text-zinc-900 dark:text-zinc-100 transition-colors duration-300">
 
       {/* ── Top Header (Portaled to AppShell on Desktop) */}
       {headerNode && createPortal(
-        <div className="flex items-center justify-between w-full h-full animate-in fade-in">
+        <div className="flex items-center justify-between w-full h-full animate-in fade-in transition-colors duration-300">
           <div className="flex flex-col justify-center shrink-0">
-            <h1 className="text-base font-bold text-white tracking-tight leading-none">Document Summarizer</h1>
-            <p className="text-zinc-400 text-[10px] leading-none hidden md:block mt-1">Upload long documents for instant AI summaries.</p>
+            <h1 className="text-base font-bold text-zinc-900 dark:text-white tracking-tight leading-none transition-colors duration-300">Document Summarizer</h1>
+            <p className="text-zinc-500 dark:text-zinc-400 text-[10px] leading-none hidden md:block mt-1 transition-colors duration-300">Upload long documents for instant AI summaries.</p>
           </div>
 
           {/* Step progress */}
           <div className="flex items-center gap-1.5 overflow-x-auto flex-nowrap shrink-0 scrollbar-hide ml-auto pl-4 min-w-0">
             {STEPS.map((s, idx) => {
-              let statusClass = "text-zinc-500 border-zinc-800 bg-zinc-900";
-              let lineClass = "bg-zinc-800";
-              if (step > s.id) { statusClass = "text-indigo-400 border-indigo-500/30 bg-indigo-500/10"; lineClass = "bg-indigo-500/50"; }
-              else if (step === s.id) { statusClass = "text-indigo-300 border-indigo-500 bg-indigo-500/20 font-medium"; }
+              let statusClass = "text-zinc-400 dark:text-zinc-500 border-gray-200 dark:border-zinc-800 bg-gray-50 dark:bg-zinc-900";
+              let lineClass = "bg-gray-200 dark:bg-zinc-800";
+              if (step > s.id) { statusClass = "text-indigo-600 dark:text-indigo-400 border-indigo-200 dark:border-indigo-500/30 bg-indigo-50 dark:bg-indigo-500/10"; lineClass = "bg-indigo-300 dark:bg-indigo-500/50"; }
+              else if (step === s.id) { statusClass = "text-indigo-600 dark:text-indigo-300 border-indigo-400 dark:border-indigo-500 bg-indigo-50 dark:bg-indigo-500/20 font-medium"; }
               return (
                 <div key={s.id} className="flex items-center shrink-0">
-                  <div className={`flex items-center justify-center w-5 h-5 rounded-full border text-[10px] transition-colors ${statusClass}`}>
+                  <div className={`flex items-center justify-center w-5 h-5 rounded-full border text-[10px] transition-all duration-300 ${statusClass}`}>
                     {step > s.id ? <CheckCircle className="w-3 h-3" /> : s.id}
                   </div>
-                  <span className={`ml-1.5 text-[11px] whitespace-nowrap ${step === s.id ? 'text-indigo-300 font-medium block' : 'text-zinc-500 hidden lg:block'}`}>{s.label}</span>
-                  {idx < STEPS.length - 1 && <div className={`w-3 lg:w-6 h-px mx-1 lg:mx-2 ${lineClass}`} />}
+                  <span className={`ml-1.5 text-[11px] whitespace-nowrap transition-colors duration-300 ${step === s.id ? 'text-indigo-600 dark:text-indigo-300 font-medium block' : 'text-zinc-400 dark:text-zinc-500 hidden lg:block'}`}>{s.label}</span>
+                  {idx < STEPS.length - 1 && <div className={`w-3 lg:w-6 h-px mx-1 lg:mx-2 transition-colors duration-300 ${lineClass}`} />}
                 </div>
               );
             })}
@@ -546,13 +546,13 @@ Do not include any text before or after the JSON.`
       )}
 
       {/* ── Mobile Top Header (Visible only on small screens) */}
-      <div className="md:hidden px-4 pt-4 pb-2">
-        <h1 className="text-xl font-bold text-white tracking-tight leading-none">Document Summarizer</h1>
-        <p className="text-zinc-400 text-[11px] mt-1.5">Upload long documents for instant AI summaries.</p>
+      <div className="md:hidden px-4 pt-4 pb-2 transition-colors duration-300">
+        <h1 className="text-xl font-bold text-zinc-900 dark:text-white tracking-tight leading-none transition-colors duration-300">Document Summarizer</h1>
+        <p className="text-zinc-500 dark:text-zinc-400 text-[11px] mt-1.5 transition-colors duration-300">Upload long documents for instant AI summaries.</p>
       </div>
 
       {/* ── Mobile 3-tab bar — only visible below lg breakpoint */}
-      <div className="lg:hidden mt-3 mx-4 flex rounded-xl bg-zinc-900 border border-zinc-800 p-1 gap-1">
+      <div className="lg:hidden mt-3 mx-4 flex rounded-xl bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 p-1 gap-1 transition-colors duration-300 shadow-sm">
           {[
             { key: 'upload', label: 'Upload', icon: <UploadCloud className="w-4 h-4" /> },
             { key: 'summary', label: 'Summary', icon: <BookOpen className="w-4 h-4" /> },
@@ -564,7 +564,7 @@ Do not include any text before or after the JSON.`
               className={`flex-1 flex items-center justify-center gap-1.5 py-2 rounded-lg text-sm font-medium transition-all ${
                 activeMobileTab === tab.key
                   ? 'bg-indigo-600 text-white shadow-sm'
-                  : 'text-zinc-400 hover:text-zinc-200'
+                  : 'text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-200'
               }`}
             >
               {tab.icon}

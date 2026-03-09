@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useAuth } from '../hooks/useAuth';
 import { db } from '../services/firebase';
 import { collection, addDoc, query, orderBy, limit, onSnapshot, doc, updateDoc } from 'firebase/firestore';
@@ -268,29 +268,29 @@ For official letters, use proper formal structure.`;
   };
 
   return (
-    <div className="flex flex-col min-h-screen bg-zinc-950 text-zinc-100 font-sans overflow-hidden">
+    <div className="flex flex-col min-h-screen bg-gray-50 dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100 font-sans overflow-hidden transition-colors duration-300">
       
       {/* ── Top Header (Portaled to AppShell on Desktop) */}
       {headerNode && createPortal(
-        <div className="flex items-center justify-between w-full h-full animate-in fade-in">
+        <div className="flex items-center justify-between w-full h-full animate-in fade-in transition-all duration-300">
           <div className="flex flex-col justify-center shrink-0">
-            <h1 className="text-base font-bold text-white tracking-tight leading-none">AI Speechwriter</h1>
-            <p className="text-zinc-400 text-[10px] leading-none hidden md:block mt-1">Draft speeches, letters, and statements.</p>
+            <h1 className="text-base font-bold text-zinc-900 dark:text-white tracking-tight leading-none transition-colors duration-300">AI Speechwriter</h1>
+            <p className="text-zinc-500 dark:text-zinc-400 text-[10px] leading-none hidden md:block mt-1 transition-colors duration-300">Draft speeches, letters, and statements.</p>
           </div>
         </div>,
         headerNode
       )}
 
       {/* ── Mobile Action Bar (Sticky) */}
-      <div className="lg:hidden flex items-center justify-between px-4 py-3 border-b border-zinc-800 bg-zinc-950/80 backdrop-blur-md sticky top-0 z-30 shrink-0">
+      <div className="lg:hidden flex items-center justify-between px-4 py-3 border-b border-gray-200 dark:border-zinc-800 bg-white/80 dark:bg-zinc-950/80 backdrop-blur-md sticky top-0 z-30 shrink-0 transition-colors duration-300">
         <div className="flex items-center gap-2">
-           <Pencil className="w-4 h-4 text-indigo-400" />
-           <span className="text-sm font-semibold">AI Speechwriter</span>
+           <Pencil className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
+           <span className="text-sm font-semibold text-zinc-900 dark:text-white">AI Speechwriter</span>
         </div>
         <div className="flex items-center gap-2">
           <button 
             onClick={() => setMobileSidebarOpen(!mobileSidebarOpen)}
-            className={`p-2 rounded-lg border transition-all ${mobileSidebarOpen ? 'bg-indigo-600 border-indigo-500 text-white' : 'bg-zinc-900 border-zinc-800 text-zinc-400'}`}
+            className={`p-2 rounded-lg border transition-all shadow-xs ${mobileSidebarOpen ? 'bg-indigo-600 border-indigo-500 text-white' : 'bg-white dark:bg-zinc-900 border-gray-200 dark:border-zinc-800 text-zinc-500 dark:text-zinc-400'}`}
           >
             <FileText className="w-4 h-4" />
           </button>
@@ -307,14 +307,14 @@ For official letters, use proper formal structure.`;
         
         {/* LEFT PANEL / SIDEBAR (Collapsible on Mobile) */}
         <aside className={`
-          absolute inset-0 z-20 lg:relative lg:flex lg:flex-col lg:w-80 border-r border-zinc-800 bg-zinc-950 transition-transform duration-300 transform
+          absolute inset-0 z-20 lg:relative lg:flex lg:flex-col lg:w-80 border-r border-gray-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 transition-all duration-300 transform shadow-sm
           ${mobileSidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
         `}>
           <div className="flex flex-col h-full">
-            <div className="p-4 border-b border-zinc-800 bg-zinc-950 sticky top-0 z-10 hidden lg:block">
+            <div className="p-4 border-b border-gray-100 dark:border-zinc-800 bg-white dark:bg-zinc-950 sticky top-0 z-10 hidden lg:block transition-colors duration-300">
               <button
                 onClick={handleNewDraft}
-                className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl font-medium transition-colors shadow-sm"
+                className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl font-medium transition-all shadow-sm active:scale-95"
               >
                 <PenTool className="w-4 h-4" /> New Draft
               </button>
@@ -322,14 +322,14 @@ For official letters, use proper formal structure.`;
             
             <div className="flex-1 overflow-y-auto px-3 py-4 space-y-4">
               <div className="px-2 flex items-center justify-between mb-2">
-                <h3 className="text-[10px] font-bold text-zinc-500 uppercase tracking-[0.2em]">Saved Drafts</h3>
-                <span className="bg-zinc-800 text-zinc-400 text-[10px] px-1.5 py-0.5 rounded-full font-bold">{speeches.length}</span>
+                <h3 className="text-[10px] font-bold text-zinc-500 dark:text-zinc-500 uppercase tracking-[0.2em] transition-colors">Saved Drafts</h3>
+                <span className="bg-gray-100 dark:bg-zinc-800 text-zinc-500 dark:text-zinc-400 text-[10px] px-1.5 py-0.5 rounded-full font-bold transition-colors">{speeches.length}</span>
               </div>
               
               {speeches.length === 0 ? (
                 <div className="py-20 text-center flex flex-col items-center justify-center h-full">
-                  <BookOpen className="w-10 h-10 text-zinc-800 mb-3" />
-                  <p className="text-zinc-600 text-sm">No drafts saved yet</p>
+                  <BookOpen className="w-10 h-10 text-gray-200 dark:text-zinc-800 mb-3" />
+                  <p className="text-zinc-400 dark:text-zinc-600 text-sm">No drafts saved yet</p>
                 </div>
               ) : (
                 <div className="space-y-2">
@@ -337,29 +337,29 @@ For official letters, use proper formal structure.`;
                     <button
                       key={speech.id}
                       onClick={() => handleSelectSpeech(speech)}
-                      className={`w-full text-left p-3 rounded-xl border transition-all relative group ${
+                      className={`w-full text-left p-3 rounded-xl border transition-all relative group shadow-xs ${
                         activeSpeech?.id === speech.id 
                           ? 'bg-indigo-600/10 border-indigo-500/30' 
-                          : 'bg-zinc-900/40 border-zinc-800/60 hover:border-zinc-700'
+                          : 'bg-white dark:bg-zinc-900/40 border-gray-100 dark:border-zinc-800/60 hover:border-gray-300 dark:hover:border-zinc-700'
                       }`}
                     >
                       <div className="flex items-center gap-3 mb-2">
-                        <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 ${
-                          activeSpeech?.id === speech.id ? 'bg-indigo-600 text-white shadow-lg' : 'bg-zinc-800 text-zinc-400'
+                        <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 shadow-xs transition-all ${
+                          activeSpeech?.id === speech.id ? 'bg-indigo-600 text-white shadow-lg' : 'bg-gray-100 dark:bg-zinc-800 text-zinc-400'
                         }`}>
                           {getTypeIcon(speech.type)}
                         </div>
                         <div className="flex-1 min-w-0">
-                          <p className={`text-sm font-bold truncate leading-tight ${activeSpeech?.id === speech.id ? 'text-white' : 'text-zinc-200'}`}>
+                          <p className={`text-sm font-bold truncate leading-tight transition-colors ${activeSpeech?.id === speech.id ? 'text-indigo-600 dark:text-white' : 'text-zinc-900 dark:text-zinc-200'}`}>
                             {speech.title || 'Untitled'}
                           </p>
                         </div>
                       </div>
                       <div className="flex items-center justify-between mt-1">
-                        <span className="text-[10px] font-bold text-zinc-500 bg-zinc-800/50 px-1.5 py-0.5 rounded border border-zinc-800/80">
+                        <span className="text-[10px] font-bold text-zinc-500 dark:text-zinc-500 bg-gray-50 dark:bg-zinc-800/50 px-1.5 py-0.5 rounded border border-gray-100 dark:border-zinc-800/80 transition-colors">
                           {speech.type?.toUpperCase()}
                         </span>
-                        <span className="text-[10px] text-zinc-600 font-medium">{formatDate(speech.createdAt)}</span>
+                        <span className="text-[10px] text-zinc-400 dark:text-zinc-600 font-medium transition-colors">{formatDate(speech.createdAt)}</span>
                       </div>
                     </button>
                   ))}
@@ -378,32 +378,32 @@ For official letters, use proper formal structure.`;
         )}
 
         {/* MAIN CONTENT AREA */}
-        <main className="flex-1 flex flex-col min-w-0 bg-zinc-950 overflow-hidden relative">
+        <main className="flex-1 flex flex-col min-w-0 bg-gray-50 dark:bg-zinc-950 overflow-hidden relative transition-colors duration-300">
           
           {step === 1 && (
             <div className="flex-1 overflow-y-auto p-4 md:p-8 space-y-8 scrollbar-hide animate-in fade-in slide-in-from-bottom-2 duration-500">
               <div className="max-w-2xl mx-auto pb-10">
                 <header className="mb-8">
-                   <h2 className="text-2xl font-black text-white tracking-tight">Create New Draft</h2>
-                   <p className="text-zinc-500 text-sm mt-1">Set your preferences for the perfect draft.</p>
+                   <h2 className="text-2xl font-black text-zinc-900 dark:text-white tracking-tight transition-colors">Create New Draft</h2>
+                   <p className="text-zinc-500 dark:text-zinc-500 text-sm mt-1 transition-colors">Set your preferences for the perfect draft.</p>
                 </header>
                 
                 <div className="space-y-8">
                   {/* Draft Type */}
                   <section>
-                    <label className="block text-[10px] font-bold text-zinc-500 uppercase tracking-[0.2em] mb-4">Draft Type</label>
+                    <label className="block text-[10px] font-bold text-zinc-500 dark:text-zinc-500 uppercase tracking-[0.2em] mb-4 transition-colors">Draft Type</label>
                     <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                       {DRAFT_TYPES.map(type => (
                         <button
                           key={type.id}
                           onClick={() => setDraftType(type.id)}
-                          className={`flex flex-col items-center justify-center gap-2.5 p-4 rounded-2xl border transition-all duration-300 ${
+                          className={`flex flex-col items-center justify-center gap-2.5 p-4 rounded-2xl border transition-all duration-300 shadow-xs ${
                             draftType === type.id 
-                              ? 'bg-indigo-600 border-indigo-400 text-white shadow-[0_0_20px_rgba(79,70,229,0.3)] scale-105 z-10' 
-                              : 'bg-zinc-900/50 border-zinc-800 text-zinc-400 hover:border-zinc-700 hover:text-zinc-200'
+                              ? 'bg-white dark:bg-indigo-600 border-indigo-400 dark:border-indigo-400 text-indigo-600 dark:text-white shadow-[0_0_20px_rgba(79,70,229,0.15)] ring-2 ring-indigo-500/20 scale-105 z-10' 
+                              : 'bg-white dark:bg-zinc-900/50 border-gray-200 dark:border-zinc-800 text-zinc-400 dark:text-zinc-500 hover:border-gray-300 dark:hover:border-zinc-700 hover:text-zinc-900 dark:hover:text-zinc-200'
                           }`}
                         >
-                          <type.icon className={`w-5 h-5 ${draftType === type.id ? 'text-white' : 'text-zinc-500'}`} />
+                          <type.icon className={`w-5 h-5 ${draftType === type.id ? 'text-indigo-600 dark:text-white' : 'text-zinc-400 dark:text-zinc-500'}`} />
                           <span className="text-[10px] font-black uppercase tracking-wider">{type.label}</span>
                         </button>
                       ))}
@@ -412,29 +412,29 @@ For official letters, use proper formal structure.`;
 
                   {/* Topic */}
                   <section>
-                    <label className="block text-[10px] font-bold text-zinc-500 uppercase tracking-[0.2em] mb-4">Topic / Occasion</label>
+                    <label className="block text-[10px] font-bold text-zinc-500 dark:text-zinc-500 uppercase tracking-[0.2em] mb-4 transition-colors">Topic / Occasion</label>
                     <input
                       type="text"
                       value={topic}
                       onChange={e => setTopic(e.target.value)}
                       placeholder="e.g. Inauguration of NH-48 Highway..."
-                      className="w-full bg-zinc-900 border-2 border-zinc-800 text-zinc-100 rounded-2xl px-5 py-4 focus:border-indigo-500 outline-none transition-all placeholder:text-zinc-600 text-base"
+                      className="w-full bg-white dark:bg-zinc-900 border-2 border-gray-200 dark:border-zinc-800 text-zinc-900 dark:text-zinc-100 rounded-2xl px-5 py-4 focus:border-indigo-500 dark:focus:border-indigo-500 outline-none transition-all placeholder:text-zinc-400 dark:placeholder:text-zinc-600 text-base shadow-xs"
                     />
                   </section>
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                     {/* Tone */}
                     <section>
-                      <label className="block text-[10px] font-bold text-zinc-500 uppercase tracking-[0.2em] mb-4">Tone</label>
+                      <label className="block text-[10px] font-bold text-zinc-500 dark:text-zinc-500 uppercase tracking-[0.2em] mb-4 transition-colors">Tone</label>
                       <div className="flex flex-wrap gap-2">
                         {TONES.map(t => (
                           <button
                             key={t}
                             onClick={() => setTone(t)}
-                            className={`px-4 py-2 rounded-xl text-xs font-bold border transition-all ${
+                            className={`px-4 py-2 rounded-xl text-xs font-bold border transition-all shadow-xs ${
                               tone === t 
-                                ? 'bg-indigo-600 border-indigo-400 text-white shadow-lg' 
-                                : 'bg-zinc-900 border-zinc-800 text-zinc-500 hover:border-zinc-700'
+                                ? 'bg-indigo-600 border-indigo-500 text-white shadow-md' 
+                                : 'bg-white dark:bg-zinc-900 border-gray-200 dark:border-zinc-800 text-zinc-500 dark:text-zinc-600 hover:border-gray-300 dark:hover:border-zinc-700 hover:text-zinc-900 dark:hover:text-zinc-400'
                             }`}
                           >
                             {t}
@@ -445,16 +445,16 @@ For official letters, use proper formal structure.`;
 
                     {/* Length */}
                     <section>
-                      <label className="block text-[10px] font-bold text-zinc-500 uppercase tracking-[0.2em] mb-4">Length</label>
+                      <label className="block text-[10px] font-bold text-zinc-500 dark:text-zinc-500 uppercase tracking-[0.2em] mb-4 transition-colors">Length</label>
                       <div className="flex flex-wrap gap-2">
                         {LENGTHS.map(l => (
                           <button
                             key={l.id}
                             onClick={() => setLength(l.id)}
-                            className={`px-4 py-2 rounded-xl text-xs font-bold border transition-all ${
+                            className={`px-4 py-2 rounded-xl text-xs font-bold border transition-all shadow-xs ${
                               length === l.id 
-                                ? 'bg-indigo-600 border-indigo-400 text-white shadow-lg' 
-                                : 'bg-zinc-900 border-zinc-800 text-zinc-500 hover:border-zinc-700'
+                                ? 'bg-indigo-600 border-indigo-500 text-white shadow-md' 
+                                : 'bg-white dark:bg-zinc-900 border-gray-200 dark:border-zinc-800 text-zinc-500 dark:text-zinc-600 hover:border-gray-300 dark:hover:border-zinc-700 hover:text-zinc-900 dark:hover:text-zinc-400'
                             }`}
                           >
                             {l.label.split(' ')[0]}
@@ -466,13 +466,13 @@ For official letters, use proper formal structure.`;
 
                   {/* Context */}
                   <section>
-                    <label className="block text-[10px] font-bold text-zinc-500 uppercase tracking-[0.2em] mb-4">Additional Context</label>
+                    <label className="block text-[10px] font-bold text-zinc-500 dark:text-zinc-500 uppercase tracking-[0.2em] mb-4 transition-colors">Additional Context</label>
                     <textarea
                       value={context}
                       onChange={e => setContext(e.target.value)}
                       placeholder="Notes, statistics, or specific talking points..."
                       rows={4}
-                      className="w-full bg-zinc-900 border-2 border-zinc-800 text-zinc-100 rounded-2xl px-5 py-4 focus:border-indigo-500 outline-none transition-all placeholder:text-zinc-600 resize-none text-base"
+                      className="w-full bg-white dark:bg-zinc-900 border-2 border-gray-200 dark:border-zinc-800 text-zinc-900 dark:text-zinc-100 rounded-2xl px-5 py-4 focus:border-indigo-500 dark:focus:border-indigo-500 outline-none transition-all placeholder:text-zinc-400 dark:placeholder:text-zinc-600 resize-none text-base shadow-xs"
                     />
                   </section>
                 </div>
@@ -481,7 +481,7 @@ For official letters, use proper formal structure.`;
                   <button
                     onClick={handleGenerate}
                     disabled={!topic.trim() || isGenerating}
-                    className="w-full sm:w-auto px-10 py-4 bg-indigo-600 hover:bg-indigo-500 text-white rounded-2xl font-black uppercase tracking-widest text-sm transition-all shadow-[0_0_30px_rgba(79,70,229,0.3)] disabled:opacity-50 flex items-center justify-center gap-3 active:scale-95"
+                    className="w-full sm:w-auto px-10 py-4 bg-indigo-600 hover:bg-indigo-500 text-white rounded-2xl font-black uppercase tracking-widest text-sm transition-all shadow-[0_10px_30px_rgba(79,70,229,0.3)] disabled:opacity-50 flex items-center justify-center gap-3 active:scale-95"
                   >
                     <Sparkles className="w-5 h-5" />
                     Generate Draft
@@ -495,10 +495,10 @@ For official letters, use proper formal structure.`;
             <div className="flex-1 flex flex-col items-center justify-center p-8 animate-in zoom-in-95 duration-500">
               <div className="relative">
                 <div className="absolute inset-0 bg-indigo-500 blur-2xl opacity-20 animate-pulse"></div>
-                <Loader2 className="w-16 h-16 text-indigo-500 animate-[spin_1.5s_linear_infinite] relative z-10" />
+                <Loader2 className="w-16 h-16 text-indigo-600 dark:text-indigo-500 animate-[spin_1.5s_linear_infinite] relative z-10" />
               </div>
-              <h3 className="text-2xl font-black text-white mt-8 mb-2 tracking-tight">Drafting In Progress</h3>
-              <p className="text-zinc-500 text-center max-w-70">Our legislative engine is crafting your {draftType.toLowerCase()} response...</p>
+              <h3 className="text-2xl font-black text-zinc-900 dark:text-white mt-8 mb-2 tracking-tight transition-colors">Drafting In Progress</h3>
+              <p className="text-zinc-500 dark:text-zinc-500 text-center max-w-70 transition-colors">Our legislative engine is crafting your {draftType.toLowerCase()} response...</p>
               
               {error && (
                 <div className="mt-10 max-w-sm p-5 bg-red-950/20 border-2 border-red-900/30 rounded-3xl text-center space-y-4">
@@ -514,10 +514,10 @@ For official letters, use proper formal structure.`;
           )}
 
           {step === 3 && activeSpeech && (
-            <div className="flex-1 flex flex-col min-h-0 bg-zinc-950 animate-in slide-in-from-right-4 duration-500">
+            <div className="flex-1 flex flex-col min-h-0 bg-white dark:bg-zinc-950 animate-in slide-in-from-right-4 duration-500 transition-colors duration-300">
               
               {/* Toolbar */}
-              <div className="px-4 py-4 md:px-6 md:py-5 border-b border-zinc-900 flex flex-wrap items-center justify-between gap-4 sticky top-0 z-10 bg-zinc-950/80 backdrop-blur-md shrink-0">
+              <div className="px-4 py-4 md:px-6 md:py-5 border-b border-gray-100 dark:border-zinc-900 flex flex-wrap items-center justify-between gap-4 sticky top-0 z-10 bg-white/80 dark:bg-zinc-950/80 backdrop-blur-md shrink-0 transition-colors duration-300">
                 <div className="flex-1 min-w-0 pr-2">
                   {isEditingTitle ? (
                     <input
@@ -530,21 +530,21 @@ For official letters, use proper formal structure.`;
                         if (e.key === 'Escape') setIsEditingTitle(false);
                       }}
                       onBlur={handleTitleSubmit}
-                      className="w-full bg-zinc-900 border-2 border-indigo-500/50 text-white text-base md:text-lg font-black rounded-xl px-4 py-2 focus:outline-none"
+                      className="w-full bg-gray-50 dark:bg-zinc-900 border-2 border-indigo-500/50 text-zinc-900 dark:text-white text-base md:text-lg font-black rounded-xl px-4 py-2 focus:outline-none transition-all shadow-xs"
                     />
                   ) : (
                     <div className="flex flex-col">
                       <div className="flex items-center gap-1 mb-1">
-                        <span className="text-[9px] font-black uppercase tracking-widest text-indigo-500 bg-indigo-500/10 px-1.5 py-0.5 rounded">{activeSpeech.type}</span>
-                        {saveStatus === 'saving' && <span className="text-[9px] font-bold text-zinc-600 uppercase animate-pulse">● Saving</span>}
-                        {saveStatus === 'saved' && <Cloud className="w-3 h-3 text-zinc-700" />}
+                        <span className="text-[9px] font-black uppercase tracking-widest text-indigo-600 dark:text-indigo-500 bg-indigo-50 dark:bg-indigo-500/10 px-1.5 py-0.5 rounded transition-colors duration-300">{activeSpeech.type}</span>
+                        {saveStatus === 'saving' && <span className="text-[9px] font-bold text-zinc-400 dark:text-zinc-600 uppercase animate-pulse transition-colors">● Saving</span>}
+                        {saveStatus === 'saved' && <Cloud className="w-3 h-3 text-zinc-300 dark:text-zinc-700 transition-colors" />}
                       </div>
                       <h2 
-                        className="text-lg md:text-xl font-black text-white truncate cursor-pointer hover:text-indigo-400 transition-colors flex items-center gap-2"
+                        className="text-lg md:text-xl font-black text-zinc-900 dark:text-white truncate cursor-pointer hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors flex items-center gap-2 duration-300"
                         onClick={() => { setEditTitle(activeSpeech.title); setIsEditingTitle(true); }}
                       >
                         {activeSpeech.title}
-                        < Pencil className="w-3.5 h-3.5 text-zinc-700 shrink-0" />
+                        < Pencil className="w-3.5 h-3.5 text-zinc-300 dark:text-zinc-700 shrink-0 transition-colors" />
                       </h2>
                     </div>
                   )}
@@ -563,53 +563,68 @@ For official letters, use proper formal structure.`;
                    </button>
                 </div>
               </div>
-              
-              {/* Editor Container */}
-              <div className="flex-1 min-h-0 bg-zinc-950 overflow-hidden relative group">
-                <style>{`
-                  .speeches-quill-container .ql-toolbar {
-                    border: none !important;
-                    border-bottom: 2px solid #18181b !important;
-                    background-color: #09090b !important;
-                    padding: 10px 16px !important;
-                  }
-                  .speeches-quill-container .ql-container {
-                    border: none !important;
-                    font-size: 16px !important;
-                    color: #e4e4e7 !important;
-                    height: calc(100% - 44px) !important;
-                  }
-                  .speeches-quill-container .ql-editor {
-                    padding: 24px !important;
-                    line-height: 1.6 !important;
-                    scrollbar-width: thin;
-                    scrollbar-color: #27272a transparent;
-                  }
-                  .speeches-quill-container .ql-stroke { stroke: #52525b !important; }
-                  .speeches-quill-container .ql-fill { fill: #52525b !important; }
-                  .speeches-quill-container .ql-picker { color: #52525b !important; font-weight: bold !important; }
-                  .speeches-quill-container .ql-active .ql-stroke, 
-                  .speeches-quill-container .ql-active .ql-fill,
-                  .speeches-quill-container button:hover .ql-stroke { stroke: #6366f1 !important; }
-                  @media (max-width: 768px) {
-                    .speeches-quill-container .ql-editor { padding: 16px !important; font-size: 15px !important; }
-                    .speeches-quill-container .ql-toolbar { padding: 8px !important; overflow-x: auto; display: flex; align-items: center; }
-                  }
-                `}</style>
-                <div className="h-full speeches-quill-container">
-                  <ReactQuill 
-                    theme="snow" 
-                    value={draftContent} 
-                    onChange={setDraftContent}
-                    className="h-full"
-                  />
+                   {/* Editor Container */}
+                <div className="flex-1 min-h-0 bg-white dark:bg-zinc-950 overflow-hidden relative group transition-colors duration-300">
+                  <style>{`
+                    .speeches-quill-container .ql-toolbar {
+                      border: none !important;
+                      border-bottom: 2px solid var(--quill-border) !important;
+                      background-color: var(--quill-toolbar-bg) !important;
+                      padding: 10px 16px !important;
+                      transition: all 0.3s ease;
+                    }
+                    .speeches-quill-container .ql-container {
+                      border: none !important;
+                      font-size: 16px !important;
+                      color: var(--quill-text) !important;
+                      height: calc(100% - 44px) !important;
+                      transition: all 0.3s ease;
+                    }
+                    .speeches-quill-container .ql-editor {
+                      padding: 24px !important;
+                      line-height: 1.6 !important;
+                      scrollbar-width: thin;
+                      scrollbar-color: var(--quill-scrollbar) transparent;
+                    }
+                    .speeches-quill-container .ql-stroke { stroke: var(--quill-icon) !important; }
+                    .speeches-quill-container .ql-fill { fill: var(--quill-icon) !important; }
+                    .speeches-quill-container .ql-picker { color: var(--quill-icon) !important; font-weight: bold !important; }
+                    .speeches-quill-container .ql-active .ql-stroke, 
+                    .speeches-quill-container .ql-active .ql-fill,
+                    .speeches-quill-container button:hover .ql-stroke { stroke: #6366f1 !important; }
+                    
+                    :root {
+                      --quill-border: #f4f4f5;
+                      --quill-toolbar-bg: #ffffff;
+                      --quill-text: #18181b;
+                      --quill-icon: #71717a;
+                      --quill-scrollbar: #e4e4e7;
+                    }
+                    
+                    [data-theme='dark'] {
+                      --quill-border: #18181b;
+                      --quill-toolbar-bg: #09090b;
+                      --quill-text: #e4e4e7;
+                      --quill-icon: #52525b;
+                      --quill-scrollbar: #27272a;
+                    }
+
+                    @media (max-width: 768px) {
+                      .speeches-quill-container .ql-editor { padding: 16px !important; font-size: 15px !important; }
+                      .speeches-quill-container .ql-toolbar { padding: 8px !important; overflow-x: auto; display: flex; align-items: center; }
+                    }
+                  `}</style>
+                  <div className="h-full speeches-quill-container">
+                    <ReactQuill 
+                      theme="snow" 
+                      value={draftContent} 
+                      onChange={setDraftContent}
+                    />
+                  </div>
                 </div>
               </div>
-              
-            </div>
-          )}
+            )}
         </main>
-        
       </div>
     </div>
   );

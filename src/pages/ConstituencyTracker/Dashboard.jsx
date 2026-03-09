@@ -55,74 +55,74 @@ export default function ConstituencyDashboard() {
     <div className="p-6 max-w-7xl mx-auto space-y-6">
       {/* Summary Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        <div className="bg-zinc-900 border border-zinc-800 p-5 rounded-lg">
-          <div className="flex items-center gap-3 mb-2">
-            <div className="p-2 bg-zinc-800/80 text-zinc-300 rounded-lg">
+        <div className="bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 shadow-sm p-5 rounded-2xl transition-all">
+          <div className="flex items-center gap-3 mb-3">
+            <div className="p-2 bg-gray-100 dark:bg-zinc-800/80 text-zinc-500 dark:text-zinc-300 rounded-xl transition-colors">
               <Inbox className="w-5 h-5" />
             </div>
-            <h3 className="text-sm font-medium text-zinc-400">Recorded Issues</h3>
+            <h3 className="text-sm font-bold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider transition-colors">Recorded Issues</h3>
           </div>
-          <p className="text-2xl font-bold text-zinc-100">{complaints.length}</p>
+          <p className="text-3xl font-black text-zinc-900 dark:text-zinc-100 transition-colors">{complaints.length}</p>
         </div>
         
-        <div className="bg-zinc-900 border border-zinc-800 p-5 rounded-lg">
-          <div className="flex items-center gap-3 mb-2">
-            <div className="p-2 bg-blue-500/10 text-blue-500 rounded-lg">
+        <div className="bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 shadow-sm p-5 rounded-2xl transition-all">
+          <div className="flex items-center gap-3 mb-3">
+            <div className="p-2 bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 rounded-xl transition-colors">
               <Briefcase className="w-5 h-5" />
             </div>
-            <h3 className="text-sm font-medium text-zinc-400">Active Projects</h3>
+            <h3 className="text-sm font-bold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider transition-colors">Active Projects</h3>
           </div>
-          <p className="text-2xl font-bold text-zinc-100">{activeProjects}</p>
+          <p className="text-3xl font-black text-zinc-900 dark:text-zinc-100 transition-colors">{activeProjects}</p>
         </div>
 
-        <div className="bg-zinc-900 border border-zinc-800 p-5 rounded-lg">
-          <div className="flex items-center gap-3 mb-2">
-            <div className="p-2 bg-red-500/10 text-red-500 rounded-lg">
+        <div className="bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 shadow-sm p-5 rounded-2xl transition-all">
+          <div className="flex items-center gap-3 mb-3">
+            <div className="p-2 bg-red-500/10 text-red-600 dark:text-red-400 rounded-xl transition-colors">
               <AlertCircle className="w-5 h-5" />
             </div>
-            <h3 className="text-sm font-medium text-zinc-400">Pending Complaints</h3>
+            <h3 className="text-sm font-bold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider transition-colors">Pending Complaints</h3>
           </div>
-          <p className="text-2xl font-bold text-zinc-100">{complaints.filter(c => c.status === 'Pending').length}</p>
+          <p className="text-3xl font-black text-zinc-900 dark:text-zinc-100 transition-colors">{complaints.filter(c => c.status === 'Pending').length}</p>
         </div>
         
-        <div className="bg-zinc-900 border border-zinc-800 p-5 rounded-lg">
-          <div className="flex items-center gap-3 mb-2">
-            <div className="p-2 bg-purple-500/10 text-purple-500 rounded-lg">
+        <div className="bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 shadow-sm p-5 rounded-2xl transition-all">
+          <div className="flex items-center gap-3 mb-3">
+            <div className="p-2 bg-purple-500/10 text-purple-600 dark:text-purple-400 rounded-xl transition-colors">
               <Users className="w-5 h-5" />
             </div>
-            <h3 className="text-sm font-medium text-zinc-400">Stakeholders</h3>
+            <h3 className="text-sm font-bold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider transition-colors">Stakeholders</h3>
           </div>
-          <p className="text-2xl font-bold text-zinc-100">{people.length}</p>
+          <p className="text-3xl font-black text-zinc-900 dark:text-zinc-100 transition-colors">{people.length}</p>
         </div>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         
         {/* Ward Health Matrix */}
-        <div className="lg:col-span-1 bg-zinc-900 border border-zinc-800 rounded-lg p-5">
+        <div className="lg:col-span-1 bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 rounded-2xl shadow-sm p-6 transition-all">
           <div className="flex items-center justify-between mb-6">
-            <div className="flex items-center gap-2">
-              <Activity className="w-5 h-5 text-zinc-400" />
-              <h2 className="text-lg font-bold text-zinc-100">Hotspot Wards</h2>
+            <div className="flex items-center gap-3">
+              <Activity className="w-5 h-5 text-indigo-500" />
+              <h2 className="text-lg font-black text-zinc-900 dark:text-zinc-100 tracking-tight transition-colors">Hotspot Wards</h2>
             </div>
-            <Link to="/constituency/wards" className="text-xs text-zinc-400 hover:text-white transition-colors">
+            <Link to="/constituency/wards" className="text-xs font-bold text-indigo-600 dark:text-indigo-400 hover:underline transition-colors">
               View All
             </Link>
           </div>
           
           <div className="space-y-4">
             {wardHealth.map((ward, idx) => (
-              <div key={ward.ward} className="flex items-center justify-between p-3 bg-zinc-950 border border-zinc-800 rounded-md">
+              <div key={ward.ward} className="flex items-center justify-between p-3.5 bg-gray-50 dark:bg-zinc-950 border border-gray-100 dark:border-zinc-800 rounded-xl transition-all">
                 <div className="flex items-center gap-3">
-                  <span className="text-zinc-500 font-mono text-xs w-3">{idx + 1}.</span>
-                  <span className="text-zinc-200 font-medium text-sm">{ward.ward}</span>
+                  <span className="text-zinc-400 dark:text-zinc-600 font-mono text-xs w-4 font-bold">{idx + 1}.</span>
+                  <span className="text-zinc-900 dark:text-zinc-200 font-bold text-sm transition-colors">{ward.ward}</span>
                 </div>
-                <div className="flex gap-3 text-xs">
-                  <span className="flex items-center gap-1.25 text-red-400">
+                <div className="flex gap-4 text-[11px] font-black uppercase tracking-wider">
+                  <span className="flex items-center gap-1.25 text-red-600 dark:text-red-400 transition-colors">
                     <AlertCircle className="w-3 h-3" />
                     {ward.complaintCount} Issue{ward.complaintCount !== 1 ? 's' : ''}
                   </span>
-                  <span className="flex items-center gap-1.25 text-blue-400">
+                  <span className="flex items-center gap-1.25 text-indigo-600 dark:text-indigo-400 transition-colors">
                     <Briefcase className="w-3 h-3" />
                     {ward.projectCount} Proj.
                   </span>
@@ -133,10 +133,10 @@ export default function ConstituencyDashboard() {
         </div>
 
         {/* Recent Complaints List */}
-        <div className="lg:col-span-2 bg-zinc-900 border border-zinc-800 rounded-lg overflow-hidden flex flex-col">
-          <div className="px-5 py-4 border-b border-zinc-800 flex justify-between items-center bg-zinc-900/50">
-            <h2 className="text-lg font-semibold text-zinc-100">Most Recent Complaints</h2>
-            <Link to="/constituency/complaints" className="text-xs text-zinc-400 hover:text-white flex items-center gap-1 transition-colors">
+        <div className="lg:col-span-2 bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 rounded-2xl shadow-sm overflow-hidden flex flex-col transition-all">
+          <div className="px-6 py-4 border-b border-gray-100 dark:border-zinc-800 flex justify-between items-center bg-gray-50/50 dark:bg-zinc-900/50 transition-colors">
+            <h2 className="text-lg font-black text-zinc-900 dark:text-zinc-100 tracking-tight transition-colors">Most Recent Complaints</h2>
+            <Link to="/constituency/complaints" className="text-xs font-bold text-indigo-600 dark:text-indigo-400 hover:underline flex items-center gap-1 transition-colors">
               View Database
             </Link>
           </div>
@@ -145,20 +145,20 @@ export default function ConstituencyDashboard() {
               {recentComplaints.map(complaint => (
                 <div 
                   key={complaint.id} 
-                  className="flex justify-between items-center p-3 bg-zinc-950 border border-zinc-800 rounded-md hover:border-zinc-700 transition-colors"
+                  className="flex justify-between items-center p-4 bg-gray-50 dark:bg-zinc-950 border border-gray-100 dark:border-zinc-800 rounded-xl hover:border-indigo-500/30 transition-all group"
                 >
                   <div>
-                    <Link to={`/constituency/complaints/${complaint.id}`} className="font-medium text-zinc-200 text-sm hover:underline">
+                    <Link to={`/constituency/complaints/${complaint.id}`} className="font-bold text-zinc-900 dark:text-zinc-200 text-sm hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">
                       {complaint.citizenName}
                     </Link>
-                    <p className="text-zinc-500 text-xs mt-1">
+                    <p className="text-zinc-500 dark:text-zinc-500 text-xs mt-1 font-medium transition-colors">
                       {complaint.ward} • {complaint.issueType}
                     </p>
                   </div>
-                  <span className={`px-2 py-0.5 rounded-full text-xs font-medium border
-                    ${complaint.status === 'Resolved' ? 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20' : 
-                      complaint.status === 'In Progress' ? 'bg-blue-500/10 text-blue-500 border-blue-500/20' : 
-                      'bg-amber-500/10 text-amber-500 border-amber-500/20'}
+                  <span className={`px-3 py-1 rounded-lg text-[10px] font-black uppercase tracking-wider border transition-all
+                    ${complaint.status === 'Resolved' ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-500 border-emerald-500/20' : 
+                      complaint.status === 'In Progress' ? 'bg-indigo-500/10 text-indigo-600 dark:text-indigo-500 border-indigo-500/20' : 
+                      'bg-amber-500/10 text-amber-600 dark:text-amber-500 border-amber-500/20'}
                   `}>
                     {complaint.status}
                   </span>

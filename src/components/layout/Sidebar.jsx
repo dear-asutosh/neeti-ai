@@ -62,7 +62,7 @@ export default function Sidebar({ mobileOpen, setMobileOpen }) {
     }
   ];
 
-  const sidebarClasses = `bg-zinc-950 text-zinc-300 flex flex-col h-full transition-all duration-300 z-20 border-r border-zinc-800
+  const sidebarClasses = `bg-white dark:bg-zinc-950 text-zinc-600 dark:text-zinc-300 flex flex-col h-full transition-all duration-300 z-20 border-r border-gray-200 dark:border-zinc-800
     ${isCollapsed ? 'w-20' : 'w-64'} 
     ${mobileOpen ? 'fixed inset-y-0 left-0 translate-x-0' : 'fixed inset-y-0 left-0 -translate-x-full md:relative md:translate-x-0'}`;
 
@@ -79,12 +79,12 @@ export default function Sidebar({ mobileOpen, setMobileOpen }) {
       {/* Sidebar Container */}
       <div className={sidebarClasses}>
         {/* Header */}
-        <div className={`flex items-center justify-between h-14 px-4 border-b border-zinc-800 ${isCollapsed ? 'justify-center' : ''}`}>
+        <div className={`flex items-center justify-between h-14 px-4 border-b border-gray-100 dark:border-zinc-800 ${isCollapsed ? 'justify-center' : ''}`}>
           <NavLink to="/" onClick={() => setMobileOpen(false)} className="flex items-center gap-3 overflow-hidden cursor-pointer hover:opacity-80 transition-opacity">
-            <div className="bg-[#09090B] rounded-md p-1.5 shrink-0 flex items-center justify-center">
-               <Landmark className="text-white w-5 h-5" />
+            <div className="bg-gray-100 dark:bg-[#09090B] rounded-md p-1.5 shrink-0 flex items-center justify-center">
+               <Landmark className="text-zinc-900 dark:text-white w-5 h-5" />
             </div>
-            {!isCollapsed && <span className="text-[15px] font-semibold tracking-tight text-white whitespace-nowrap">Neeti AI</span>}
+            {!isCollapsed && <span className="text-[15px] font-semibold tracking-tight text-zinc-900 dark:text-white whitespace-nowrap">Neeti AI</span>}
           </NavLink>
           {/* Mobile Close Button */}
           {mobileOpen && (
@@ -100,7 +100,7 @@ export default function Sidebar({ mobileOpen, setMobileOpen }) {
             {navSections.map((section, idx) => (
               <div key={section.title} className="flex flex-col space-y-1">
                 {!isCollapsed && (
-                  <div className="px-2 text-[11px] font-medium text-zinc-500 tracking-wider mb-1 mt-1 font-sans">
+                  <div className="px-2 text-[11px] font-medium text-zinc-400 dark:text-zinc-500 tracking-wider mb-1 mt-1 font-sans">
                     {section.title}
                   </div>
                 )}
@@ -117,7 +117,7 @@ export default function Sidebar({ mobileOpen, setMobileOpen }) {
                       onClick={() => setMobileOpen(false)}
                       className={({ isActive }) => `
                         flex items-center gap-3 px-2.5 py-2 rounded-md transition-all text-sm font-medium
-                        ${isActive ? 'bg-zinc-800/80 text-zinc-50 shadow-sm' : 'text-zinc-400 hover:bg-zinc-800/50 hover:text-zinc-100'}
+                        ${isActive ? 'bg-gray-100 dark:bg-zinc-800/80 text-zinc-900 dark:text-zinc-50 shadow-sm' : 'text-zinc-500 dark:text-zinc-400 hover:bg-gray-50 dark:hover:bg-zinc-800/50 hover:text-zinc-900 dark:hover:text-zinc-100'}
                         ${isCollapsed ? 'justify-center' : ''}
                       `}
                       title={isCollapsed ? item.name : undefined}
@@ -137,11 +137,11 @@ export default function Sidebar({ mobileOpen, setMobileOpen }) {
         </div>
 
         {/* Bottom Actions */}
-        <div className="p-3 border-t border-zinc-800 space-y-1">
+        <div className="p-3 border-t border-gray-100 dark:border-zinc-800 space-y-1">
           {/* Desktop Collapse Toggle */}
           <button
             onClick={() => setIsCollapsed(!isCollapsed)}
-            className={`hidden md:flex items-center gap-3 w-full px-2.5 py-2 rounded-md text-zinc-400 hover:bg-zinc-800/50 hover:text-zinc-100 transition-colors text-sm font-medium ${isCollapsed ? 'justify-center' : ''}`}
+            className={`hidden md:flex items-center gap-3 w-full px-2.5 py-2 rounded-md text-zinc-500 dark:text-zinc-400 hover:bg-gray-100 dark:hover:bg-zinc-800/50 hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors text-sm font-medium ${isCollapsed ? 'justify-center' : ''}`}
           >
             {isCollapsed ? <ChevronRight className="w-4 h-4" /> : <ChevronLeft className="w-4 h-4" />}
             {!isCollapsed && <span>Collapse</span>}
@@ -150,20 +150,20 @@ export default function Sidebar({ mobileOpen, setMobileOpen }) {
           {/* Profile Section */}
           <div className="relative group">
             {/* Hover Menu */}
-            <div className={`absolute bottom-full left-0 mb-2 bg-zinc-900 border border-zinc-800 rounded-md shadow-lg overflow-hidden transition-all duration-200 opacity-0 invisible group-hover:opacity-100 group-hover:visible flex flex-col z-50
+            <div className={`absolute bottom-full left-0 mb-2 bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 rounded-md shadow-lg overflow-hidden transition-all duration-200 opacity-0 invisible group-hover:opacity-100 group-hover:visible flex flex-col z-50
               ${isCollapsed ? 'left-full ml-2 w-48' : 'w-full'}
             `}>
               <NavLink 
                 to="/settings"
                 onClick={() => setMobileOpen(false)}
-                className="flex items-center gap-3 px-3 py-2 text-sm text-zinc-300 hover:bg-zinc-800 hover:text-zinc-50 w-full text-left transition-colors font-medium"
+                className="flex items-center gap-3 px-3 py-2 text-sm text-zinc-600 dark:text-zinc-300 hover:bg-gray-100 dark:hover:bg-zinc-800 hover:text-zinc-900 dark:hover:text-zinc-50 w-full text-left transition-colors font-medium"
               >
                 <Settings className="w-4 h-4 shrink-0" />
                 <span>Settings & Security</span>
               </NavLink>
               <button
                 onClick={handleLogout}
-                className="flex items-center gap-3 px-3 py-2 text-sm text-red-500 hover:bg-zinc-800 hover:text-red-400 w-full text-left transition-colors border-t border-zinc-800 font-medium"
+                className="flex items-center gap-3 px-3 py-2 text-sm text-red-500 hover:bg-gray-100 dark:hover:bg-zinc-800 hover:text-red-400 w-full text-left transition-colors border-t border-gray-100 dark:border-zinc-800 font-medium"
               >
                 <LogOut className="w-4 h-4 shrink-0" />
                 <span>Sign Out</span>
@@ -172,9 +172,9 @@ export default function Sidebar({ mobileOpen, setMobileOpen }) {
 
             {/* Profile Button */}
             <button
-              className={`flex items-center gap-3 w-full px-2 py-2 rounded-md text-zinc-300 hover:bg-zinc-800 hover:text-zinc-50 transition-colors mt-1 ${isCollapsed ? 'justify-center' : ''}`}
+              className={`flex items-center gap-3 w-full px-2 py-2 rounded-md text-zinc-600 dark:text-zinc-300 hover:bg-gray-100 dark:hover:bg-zinc-800 hover:text-zinc-900 dark:hover:text-zinc-50 transition-colors mt-1 ${isCollapsed ? 'justify-center' : ''}`}
             >
-              <div className="w-8 h-8 rounded-md bg-zinc-800 border border-zinc-700 flex items-center justify-center shrink-0 overflow-hidden shadow-sm">
+              <div className="w-8 h-8 rounded-md bg-gray-100 dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 flex items-center justify-center shrink-0 overflow-hidden shadow-sm">
                 {displayPhoto ? (
                   <img src={displayPhoto} alt="Avatar" className="h-full w-full object-cover" referrerPolicy="no-referrer" />
                 ) : (
@@ -183,7 +183,7 @@ export default function Sidebar({ mobileOpen, setMobileOpen }) {
               </div>
               {!isCollapsed && (
                 <div className="flex flex-col items-start overflow-hidden">
-                  <span className="text-sm font-medium text-zinc-50 truncate w-full text-left">{dbUser?.displayName || currentUser?.displayName || 'Leader'}</span>
+                  <span className="text-sm font-medium text-zinc-900 dark:text-zinc-50 truncate w-full text-left">{dbUser?.displayName || currentUser?.displayName || 'Leader'}</span>
                   <span className="text-xs text-zinc-500 truncate w-full text-left">{currentUser?.email || 'No email provided'}</span>
                 </div>
               )}

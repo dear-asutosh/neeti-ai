@@ -58,14 +58,14 @@ export default function ConstituencyLayout() {
   };
 
   return (
-    <div className="flex flex-col h-full bg-zinc-950">
-      <div className="bg-zinc-900 border-b border-zinc-800 px-4 md:px-6 pt-4 sticky top-0 z-10 w-full overflow-hidden">
+    <div className="flex flex-col h-full bg-gray-50 dark:bg-zinc-950 transition-colors">
+      <div className="bg-white dark:bg-zinc-900 border-b border-gray-100 dark:border-zinc-800 px-4 md:px-6 pt-5 sticky top-0 z-10 w-full overflow-hidden shadow-sm transition-all">
         <div className="max-w-7xl mx-auto relative">
           
           {showLeftArrow && (
-            <div className="absolute left-0 top-0 bottom-4 w-8 z-20 bg-linear-to-r from-zinc-900 to-transparent md:hidden">
-              <button onClick={scrollLeft} className="h-full flex items-center pl-1 text-zinc-400 hover:text-zinc-100">
-                <ChevronLeft className="w-5 h-5 -ml-1 drop-shadow-[2px_0_4px_rgba(0,0,0,0.8)]" />
+            <div className="absolute left-0 top-0 bottom-4 w-12 z-20 bg-linear-to-r from-white dark:from-zinc-900 to-transparent md:hidden transition-all">
+              <button onClick={scrollLeft} className="h-full flex items-center pl-1 text-zinc-400 dark:text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-100">
+                <ChevronLeft className="w-5 h-5 -ml-1 drop-shadow-sm" />
               </button>
             </div>
           )}
@@ -86,13 +86,13 @@ export default function ConstituencyLayout() {
                   to={tab.path}
                   ref={(el) => (tabRefs.current[tab.path] = el)}
                   className={`
-                    flex items-center gap-2 pb-3 px-1 border-b-2 transition-colors whitespace-nowrap text-sm font-medium
+                    flex items-center gap-2.5 pb-3.5 px-2 border-b-2 transition-all whitespace-nowrap text-xs font-black uppercase tracking-widest
                     ${isActive 
-                      ? 'border-zinc-100 text-zinc-100' 
-                      : 'border-transparent text-zinc-400 hover:text-zinc-200 hover:border-zinc-600'}
+                      ? 'border-indigo-600 dark:border-indigo-400 text-indigo-600 dark:text-indigo-400' 
+                      : 'border-transparent text-zinc-400 dark:text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-200'}
                   `}
                 >
-                  <tab.icon className="w-4 h-4" />
+                  <tab.icon className={`w-4 h-4 ${isActive ? 'animate-in zoom-in-50 duration-300' : ''}`} strokeWidth={isActive ? 3 : 2} />
                   {tab.name}
                 </NavLink>
               );
@@ -100,9 +100,9 @@ export default function ConstituencyLayout() {
           </nav>
 
           {showRightArrow && (
-            <div className="absolute right-0 top-0 bottom-4 w-8 z-20 bg-linear-to-l from-zinc-900 to-transparent md:hidden flex justify-end">
-              <button onClick={scrollRight} className="h-full flex items-center pr-1 text-zinc-400 hover:text-zinc-100">
-                <ChevronRight className="w-5 h-5 -mr-1 drop-shadow-[-2px_0_4px_rgba(0,0,0,0.8)]" />
+            <div className="absolute right-0 top-0 bottom-4 w-12 z-20 bg-linear-to-l from-white dark:from-zinc-900 to-transparent md:hidden flex justify-end transition-all">
+              <button onClick={scrollRight} className="h-full flex items-center pr-1 text-zinc-400 dark:text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-100">
+                <ChevronRight className="w-5 h-5 -mr-1 drop-shadow-sm" />
               </button>
             </div>
           )}
