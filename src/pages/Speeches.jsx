@@ -498,7 +498,7 @@ For official letters, use proper formal structure.`;
                 <Loader2 className="w-16 h-16 text-indigo-500 animate-[spin_1.5s_linear_infinite] relative z-10" />
               </div>
               <h3 className="text-2xl font-black text-white mt-8 mb-2 tracking-tight">Drafting In Progress</h3>
-              <p className="text-zinc-500 text-center max-w-[280px]">Our legislative engine is crafting your {draftType.toLowerCase()} response...</p>
+              <p className="text-zinc-500 text-center max-w-70">Our legislative engine is crafting your {draftType.toLowerCase()} response...</p>
               
               {error && (
                 <div className="mt-10 max-w-sm p-5 bg-red-950/20 border-2 border-red-900/30 rounded-3xl text-center space-y-4">
@@ -535,7 +535,7 @@ For official letters, use proper formal structure.`;
                   ) : (
                     <div className="flex flex-col">
                       <div className="flex items-center gap-1 mb-1">
-                        <span className="text-[9px] font-black uppercase tracking-[0.1em] text-indigo-500 bg-indigo-500/10 px-1.5 py-0.5 rounded">{activeSpeech.type}</span>
+                        <span className="text-[9px] font-black uppercase tracking-widest text-indigo-500 bg-indigo-500/10 px-1.5 py-0.5 rounded">{activeSpeech.type}</span>
                         {saveStatus === 'saving' && <span className="text-[9px] font-bold text-zinc-600 uppercase animate-pulse">● Saving</span>}
                         {saveStatus === 'saved' && <Cloud className="w-3 h-3 text-zinc-700" />}
                       </div>

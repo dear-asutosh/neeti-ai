@@ -6,21 +6,30 @@ import {
   Loader2, 
   User, 
   ChevronRight,
-  AlertCircle
+  AlertCircle,
+  Plus,
+  MessageSquare,
+  History,
+  Menu,
+  X,
+  Clock,
+  Edit2,
+  Check
 } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import { 
   collection, 
   query, 
-  where, 
+  where,
   orderBy, 
   limit, 
   getDocs, 
   doc, 
   onSnapshot, 
-  setDoc, 
+  addDoc,
   deleteDoc,
   Timestamp,
+  updateDoc,
 } from 'firebase/firestore';
 import { db } from '../services/firebase';
 import { useAuth } from '../hooks/useAuth';
@@ -37,7 +46,13 @@ export default function AIAssistant() {
   const [isLoading, setIsLoading] = useState(false);
   const [initialLoading, setInitialLoading] = useState(true);
   const [contextSnapshot, setContextSnapshot] = useState('');
-  const [error, setError] = useState(null);
+  
+  // History State
+  const [threads, setThreads] = useState([]);
+  const [activeThreadId, setActiveThreadId] = useState(null);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false); // Mobile sidebar
+  const [editingThreadId, setEditingThreadId] = useState(null);
+  const [editingTitle, setEditingTitle] = useState('');
   
   const messagesEndRef = useRef(null);
   const textareaRef = useRef(null);
@@ -55,38 +70,21 @@ export default function AIAssistant() {
 
   useEffect(() => {
     scrollToBottom();
-  }, [messages]);
+  }, [messages, isLoading]);
 
-  // Fetch context data and chat history
+  // Fetch context data
   useEffect(() => {
     if (!currentUser) return;
 
-    const fetchAllData = async () => {
+    const fetchContext = async () => {
       try {
-        setInitialLoading(true);
-        setError(null);
-
         const uid = currentUser.uid;
 
-        // 1. Documents
-        const docsQuery = query(
-          collection(db, `users/${uid}/documents`),
-          orderBy('createdAt', 'desc'),
-          limit(10)
-        );
-        const docsSnap = await getDocs(docsQuery);
-        const docTitles = docsSnap.docs.map(d => d.data().title).join(', ');
-
-        // 2. Meetings
-        const meetingsQuery = query(
-          collection(db, `users/${uid}/meetings`),
-          orderBy('createdAt', 'desc'),
-          limit(10)
-        );
-        const meetingsSnap = await getDocs(meetingsQuery);
-        const meetingTitles = meetingsSnap.docs.map(m => m.data().title).join(', ');
-
-        // 3. Schedule Events
+        // 1. Documents & Meetings
+        const docsQuery = query(collection(db, `users/${uid}/documents`), orderBy('createdAt', 'desc'), limit(10));
+        const meetingsQuery = query(collection(db, `users/${uid}/meetings`), orderBy('createdAt', 'desc'), limit(10));
+        
+        // 2. Schedule Events (Upcoming)
         const now = Timestamp.now();
         const eventsQuery = query(
           collection(db, `users/${uid}/scheduleEvents`),
@@ -94,64 +92,111 @@ export default function AIAssistant() {
           orderBy('startTime', 'asc'),
           limit(5)
         );
-        const eventsSnap = await getDocs(eventsQuery);
+
+        // 3. Fetch all in parallel
+        const [docsSnap, meetingsSnap, eventsSnap] = await Promise.all([
+          getDocs(docsQuery),
+          getDocs(meetingsQuery),
+          getDocs(eventsQuery)
+        ]);
+        
+        const docTitles = docsSnap.docs.map(d => d.data().title).join(', ');
+        const meetingTitles = meetingsSnap.docs.map(m => m.data().title).join(', ');
         const upcomingEvents = eventsSnap.docs.map(e => {
           const data = e.data();
           const date = data.startTime?.toDate()?.toLocaleDateString() || 'N/A';
           return `${data.title} (${data.category}) on ${date}`;
-        }).join(', ');
+        }).join('; ');
 
-        // 4. Complaints
-        const complaintsSnap = await getDocs(collection(db, `users/${uid}/complaints`));
-        const complaints = complaintsSnap.docs.map(d => d.data());
-        const totalComplaints = complaints.length;
-        const pendingComplaints = complaints.filter(c => c.status === 'pending' || c.status === 'Pending').length;
-        const resolvedComplaints = complaints.filter(c => c.status === 'resolved' || c.status === 'Resolved').length;
-        const complaintCategories = [...new Set(complaints.map(c => c.category))].slice(0, 5).join(', ');
+        // 4. Complaints & Projects (Totals and Status)
+        const [complaintsSnap, projectsSnap] = await Promise.all([
+          getDocs(collection(db, `users/${uid}/complaints`)),
+          getDocs(collection(db, `users/${uid}/projects`))
+        ]);
 
-        // 5. Projects
-        const projectsSnap = await getDocs(collection(db, `users/${uid}/projects`));
-        const projects = projectsSnap.docs.map(d => d.data());
-        const activeProjects = projects.filter(p => p.status === 'active' || p.status === 'Active' || p.status === 'ongoing').length;
-        const completedProjects = projects.filter(p => p.status === 'completed' || p.status === 'Completed').length;
-
-        const snapshot = `Documents summarized recently: [${docTitles || 'None'}]. Meetings analyzed: [${meetingTitles || 'None'}]. Upcoming events: [${upcomingEvents || 'None'}]. Constituency complaints: ${totalComplaints} total, ${pendingComplaints} pending, ${resolvedComplaints} resolved. Top complaint categories: [${complaintCategories || 'None'}]. Projects: ${activeProjects} active, ${completedProjects} completed.`;
+        const totalComplaints = complaintsSnap.size;
+        const pendingComplaints = complaintsSnap.docs.filter(d => ['pending', 'Pending'].includes(d.data().status)).length;
         
+        const totalProjects = projectsSnap.size;
+        const activeProjects = projectsSnap.docs.filter(d => ['active', 'Active', 'ongoing'].includes(d.data().status)).length;
+
+        const snapshot = `
+          **Recent Documents**: ${docTitles || 'None'}.
+          **Recent Meetings**: ${meetingTitles || 'None'}.
+          **Upcoming Schedule**: ${upcomingEvents || 'No upcoming events'}.
+          **Constituency Complaints**: ${totalComplaints} total (${pendingComplaints} pending).
+          **Active Projects**: ${activeProjects} out of ${totalProjects} total.
+        `.trim();
+
         setContextSnapshot(snapshot);
-
-        // Load Chat History
-        const historyDocRef = doc(db, `users/${uid}/assistantChat/history`);
-        const unsubscribe = onSnapshot(historyDocRef, (docSnap) => {
-          if (docSnap.exists()) {
-            const hData = docSnap.data();
-            setMessages(hData.messages || []);
-          } else {
-            // First time user - add proactive message
-            const welcomeMsg = {
-              role: 'assistant',
-              content: "Welcome to Neeti AI Assistant. I have access to your workspace — your documents, meetings, schedule, constituency complaints, and projects. How can I help you today? You can ask me to summarize your week, draft a speech, or tell you what needs your attention.",
-              timestamp: Date.now()
-            };
-            setMessages([welcomeMsg]);
-            setDoc(historyDocRef, { messages: [welcomeMsg] });
-          }
-          setInitialLoading(false);
-        }, (err) => {
-          console.error("History fetch error:", err);
-          setInitialLoading(false);
-        });
-
-        return unsubscribe;
-
       } catch (err) {
         console.error("Context fetch error:", err);
-        setError("Subtle warning: Context data could not be fully loaded. Performance may be degraded.");
-        setInitialLoading(false);
       }
     };
 
-    fetchAllData();
+    fetchContext();
   }, [currentUser]);
+
+  // Fetch Chat Threads List
+  useEffect(() => {
+    if (!currentUser) return;
+
+    const threadsQuery = query(
+      collection(db, `users/${currentUser.uid}/assistantChat`),
+      orderBy('updatedAt', 'desc'),
+      limit(20)
+    );
+
+    const unsubscribe = onSnapshot(threadsQuery, (snapshot) => {
+      const threadsList = snapshot.docs
+        .filter(doc => doc.id !== 'history') // Ignore legacy single-doc history
+        .map(doc => ({
+          id: doc.id,
+          ...doc.data()
+        }));
+      setThreads(threadsList);
+      
+      // Auto-select latest if none active
+      if (threadsList.length > 0 && !activeThreadId && initialLoading) {
+        // setActiveThreadId(threadsList[0].id); // Optional: auto-load latest
+      }
+      setInitialLoading(false);
+    });
+
+    return () => unsubscribe();
+  }, [currentUser, activeThreadId, initialLoading]);
+
+  // Load Active Thread Messages
+  useEffect(() => {
+    if (!currentUser || !activeThreadId) {
+      // If no active thread and not loading, show welcome
+      if (!initialLoading && !activeThreadId) {
+        setMessages([{
+          role: 'assistant',
+          content: "Welcome to Neeti AI Assistant. I have access to your workspace — your documents, meetings, schedule, constituency complaints, and projects. How can I help you today?",
+          timestamp: Date.now()
+        }]);
+      }
+      return;
+    }
+
+    const threadDocRef = doc(db, `users/${currentUser.uid}/assistantChat`, activeThreadId);
+    const unsubscribe = onSnapshot(threadDocRef, (docSnap) => {
+      if (docSnap.exists()) {
+        setMessages(docSnap.data().messages || []);
+      }
+    });
+
+    return () => unsubscribe();
+  }, [currentUser, activeThreadId, initialLoading]);
+
+  const handleNewChat = () => {
+    setActiveThreadId(null);
+    setMessages([]);
+    setInput('');
+    setIsSidebarOpen(false);
+    setEditingThreadId(null);
+  };
 
   const handleSend = async (content = input) => {
     if (!content.trim() || isLoading) return;
@@ -168,14 +213,16 @@ export default function AIAssistant() {
     setIsLoading(true);
 
     try {
-      const systemPrompt = `You are Neeti AI Assistant, an intelligent governance copilot built for public officials and administrators in India. You are professional, concise, helpful, and empathetic. You never make up data — if something is not in the provided context, say so honestly. Always end your responses with a suggested next action when relevant.
+      const systemPrompt = `You are Neeti AI Assistant, an advanced governance copilot built for public officials and administrators in India. You are professional, concise, helpful, and empathetic. 
 
-Here is the current workspace context for the official you are assisting:
+CRITICAL: You have DIRECT access to the user's workspace data provided in the context below. If the user asks about their schedule, meetings, documents, complaints, or projects, use THIS specific data to answer. Do not guess or hallucinate.
+
+WORKSPACE CONTEXT (Current Time: ${new Date().toLocaleString()}):
 ${contextSnapshot}
 
-You can help with: answering questions about their data, drafting speeches and official content, suggesting actions based on pending work, and answering general governance and policy questions.`;
+If the user asks for their upcoming schedule, refer to the "**Upcoming Schedule**" section in the context. If it says "No upcoming events", inform them accordingly.
+Always prioritize providing actionable insights based on this context.`;
 
-      // Only send last 10 messages + user message
       const historyToSend = messages.slice(-10).map(m => ({
         role: m.role,
         content: m.content
@@ -213,31 +260,76 @@ You can help with: answering questions about their data, drafting speeches and o
       setMessages(finalMessages);
 
       // Save to Firestore
-      const historyDocRef = doc(db, `users/${currentUser.uid}/assistantChat/history`);
-      await setDoc(historyDocRef, { messages: finalMessages }, { merge: true });
+      let currentId = activeThreadId;
+      if (!currentId) {
+        // Create new thread
+        const newThreadRef = await addDoc(collection(db, `users/${currentUser.uid}/assistantChat`), {
+          title: content.trim().substring(0, 40) + (content.length > 40 ? '...' : ''),
+          messages: finalMessages,
+          createdAt: Timestamp.now(),
+          updatedAt: Timestamp.now(),
+          lastMessage: assistantMessage.content.substring(0, 100)
+        });
+        setActiveThreadId(newThreadRef.id);
+      } else {
+        // Update existing
+        const threadDocRef = doc(db, `users/${currentUser.uid}/assistantChat`, currentId);
+        await updateDoc(threadDocRef, {
+          messages: finalMessages,
+          updatedAt: Timestamp.now(),
+          lastMessage: assistantMessage.content.substring(0, 100)
+        });
+      }
 
     } catch (err) {
       console.error("Send error:", err);
-      const errorMsg = {
+      setMessages(prev => [...prev, {
         role: 'assistant',
         content: "Sorry, I encountered an error. Please try again.",
         timestamp: Date.now(),
         isError: true
-      };
-      setMessages(prev => [...prev, errorMsg]);
+      }]);
     } finally {
       setIsLoading(false);
     }
   };
 
-  const clearChat = async () => {
+  const deleteThread = async (e, threadId) => {
+    e.stopPropagation();
     if (!currentUser) return;
     try {
-      const historyDocRef = doc(db, `users/${currentUser.uid}/assistantChat/history`);
-      await deleteDoc(historyDocRef);
-      // setMessages will be updated via onSnapshot
+      await deleteDoc(doc(db, `users/${currentUser.uid}/assistantChat`, threadId));
+      if (activeThreadId === threadId) {
+        handleNewChat();
+      }
     } catch (err) {
-      console.error("Clear chat error:", err);
+      console.error("Delete thread error:", err);
+    }
+  };
+
+  const startRenaming = (e, thread) => {
+    e.stopPropagation();
+    setEditingThreadId(thread.id);
+    setEditingTitle(thread.title || 'Conversation');
+  };
+
+  const submitRename = async (e) => {
+    if (e) e.stopPropagation();
+    if (!currentUser || !editingThreadId || !editingTitle.trim()) {
+      setEditingThreadId(null);
+      return;
+    }
+
+    try {
+      const threadDocRef = doc(db, `users/${currentUser.uid}/assistantChat`, editingThreadId);
+      await updateDoc(threadDocRef, {
+        title: editingTitle.trim(),
+        updatedAt: Timestamp.now()
+      });
+    } catch (err) {
+      console.error("Rename error:", err);
+    } finally {
+      setEditingThreadId(null);
     }
   };
 
@@ -246,6 +338,16 @@ You can help with: answering questions about their data, drafting speeches and o
       e.preventDefault();
       handleSend();
     }
+  };
+
+  const formatDate = (timestamp) => {
+    if (!timestamp) return '';
+    const date = timestamp.toDate ? timestamp.toDate() : new Date(timestamp);
+    const now = new Date();
+    if (date.toDateString() === now.toDateString()) {
+      return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    }
+    return date.toLocaleDateString([], { month: 'short', day: 'numeric' });
   };
 
   if (initialLoading) {
@@ -257,139 +359,239 @@ You can help with: answering questions about their data, drafting speeches and o
   }
 
   return (
-    <div className="flex flex-col h-full bg-zinc-950 font-sans relative">
-      {/* Absolute Clear Chat Button */}
-      <div className="absolute top-4 right-4 z-20">
-        <button 
-          onClick={clearChat}
-          title="Clear Chat History"
-          className="flex items-center gap-2 px-2 py-1.5 text-xs text-zinc-500 hover:text-red-400 hover:bg-red-950/20 rounded-md transition-all border border-zinc-900 hover:border-red-900/30 bg-zinc-950/50 backdrop-blur-sm"
-        >
-          <Trash2 className="w-3.5 h-3.5" />
-          <span className="hidden sm:inline">Clear Chat</span>
-        </button>
-      </div>
-
-      {/* Message Area */}
-      <div className="flex-1 overflow-y-auto px-4 py-8 space-y-6 scrollbar-hide">
-        {error && (
-          <div className="mx-auto max-w-2xl bg-amber-950/20 border border-amber-900/30 p-3 rounded-lg flex items-center gap-3 text-amber-500 text-sm">
-            <AlertCircle className="w-4 h-4 shrink-0" />
-            <p>{error}</p>
+    <div className="flex h-full bg-zinc-950 font-sans text-zinc-100 overflow-hidden relative">
+      
+      {/* ── Sidebar (Desktop) / Drawer (Mobile) ── */}
+      <aside className={`
+        fixed inset-y-0 left-0 z-40 w-72 bg-zinc-950 border-r border-zinc-900 transition-transform duration-300 lg:relative lg:translate-x-0
+        ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'}
+      `}>
+        <div className="flex flex-col h-full">
+          <div className="p-4 flex items-center justify-between border-b border-zinc-900">
+            <h2 className="text-sm font-bold uppercase tracking-widest text-zinc-500">History</h2>
+            <button onClick={() => setIsSidebarOpen(false)} className="lg:hidden p-1 text-zinc-500 hover:text-white">
+              <X className="w-5 h-5" />
+            </button>
           </div>
-        )}
 
-        <div className="max-w-3xl mx-auto space-y-8">
-          {messages.map((msg, idx) => (
-            <div 
-              key={idx} 
-              className={`flex gap-4 ${msg.role === 'user' ? 'flex-row-reverse' : ''}`}
+          <div className="p-4">
+            <button 
+              onClick={handleNewChat}
+              className="w-full flex items-center justify-center gap-2 py-3 px-4 bg-zinc-900 border border-zinc-800 hover:border-zinc-700 rounded-xl text-sm font-semibold transition-all active:scale-95"
             >
-              <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 mt-1 overflow-hidden ${
-                msg.role === 'user' ? 'bg-zinc-700 border border-zinc-600' : 'bg-blue-900/20 border border-blue-800/30'
-              }`}>
-                {msg.role === 'user' ? (
-                  displayPhoto ? (
-                    <img src={displayPhoto} alt="User" className="w-full h-full object-cover" />
-                  ) : (
-                    <User className="w-4 h-4 text-zinc-300" />
-                  )
-                ) : (
-                  <Sparkles className="w-4 h-4 text-blue-400" />
-                )}
-              </div>
-              <div className={`max-w-[85%] px-4 py-3 rounded-2xl text-sm leading-relaxed shadow-sm ${
-                msg.role === 'user' 
-                  ? 'bg-zinc-700 text-zinc-100' 
-                  : 'bg-zinc-800/60 text-zinc-200 border border-zinc-800/50'
-              }`}>
-                <div className="markdown-style">
-                  <ReactMarkdown
-                    components={{
-                      p: ({...props}) => <p className="mb-2 last:mb-0" {...props} />,
-                      ul: ({...props}) => <ul className="list-disc pl-4 mb-2" {...props} />,
-                      ol: ({...props}) => <ol className="list-decimal pl-4 mb-2" {...props} />,
-                      li: ({...props}) => <li className="mb-1" {...props} />,
-                      h1: ({...props}) => <h1 className="text-lg font-bold mb-2" {...props} />,
-                      h2: ({...props}) => <h2 className="text-md font-bold mb-2" {...props} />,
-                      code: ({inline, ...props}) => (
-                        inline 
-                          ? <code className="bg-zinc-900 px-1 rounded text-blue-300" {...props} />
-                          : <code className="block bg-zinc-900 p-2 rounded text-blue-300 overflow-x-auto my-2" {...props} />
-                      )
-                    }}
-                  >
-                    {msg.content}
-                  </ReactMarkdown>
-                </div>
-              </div>
-            </div>
-          ))}
-          {isLoading && (
-            <div className="flex gap-4">
-              <div className="w-8 h-8 rounded-lg bg-blue-900/20 border border-blue-800/30 flex items-center justify-center shrink-0">
-                <Sparkles className="w-4 h-4 text-blue-400" />
-              </div>
-              <div className="bg-zinc-800/60 border border-zinc-800/50 px-4 py-3 rounded-2xl flex items-center gap-1.5">
-                <span className="w-1.5 h-1.5 bg-zinc-500 rounded-full animate-bounce [animation-delay:-0.3s]"></span>
-                <span className="w-1.5 h-1.5 bg-zinc-500 rounded-full animate-bounce [animation-delay:-0.15s]"></span>
-                <span className="w-1.5 h-1.5 bg-zinc-500 rounded-full animate-bounce"></span>
-              </div>
-            </div>
-          )}
-          <div ref={messagesEndRef} />
-        </div>
-      </div>
+              <Plus className="w-4 h-4" /> New Chat
+            </button>
+          </div>
 
-      {/* Input Section */}
-      <footer className="shrink-0 pb-6 px-4">
-        <div className="max-w-3xl mx-auto space-y-4">
-          {/* Quick Prompts */}
-          {messages.length <= 1 && !isLoading && (
-            <div className="flex flex-wrap gap-2 justify-center">
-              {quickPrompts.map(prompt => (
-                <button
-                  key={prompt}
-                  onClick={() => handleSend(prompt)}
-                  className="px-4 py-1.5 bg-zinc-900 border border-zinc-800 hover:border-zinc-700 hover:bg-zinc-800 text-zinc-400 hover:text-zinc-200 text-xs font-medium rounded-full transition-all flex items-center gap-2 group"
-                >
-                  {prompt}
-                  <ChevronRight className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity" />
-                </button>
-              ))}
-            </div>
-          )}
-
-          {/* Input Bar */}
-          <div className="relative group">
-            <div className={`absolute -inset-0.5 bg-linear-to-r from-blue-900/50 to-purple-900/50 rounded-2xl blur opacity-20 group-focus-within:opacity-40 transition duration-500`}></div>
-            <div className="relative flex items-end gap-2 bg-zinc-900 border border-zinc-800 focus-within:border-zinc-700/50 p-2 rounded-2xl transition-all shadow-xl">
-              <textarea
-                ref={textareaRef}
-                value={input}
-                onChange={(e) => setInput(e.target.value)}
-                onKeyDown={handleKeyDown}
-                placeholder="Ask Neeti AI Assistant anything..."
-                rows={1}
-                className="flex-1 bg-transparent border-none focus:ring-0 focus:outline-none outline-none text-zinc-100 text-[15px] py-1 px-3 resize-none max-h-32 min-h-11 scrollbar-hide placeholder:text-zinc-600"
-                style={{ height: 'auto' }}
-              />
-              <button
-                onClick={() => handleSend()}
-                disabled={!input.trim() || isLoading}
-                className={`p-2 rounded-xl transition-all ${
-                  input.trim() && !isLoading 
-                    ? 'bg-blue-600 text-white shadow-lg shadow-blue-900/20 hover:scale-105 active:scale-95' 
-                    : 'bg-zinc-800 text-zinc-600 cursor-not-allowed'
+          <div className="flex-1 overflow-y-auto px-2 space-y-1 scrollbar-hide pb-20">
+            {threads.map(thread => (
+              <div
+                key={thread.id}
+                onClick={() => { setActiveThreadId(thread.id); setIsSidebarOpen(false); }}
+                className={`w-full text-left p-3 rounded-xl transition-all group relative flex gap-3 cursor-pointer ${
+                  activeThreadId === thread.id ? 'bg-zinc-900 border border-zinc-800' : 'hover:bg-zinc-900/50'
                 }`}
               >
-                <Send className="w-5 h-5" />
-              </button>
+                <div className="mt-1 shrink-0">
+                  <MessageSquare className={`w-4 h-4 ${activeThreadId === thread.id ? 'text-blue-500' : 'text-zinc-600'}`} />
+                </div>
+                <div className="flex-1 min-w-0">
+                  {editingThreadId === thread.id ? (
+                    <div className="flex items-center gap-1" onClick={e => e.stopPropagation()}>
+                      <input
+                        autoFocus
+                        type="text"
+                        value={editingTitle}
+                        onChange={e => setEditingTitle(e.target.value)}
+                        onBlur={() => submitRename()}
+                        onKeyDown={e => {
+                          if (e.key === 'Enter') submitRename();
+                          if (e.key === 'Escape') setEditingThreadId(null);
+                        }}
+                        className="flex-1 bg-zinc-800 border-none focus:ring-1 focus:ring-blue-500 rounded text-xs px-2 py-1 text-white"
+                      />
+                      <button onClick={submitRename} className="p-1 text-blue-500 hover:text-blue-400">
+                        <Check className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
+                  ) : (
+                    <>
+                      <p className={`text-sm font-medium truncate ${activeThreadId === thread.id ? 'text-white' : 'text-zinc-400'}`}>
+                        {thread.title || 'Conversation'}
+                      </p>
+                      <p className="text-[10px] text-zinc-600 font-medium flex items-center gap-1 mt-0.5">
+                        <Clock className="w-2.5 h-2.5" /> {formatDate(thread.updatedAt)}
+                      </p>
+                    </>
+                  )}
+                </div>
+                
+                {editingThreadId !== thread.id && (
+                  <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <button 
+                      onClick={(e) => startRenaming(e, thread)}
+                      className="p-1 text-zinc-600 hover:text-blue-400"
+                      title="Rename"
+                    >
+                      <Edit2 className="w-3.5 h-3.5" />
+                    </button>
+                    <button 
+                      onClick={(e) => deleteThread(e, thread.id)}
+                      className="p-1 text-zinc-600 hover:text-red-400"
+                      title="Delete"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+      </aside>
+
+      {/* Mobile Backdrop */}
+      {isSidebarOpen && (
+        <div 
+          className="fixed inset-0 z-30 bg-black/60 backdrop-blur-sm lg:hidden"
+          onClick={() => setIsSidebarOpen(false)}
+        />
+      )}
+
+      {/* ── Main Chat Area ── */}
+      <main className="flex-1 flex flex-col min-w-0 bg-zinc-950">
+        
+        {/* Header (Title + Mobile Menu) */}
+        <header className="h-14 border-b border-zinc-900 flex items-center justify-between px-4 sticky top-0 bg-zinc-950/80 backdrop-blur-md z-10">
+          <div className="flex items-center gap-3">
+            <button onClick={() => setIsSidebarOpen(true)} className="lg:hidden p-2 text-zinc-400 hover:text-white hover:bg-zinc-900 rounded-lg transition-colors">
+              <Menu className="w-5 h-5" />
+            </button>
+            <div className="flex items-center gap-2">
+              <Sparkles className="w-4 h-4 text-blue-500" />
+              <h1 className="text-sm font-bold tracking-tight">AI Assistant</h1>
+              {activeThreadId && (
+                <span className="hidden sm:inline text-[10px] bg-zinc-900 text-zinc-500 border border-zinc-800 px-2 py-0.5 rounded-full font-bold uppercase tracking-wider ml-2">Active session</span>
+              )}
             </div>
           </div>
-          <p className="text-[10px] text-zinc-600 text-center uppercase tracking-widest font-medium">Neeti AI can provide context-aware insights from your workspace.</p>
+          
+          <div className="flex items-center gap-2">
+            <button 
+              onClick={handleNewChat}
+              className="p-2 text-zinc-400 hover:text-blue-400 hover:bg-blue-900/10 rounded-lg transition-all"
+              title="New Chat"
+            >
+              <Plus className="w-5 h-5" />
+            </button>
+          </div>
+        </header>
+
+        {/* Messages */}
+        <div className="flex-1 overflow-y-auto px-4 py-8 space-y-6 scrollbar-hide">
+          <div className="max-w-3xl mx-auto space-y-8 pb-10">
+            {messages.map((msg, idx) => (
+              <div key={idx} className={`flex gap-4 ${msg.role === 'user' ? 'flex-row-reverse' : ''}`}>
+                <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 mt-1 overflow-hidden shadow-lg ${
+                  msg.role === 'user' ? 'bg-zinc-800 border border-zinc-700' : 'bg-blue-900/20 border border-blue-800/30'
+                }`}>
+                  {msg.role === 'user' ? (
+                    displayPhoto ? <img src={displayPhoto} alt="U" className="w-full h-full object-cover" /> : <User className="w-4 h-4 text-zinc-400" />
+                  ) : (
+                    <Sparkles className="w-4 h-4 text-blue-500" />
+                  )}
+                </div>
+                <div className={`max-w-[85%] px-5 py-3.5 rounded-2xl text-[15px] leading-relaxed transition-all duration-300 ${
+                  msg.role === 'user' 
+                    ? 'bg-zinc-800 text-zinc-100' 
+                    : 'bg-zinc-900/50 text-zinc-200 border border-zinc-800/50'
+                }`}>
+                  <div className="markdown-style overflow-hidden">
+                    <ReactMarkdown
+                      components={{
+                        p: ({...props}) => <p className="mb-3 last:mb-0" {...props} />,
+                        ul: ({...props}) => <ul className="list-disc pl-5 mb-3 space-y-1" {...props} />,
+                        ol: ({...props}) => <ol className="list-decimal pl-5 mb-3 space-y-1" {...props} />,
+                        li: ({...props}) => <li {...props} />,
+                        h1: ({...props}) => <h1 className="text-xl font-black mb-3 text-white" {...props} />,
+                        h2: ({...props}) => <h2 className="text-lg font-black mb-3 text-white" {...props} />,
+                        code: ({inline, ...props}) => (
+                          inline 
+                            ? <code className="bg-zinc-950 px-1.5 py-0.5 rounded text-blue-400 font-bold" {...props} />
+                            : <code className="block bg-zinc-950 p-4 rounded-xl text-blue-400 overflow-x-auto my-4 text-sm font-mono border border-zinc-800/50" {...props} />
+                        )
+                      }}
+                    >
+                      {msg.content}
+                    </ReactMarkdown>
+                  </div>
+                </div>
+              </div>
+            ))}
+            
+            {isLoading && (
+              <div className="flex gap-4 animate-in fade-in duration-300">
+                <div className="w-8 h-8 rounded-lg bg-blue-900/20 border border-blue-800/30 flex items-center justify-center shrink-0">
+                  <Sparkles className="w-4 h-4 text-blue-500 animate-pulse" />
+                </div>
+                <div className="bg-zinc-900/50 border border-zinc-800/50 px-5 py-3.5 rounded-2xl flex items-center gap-2">
+                  <span className="w-1.5 h-1.5 bg-blue-500 rounded-full animate-bounce [animation-delay:-0.3s]"></span>
+                  <span className="w-1.5 h-1.5 bg-blue-500 rounded-full animate-bounce [animation-delay:-0.15s]"></span>
+                  <span className="w-1.5 h-1.5 bg-blue-500 rounded-full animate-bounce"></span>
+                </div>
+              </div>
+            )}
+            <div ref={messagesEndRef} />
+          </div>
         </div>
-      </footer>
+
+        {/* Input Bar */}
+        <footer className="shrink-0 p-4 md:p-6 bg-linear-to-t from-zinc-950 via-zinc-950 to-transparent">
+          <div className="max-w-3xl mx-auto space-y-4">
+            {!activeThreadId && messages.length <= 1 && !isLoading && (
+              <div className="flex flex-wrap gap-2 justify-center animate-in slide-in-from-bottom-2 duration-500">
+                {quickPrompts.map(prompt => (
+                  <button
+                    key={prompt}
+                    onClick={() => handleSend(prompt)}
+                    className="px-4 py-2 bg-zinc-900/50 border border-zinc-800 hover:border-blue-500/50 hover:bg-zinc-900 text-zinc-400 hover:text-blue-400 text-xs font-bold rounded-full transition-all flex items-center gap-2 group"
+                  >
+                    {prompt}
+                    <ChevronRight className="w-3 h-3 opacity-0 group-hover:opacity-100 -translate-x-1 group-hover:translate-x-0 transition-transform" />
+                  </button>
+                ))}
+              </div>
+            )}
+
+            <div className="relative group">
+              <div className="absolute -inset-0.5 bg-linear-to-r from-blue-600/20 to-indigo-600/20 rounded-2xl blur-md opacity-0 group-focus-within:opacity-100 transition duration-1000"></div>
+              <div className="relative flex items-end gap-2 bg-zinc-900 border border-zinc-800 focus-within:border-zinc-700/50 p-2.5 rounded-2xl transition-all shadow-2xl">
+                <textarea
+                  ref={textareaRef}
+                  value={input}
+                  onChange={(e) => setInput(e.target.value)}
+                  onKeyDown={handleKeyDown}
+                  placeholder="Ask Neeti AI Assistant anything..."
+                  rows={1}
+                  className="flex-1 bg-transparent border-none focus:ring-0 focus:outline-none text-zinc-100 text-[15px] py-2 px-3 resize-none max-h-48 min-h-12 scrollbar-hide placeholder:text-zinc-600 leading-relaxed"
+                />
+                <button
+                  onClick={() => handleSend()}
+                  disabled={!input.trim() || isLoading}
+                  className={`p-3 rounded-xl transition-all duration-300 ${
+                    input.trim() && !isLoading 
+                      ? 'bg-blue-600 text-white shadow-lg shadow-blue-900/30 hover:scale-105 active:scale-95' 
+                      : 'bg-zinc-800 text-zinc-600 cursor-not-allowed'
+                  }`}
+                >
+                  <Send className="w-5 h-5" />
+                </button>
+              </div>
+            </div>
+            <p className="text-[10px] text-zinc-600 text-center uppercase tracking-[0.2em] font-black">Neeti AI • Governance Copilot</p>
+          </div>
+        </footer>
+      </main>
     </div>
   );
 }
