@@ -2,8 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
 import { db } from '../services/firebase';
-import { collection, onSnapshot, query, orderBy, limit } from 'firebase/firestore';
-import { 
+import { collection, onSnapshot, query, orderBy, limit, where, Timestamp } from 'firebase/firestore';
+import {
   FileText, 
   Mic, 
   ImageIcon, 
@@ -25,6 +25,7 @@ export default function Dashboard() {
   const [meetingCount, setMeetingCount] = useState(0);
   const [constituentCount, setConstituentCount] = useState(0);
   const [recentActivity, setRecentActivity] = useState([]);
+  const [nextEvent, setNextEvent] = useState(null);
 
   useEffect(() => {
     if (!currentUser?.uid) return;
@@ -47,10 +48,32 @@ export default function Dashboard() {
       setConstituentCount(snap.size);
     });
 
+    // Listen to Next Schedule Event
+    const now = new Date();
+    const qUpcoming = query(
+      collection(db, 'users', currentUser.uid, 'scheduleEvents'), 
+      where('startTime', '>=', now),
+      orderBy('startTime', 'asc'), 
+      limit(1)
+    );
+    const unsubUpcoming = onSnapshot(qUpcoming, (snap) => {
+      if (!snap.empty) {
+        const data = snap.docs[0].data();
+        setNextEvent({
+          id: snap.docs[0].id,
+          ...data,
+          startTime: data.startTime ? data.startTime.toDate() : new Date()
+        });
+      } else {
+        setNextEvent(null);
+      }
+    });
+
     return () => {
       unsubDocs();
       unsubMeetings();
       unsubConst();
+      unsubUpcoming();
     };
   }, [currentUser]);
 
@@ -142,6 +165,29 @@ export default function Dashboard() {
 
   // Format current date
   const today = new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' });
+
+  // Format Event Time
+  const formatEventTime = (dateObj) => {
+    const todayDate = new Date();
+    const tomorrowDate = new Date(todayDate);
+    tomorrowDate.setDate(tomorrowDate.getDate() + 1);
+    
+    const isToday = todayDate.getDate() === dateObj.getDate() && todayDate.getMonth() === dateObj.getMonth() && todayDate.getFullYear() === dateObj.getFullYear();
+    const isTomorrow = tomorrowDate.getDate() === dateObj.getDate() && tomorrowDate.getMonth() === dateObj.getMonth() && tomorrowDate.getFullYear() === dateObj.getFullYear();
+    
+    const timeStr = dateObj.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true });
+    
+    if (isToday) return `Today, ${timeStr}`;
+    if (isTomorrow) return `Tomorrow, ${timeStr}`;
+    return `${dateObj.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })}, ${timeStr}`;
+  };
+
+  const CATEGORY_COLORS = {
+    'Meeting': 'bg-indigo-500',
+    'Deadline': 'bg-rose-500',
+    'Public Event': 'bg-amber-500',
+    'Personal': 'bg-emerald-500'
+  };
 
   return (
     <div className="min-h-full bg-zinc-950 text-zinc-100 p-4 md:p-2 lg:p-4 font-sans">
@@ -277,11 +323,20 @@ export default function Dashboard() {
                     Coming Up Next
                   </h2>
                 </div>
-                <div className="bg-zinc-950/50 backdrop-blur-md rounded-xl p-4 border border-zinc-800/80">
-                  <p className="text-[11px] font-bold text-indigo-400 uppercase tracking-wider mb-2">Today, 2:00 PM</p>
-                  <p className="text-sm font-semibold text-zinc-100 leading-snug mb-1">City Council Briefing</p>
-                  <p className="text-xs text-zinc-400">Review the zoning proposal summary before attending.</p>
-                </div>
+                {nextEvent ? (
+                  <div className="bg-zinc-950/50 backdrop-blur-md rounded-xl p-4 border border-zinc-800/80">
+                    <div className="flex items-center justify-between mb-2">
+                       <p className="text-[11px] font-bold text-indigo-400 uppercase tracking-wider">{formatEventTime(nextEvent.startTime)}</p>
+                       <span className="flex items-center gap-1.5"><span className={`w-1.5 h-1.5 rounded-full ${CATEGORY_COLORS[nextEvent.category] || CATEGORY_COLORS['Meeting']}`}></span><span className="text-[10px] text-zinc-400 font-medium uppercase tracking-wider">{nextEvent.category}</span></span>
+                    </div>
+                    <p className="text-sm font-semibold text-zinc-100 leading-snug mb-1">{nextEvent.title}</p>
+                    {nextEvent.description && <p className="text-xs text-zinc-400 line-clamp-1">{nextEvent.description}</p>}
+                  </div>
+                ) : (
+                  <div className="bg-zinc-950/20 rounded-xl p-4 border border-zinc-800/50 border-dashed text-center py-6">
+                    <p className="text-sm text-zinc-500 font-medium tracking-wide">No upcoming events</p>
+                  </div>
+                )}
                 <button 
                   onClick={() => navigate('/schedule')}
                   className="w-full mt-4 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-medium rounded-xl transition-all shadow-md shadow-indigo-900/20"

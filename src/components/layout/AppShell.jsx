@@ -4,6 +4,7 @@ import { Menu, User, LogOut, ChevronDown, Map, Sparkles, FileText, Calendar, Bar
 import Sidebar from './Sidebar';
 import { useAuth } from '../../hooks/useAuth';
 import { auth } from '../../services/firebase';
+import { useNotifications } from '../../hooks/useNotifications';
 
 export default function AppShell() {
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -11,6 +12,9 @@ export default function AppShell() {
   const { currentUser, dbUser } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
+
+  // Initialize background notification polling
+  useNotifications();
 
   const handleLogout = async () => {
     try {

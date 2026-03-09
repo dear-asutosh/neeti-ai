@@ -42,6 +42,7 @@ createRoot(document.getElementById('root')).render(
           {/* AppShell acts as a layout wrapper for authenticated routes */}
           <Route element={<PrivateRoute><AppShell /></PrivateRoute>}>
             <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/schedule" element={<Schedule />} />
             <Route path="/documents" element={<Documents />} />
             <Route path="/meetings" element={<Meetings />} />
             <Route path="/speeches" element={<Speeches />} />
