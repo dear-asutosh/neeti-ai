@@ -3,14 +3,14 @@ import { useAuth } from '../hooks/useAuth';
 import { db } from '../services/firebase';
 import { collection, addDoc, query, orderBy, limit, onSnapshot } from 'firebase/firestore';
 import * as pdfjsLib from 'pdfjs-dist';
-import pdfWorker from 'pdfjs-dist/build/pdf.worker.min.mjs?worker';
+import pdfWorkerUrl from 'pdfjs-dist/build/pdf.worker.min.mjs?url';
 import mammoth from 'mammoth';
 import { UploadCloud, FileText, CheckCircle, Clock, Download, Share2, Send, Loader2, BookOpen, Book, File, CornerDownRight, MessageSquare, History } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import { createPortal } from 'react-dom';
 
-if (typeof window !== 'undefined' && !pdfjsLib.GlobalWorkerOptions.workerPort) {
-  pdfjsLib.GlobalWorkerOptions.workerPort = new pdfWorker();
+if (typeof window !== 'undefined') {
+  pdfjsLib.GlobalWorkerOptions.workerSrc = pdfWorkerUrl;
 }
 
 const STEPS = [
@@ -100,6 +100,7 @@ export default function Documents() {
         const arrayBuffer = await file.arrayBuffer();
         const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
         pageCount = pdf.numPages;
+        console.log("PDF Extracted text length:", text.length, text.substring(0, 100));
         let extractedText = '';
         for (let i = 1; i <= pdf.numPages; i++) {
           const page = await pdf.getPage(i);
@@ -107,6 +108,11 @@ export default function Documents() {
           extractedText += textContent.items.map(item => item.str).join(' ') + '\n';
         }
         text = extractedText;
+        
+        // Log individual page items for debugging
+        if (text.trim().length === 0) {
+          console.error("PDF text extraction returned empty text. PDF might be a scanned image.");
+        }
       } else if (file.type === 'text/plain' || file.name.endsWith('.txt')) {
         text = await file.text();
       } else if (file.name.endsWith('.docx')) {
@@ -118,7 +124,7 @@ export default function Documents() {
       }
 
       if (text.trim().length === 0) {
-        throw new Error('Could not extract any text from this file. It may be a scanned image PDF or corrupted.');
+        console.warn('PDF extracted text is empty. Bypassing strict error to allow debugging.');
       }
 
       setFullText(text);
@@ -200,7 +206,8 @@ Do not include any text before or after the JSON.`
       setActiveMobileTab('summary');
 
     } catch (error) {
-      alert(error.message || 'An error occurred during processing.');
+      console.error('Document Processing Error Detail:', error);
+      alert(error.message || 'An error occurred during processing. Check console for details.');
       setStep(1);
       setActiveDoc(null);
     } finally {
@@ -283,7 +290,7 @@ Do not include any text before or after the JSON.`
   // SHARED UI BLOCKS
   // --------------------------------------------------------------------------
 
-  const UploadPanel = () => (
+  const uploadPanelContent = (
     <div
       className={`bg-zinc-900/50 rounded-2xl shadow-sm border ${isProcessing ? 'border-indigo-500/30 bg-indigo-500/5' : 'border-zinc-800 border-dashed hover:border-indigo-500/50 hover:bg-zinc-900'} p-4 md:p-5 flex flex-col items-center justify-center text-center transition-all cursor-pointer`}
       onClick={() => !isProcessing && fileInputRef.current?.click()}
@@ -331,7 +338,7 @@ Do not include any text before or after the JSON.`
     </div>
   );
 
-  const HistoryList = () => (
+  const historyListContent = (
     <div className="flex-1 overflow-y-auto min-h-0 bg-zinc-900 rounded-2xl border border-zinc-800 shadow-sm flex flex-col">
       <div className="px-5 py-4 border-b border-zinc-800 bg-zinc-900/50 shrink-0">
         <h3 className="text-xs font-semibold text-zinc-400 uppercase tracking-wider">Recent Documents</h3>
@@ -382,7 +389,7 @@ Do not include any text before or after the JSON.`
     </div>
   );
 
-  const SummaryPanel = () => (
+  const summaryPanelContent = (
     activeDoc && activeDoc.status === 'summarized' ? (
       <div className="bg-zinc-900 rounded-2xl border border-zinc-800 flex flex-col h-full overflow-hidden animate-in fade-in slide-in-from-bottom-4 duration-500 shadow-sm">
 
@@ -498,7 +505,7 @@ Do not include any text before or after the JSON.`
         </div>
       </div>
     ) : (
-      <HistoryList />
+      historyListContent
     )
   );
 
@@ -572,9 +579,9 @@ Do not include any text before or after the JSON.`
 
       {/* ── MOBILE CONTENT (below lg) — show only the active tab */}
       <div className="lg:hidden px-4 pt-4 pb-6 flex flex-col gap-4">
-        {activeMobileTab === 'upload' && <UploadPanel />}
-        {activeMobileTab === 'summary' && <SummaryPanel />}
-        {activeMobileTab === 'history' && <HistoryList />}
+        {activeMobileTab === 'upload' && uploadPanelContent}
+        {activeMobileTab === 'summary' && summaryPanelContent}
+        {activeMobileTab === 'history' && historyListContent}
       </div>
 
       {/* ── DESKTOP CONTENT (lg and above) */}
@@ -583,13 +590,13 @@ Do not include any text before or after the JSON.`
         {/* LEFT COLUMN */}
         <div className="w-[35%] xl:w-1/3 flex flex-col gap-4 overflow-hidden">
           <div className="shrink-0">
-            <UploadPanel />
+            {uploadPanelContent}
           </div>
         </div>
 
         {/* RIGHT COLUMN */}
         <div className="flex-1 overflow-hidden flex flex-col min-h-0">
-          <SummaryPanel />
+          {summaryPanelContent}
         </div>
 
       </div>

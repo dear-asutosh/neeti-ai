@@ -4,7 +4,8 @@ import { db } from '../services/firebase';
 import { collection, addDoc, query, orderBy, limit, onSnapshot, doc, updateDoc } from 'firebase/firestore';
 import { 
   UploadCloud, FileText, CheckCircle, Clock, Save, FileAudio, 
-  Mic, Square, BookOpen, History, Pencil, Check, File, X
+  Mic, Square, BookOpen, History, Pencil, Check, File, X, Target, Users, Loader2,
+  Download, Share2, MessageSquare, CornerDownRight, Send
 } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import { createPortal } from 'react-dom';
@@ -540,7 +541,7 @@ ${manualAgenda.trim() ? `\nMEETING AGENDA/CONTEXT (use this to help guide your s
   // --------------------------------------------------------------------------
 
   // The record / upload input card
-  const RecordPanel = () => (
+  const recordPanelContent = (
     <div className="bg-zinc-900 border border-zinc-800 rounded-2xl overflow-hidden shadow-sm flex flex-col">
       {/* Live / Upload sub-tabs */}
       <div className="flex border-b border-zinc-800 bg-zinc-900/50">
@@ -675,7 +676,7 @@ ${manualAgenda.trim() ? `\nMEETING AGENDA/CONTEXT (use this to help guide your s
   );
 
   // Helper: renders the list of recent meetings (previously HistoryPanel)
-  const HistoryList = () => (
+  const historyListContent = (
     <div className="flex-1 overflow-y-auto min-h-0 bg-zinc-900 rounded-2xl border border-zinc-800 shadow-sm flex flex-col">
       <div className="px-5 py-4 border-b border-zinc-800 bg-zinc-900/50 shrink-0">
         <h3 className="text-xs font-semibold text-zinc-400 uppercase tracking-wider">Recent Meetings History</h3>
@@ -727,7 +728,7 @@ ${manualAgenda.trim() ? `\nMEETING AGENDA/CONTEXT (use this to help guide your s
   );
 
   // The results / summary panel
-  const SummaryPanel = () => (
+  const summaryPanelContent = (
     activeMeeting ? (
       <div className="bg-zinc-900 rounded-2xl border border-zinc-800 flex flex-col h-full overflow-hidden animate-in fade-in slide-in-from-bottom-4 duration-500 shadow-sm">
 
@@ -967,7 +968,7 @@ ${manualAgenda.trim() ? `\nMEETING AGENDA/CONTEXT (use this to help guide your s
         </div>
       </div>
     ) : (
-      <HistoryList />
+      historyListContent
     )
   );
 
@@ -1041,9 +1042,9 @@ ${manualAgenda.trim() ? `\nMEETING AGENDA/CONTEXT (use this to help guide your s
 
       {/* ── MOBILE CONTENT — only one tab visible at a time */}
       <div className="lg:hidden px-4 pt-4 pb-6 flex flex-col gap-4">
-        {activeMobileTab === 'record'  && <RecordPanel />}
-        {activeMobileTab === 'summary' && <SummaryPanel />}
-        {activeMobileTab === 'history' && <HistoryList />}
+        {activeMobileTab === 'record'  && recordPanelContent}
+        {activeMobileTab === 'summary' && summaryPanelContent}
+        {activeMobileTab === 'history' && historyListContent}
       </div>
 
       {/* ── DESKTOP CONTENT */}
@@ -1052,13 +1053,13 @@ ${manualAgenda.trim() ? `\nMEETING AGENDA/CONTEXT (use this to help guide your s
         {/* LEFT COLUMN: RecordPanel only */}
         <div className="w-[35%] xl:w-1/3 flex flex-col gap-4 overflow-hidden">
           <div className="shrink-0">
-            <RecordPanel />
+            {recordPanelContent}
           </div>
         </div>
 
         {/* RIGHT COLUMN: full height, SummaryPanel or History List */}
         <div className="flex-1 overflow-hidden flex flex-col min-h-0">
-          <SummaryPanel />
+          {summaryPanelContent}
         </div>
 
       </div>
