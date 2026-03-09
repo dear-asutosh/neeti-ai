@@ -9,6 +9,7 @@ import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
 import AppShell from './components/layout/AppShell';
 import Landing from './pages/Landing';
+import NotFound from './pages/NotFound';
 
 // Placeholder Pages
 import Documents from './pages/Documents';
@@ -72,7 +73,7 @@ createRoot(document.getElementById('root')).render(
           </Route>
           
           <Route path="/" element={<Landing />} />
-          {/* <Route path="*" element={<Navigate to="/dashboard" replace />} /> */}
+          <Route path="*" element={<NotFound />} />
         </Routes>
       </Router>
     </ThemeProvider>
