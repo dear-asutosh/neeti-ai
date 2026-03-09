@@ -163,8 +163,18 @@ export default function Dashboard() {
   const displayName = dbUser?.displayName || currentUser?.displayName || currentUser?.email?.split('@')[0] || 'Leader';
   const roleDisplay = dbUser?.department || userRole || 'Administrator';
 
-  // Format current date
+  // Format current date and greeting
   const today = new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' });
+  
+  const getGreeting = () => {
+    const hour = new Date().getHours();
+    if (hour >= 4 && hour < 12) return "Good morning";
+    if (hour >= 12 && hour < 17) return "Good afternoon";
+    if (hour >= 17 && hour < 21) return "Good evening";
+    return "Good night";
+  };
+
+  const greeting = getGreeting();
 
   // Format Event Time
   const formatEventTime = (dateObj) => {
@@ -211,7 +221,7 @@ export default function Dashboard() {
                 </span>
               </div>
               <h1 className="text-3xl md:text-5xl font-black tracking-tight text-zinc-900 dark:text-white mb-2 transition-colors">
-                Good morning, {displayName}.
+                {greeting}, {displayName}.
               </h1>
               <p className="text-zinc-600 dark:text-zinc-400 text-base md:text-lg max-w-xl leading-relaxed transition-colors">
                 Your AI-powered public service command center is ready. Here is a brief overview of your operations today.
