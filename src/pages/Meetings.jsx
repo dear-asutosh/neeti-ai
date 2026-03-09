@@ -233,8 +233,16 @@ ${manualAgenda.trim() ? `\nMEETING AGENDA/CONTEXT (use this to help guide your s
     isStartingRef.current = true;
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      
+      // Look for a supported mimetype, Safari prefers mp4/aac, Chrome prefers webm
+      let options = {};
+      if (MediaRecorder.isTypeSupported('audio/webm')) {
+        options = { mimeType: 'audio/webm' };
+      } else if (MediaRecorder.isTypeSupported('audio/mp4')) {
+        options = { mimeType: 'audio/mp4' };
+      }
 
-      const mediaRecorder = new MediaRecorder(stream);
+      const mediaRecorder = new MediaRecorder(stream, options);
       mediaRecorderRef.current = mediaRecorder;
 
       allChunksRef.current = [];
@@ -312,12 +320,31 @@ ${manualAgenda.trim() ? `\nMEETING AGENDA/CONTEXT (use this to help guide your s
     setProcessingStatus("Transcribing audio...");
 
     try {
-      const finalAudioBlob = new Blob(allChunksRef.current, { type: "audio/webm" });
+      const mimeType = mediaRecorderRef.current?.mimeType || 'audio/webm';
+      const fileExt = mimeType.includes('mp4') ? 'mp4' : 'webm';
+      
+      const finalAudioBlob = new Blob(allChunksRef.current, { type: mimeType });
 
       const url = URL.createObjectURL(finalAudioBlob);
       setLiveAudioBlobUrl(url);
 
-      const finalTranscript = await transcribeChunk(finalAudioBlob);
+      const formData = new FormData();
+      formData.append("file", finalAudioBlob, `audio.${fileExt}`);
+      formData.append("model", "whisper-large-v3-turbo");
+
+      const response = await fetch("https://api.groq.com/openai/v1/audio/transcriptions", {
+        method: "POST",
+        headers: { Authorization: `Bearer ${apiKey}` },
+        body: formData
+      });
+
+      if (!response.ok) {
+        const err = await response.json().catch(() => ({}));
+        throw new Error(err?.error?.message || "Transcription failed");
+      }
+
+      const data = await response.json();
+      const finalTranscript = data.text || "";
 
       if (!finalTranscript || finalTranscript.trim() === "") {
         throw new Error("No speech detected.");
