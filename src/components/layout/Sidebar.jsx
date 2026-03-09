@@ -15,7 +15,8 @@ import {
   Landmark,
   X,
   User,
-  Image as ImageIcon, // Added Image as ImageIcon
+  Image as ImageIcon,
+  Sparkles,
 } from 'lucide-react';
 import { auth } from '../../services/firebase';
 import { useAuth } from '../../hooks/useAuth';
@@ -47,8 +48,9 @@ export default function Sidebar({ mobileOpen, setMobileOpen }) {
       title: 'AI Tools',
       items: [
         { name: 'Document Summarizer', path: '/documents', icon: FileText },
-        { name: 'Meeting Summarizer', path: '/meetings', icon: Mic }, // Modified: Changed icon to Mic as per instruction, kept path as /meetings
-        { name: 'Speech & Drafts', path: '/speeches', icon: ImageIcon }, // Modified: Changed icon to ImageIcon as per instruction, kept path as /speeches
+        { name: 'Meeting Summarizer', path: '/meetings', icon: Mic },
+        { name: 'Speech & Drafts', path: '/speeches', icon: ImageIcon },
+        { name: 'AI Assistant', path: '/assistant', icon: Sparkles },
       ]
     },
     {
@@ -56,7 +58,6 @@ export default function Sidebar({ mobileOpen, setMobileOpen }) {
       items: [
         { name: 'Schedule Manager', path: '/schedule', icon: Calendar },
         { name: 'Constituency Tracker', path: '/constituency', icon: Map },
-        { name: 'Real-time Insights', path: '/insights', icon: BarChart3 },
       ]
     }
   ];

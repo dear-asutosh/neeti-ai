@@ -1,9 +1,9 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { db } from '../services/firebase';
 import { useAuth } from '../hooks/useAuth';
-import { collection, addDoc, query, orderBy, onSnapshot, doc, deleteDoc, updateDoc, Timestamp, where } from 'firebase/firestore';
-import { Plus, ChevronLeft, ChevronRight, Calendar, Clock, Trash2, X, AlertCircle, MapPin, Tag, Bell, Loader2 } from 'lucide-react';
+import { collection, addDoc, query, orderBy, onSnapshot, doc, deleteDoc, Timestamp } from 'firebase/firestore';
+import { Plus, ChevronLeft, ChevronRight, Calendar, Clock, Trash2, X, AlertCircle, MapPin, Bell, Loader2 } from 'lucide-react';
 import { useNotifications } from '../hooks/useNotifications';
 
 const CATEGORY_STYLES = {
@@ -280,7 +280,7 @@ export default function Schedule() {
                 <div 
                   key={idx} 
                   className={`min-h-[80px] md:min-h-[120px] p-1 md:p-2 border-r border-b border-zinc-800/50 group relative ${!cell.isCurrentMonth ? 'bg-zinc-950/30' : 'bg-zinc-900 hover:bg-zinc-800/30'} flex flex-col gap-1 transition-colors`}
-                  onClick={(e) => {
+                  onClick={() => {
                     // Quick add on mobile by tapping cell (if it's the current month)
                     if (window.innerWidth < 768 && cell.isCurrentMonth) {
                       const localDateStr = new Date(cell.date.getTime() - (cell.date.getTimezoneOffset() * 60000)).toISOString().split('T')[0];

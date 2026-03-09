@@ -47,8 +47,6 @@ export default function AppShell() {
       context = { icon: FileText, title: "Speech & Drafts", subtitle: "Draft and archive public addresses." };
     } else if (location.pathname.startsWith('/schedule')) {
       context = { icon: Calendar, title: "Schedule Manager", subtitle: "Manage appointments and events." };
-    } else if (location.pathname.startsWith('/insights')) {
-      context = { icon: Sparkles, title: "Real-time Insights", subtitle: "Live sentiment and trend analysis." };
     } else if (location.pathname.startsWith('/assistant')) {
       context = { icon: Sparkles, title: "Neeti AI Assistant", subtitle: "Your legislative and administrative copilot." };
     } else if (location.pathname.startsWith('/settings')) {
