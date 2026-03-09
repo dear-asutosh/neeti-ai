@@ -8,6 +8,9 @@ import {
   updateProfile
 } from 'firebase/auth';
 import { doc, getDoc, setDoc, serverTimestamp } from 'firebase/firestore';
+import { 
+  Sparkles, ChevronRight, AlertCircle, User, Mail, Lock, Loader2, CheckCircle2 
+} from 'lucide-react';
 import { auth, db } from '../services/firebase';
 
 export default function Login() {
@@ -127,222 +130,265 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen bg-offwhite flex items-center justify-center p-4 font-body overflow-hidden">
+    <div className="min-h-screen bg-gray-50 dark:bg-zinc-950 flex items-center justify-center p-0 sm:p-4 font-sans overflow-hidden transition-colors duration-500 relative">
       
-      {/* Main Container */}
-      <div className="relative w-full max-w-5xl h-[650px] bg-white rounded-xl shadow-2xl overflow-hidden flex flex-col md:flex-row">
+      {/* Dynamic Background Elements */}
+      <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-indigo-500/10 dark:bg-indigo-500/5 rounded-full blur-[120px] animate-pulse pointer-events-none"></div>
+      <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-gold/10 dark:bg-gold/5 rounded-full blur-[120px] animate-pulse pointer-events-none" style={{ animationDelay: '2s' }}></div>
+
+      {/* Main Card Container */}
+      <div className="relative w-full max-w-5xl h-screen sm:h-[700px] bg-white dark:bg-zinc-900/40 sm:rounded-3xl shadow-2xl overflow-hidden flex flex-col md:flex-row border-0 sm:border border-gray-100 dark:border-zinc-800/50 backdrop-blur-xl transition-all duration-500">
         
-        {/* Navy Overlay Panel that slides */}
+        {/* Decorative Side Panel (Desktop Only) */}
         <div 
-          className={`hidden md:flex absolute top-0 w-1/2 h-full bg-navy text-white flex-col justify-center items-center p-12 transition-transform duration-700 ease-in-out z-20 ${
+          className={`hidden md:flex absolute top-0 w-1/2 h-full bg-navy dark:bg-zinc-900 transition-transform duration-[800ms] cubic-bezier(0.4, 0, 0.2, 1) z-20 ${
             isLogin ? 'translate-x-full' : 'translate-x-0'
           }`}
         >
-          {/* Subtle background pattern */}
-          <div className="absolute inset-0 opacity-[0.05]" 
-               style={{ backgroundImage: 'linear-gradient(#ffffff 1px, transparent 1px), linear-gradient(90deg, #ffffff 1px, transparent 1px)', backgroundSize: '20px 20px' }}>
+          {/* Enhanced Background with Mesh Gradient Effect */}
+          <div className="absolute inset-0 opacity-40 mix-blend-overlay pointer-events-none">
+            <div className="absolute inset-0 bg-gradient-to-br from-indigo-600/20 via-transparent to-gold/20"></div>
           </div>
           
-          <div className="relative z-10 text-center flex flex-col items-center">
-            <h1 className="text-4xl font-heading font-medium mb-6">
-              {isLogin ? "Join Neeti AI." : "Welcome Back."}
-            </h1>
-            <p className="text-white/80 mb-10 text-lg leading-relaxed max-w-sm">
-              {isLogin 
-                ? "Experience India's first AI Co-Pilot built exclusively for tracking, drafting, and leading in public administration." 
-                : "Log in to access your intelligent dashboard, review key documents, and continue your governance efforts."}
-            </p>
-            
-            <button 
-              onClick={toggleMode}
-              className="px-8 py-3 border-2 border-white/30 hover:border-gold hover:text-gold rounded-sm uppercase tracking-widest text-sm font-semibold transition-colors duration-300"
-            >
-              {isLogin ? "Create Official Account" : "Sign In to Dashboard"}
-            </button>
+          <div className="relative z-10 w-full h-full p-12 lg:p-16 flex flex-col justify-between text-white">
+            <div className="flex items-center gap-2">
+              <div className="w-10 h-10 bg-white/10 backdrop-blur-md rounded-xl flex items-center justify-center border border-white/20">
+                <Sparkles className="w-5 h-5 text-gold" />
+              </div>
+              <span className="text-xl font-black tracking-tighter">NEETI AI</span>
+            </div>
+
+            <div className="space-y-6">
+              <h1 className="text-4xl lg:text-5xl font-black tracking-tight leading-none">
+                {isLogin ? "Lead with \nIntelligence." : "Empower your \nGovernance."}
+              </h1>
+              <p className="text-zinc-400 text-lg leading-relaxed max-w-md">
+                {isLogin 
+                  ? "Access India's premier AI Co-Pilot designed for administrative excellence and public leadership." 
+                  : "Join the next generation of digital governance. Draft, track, and analyze with unprecedented precision."}
+              </p>
+              
+              <div className="pt-4">
+                <button 
+                  onClick={toggleMode}
+                  className="group flex items-center gap-3 px-8 py-4 bg-white/5 hover:bg-white/10 border border-white/10 hover:border-gold/50 rounded-2xl transition-all duration-300 backdrop-blur-md"
+                >
+                  <span className="text-sm font-bold tracking-widest uppercase text-white group-hover:text-gold transition-colors">
+                    {isLogin ? "Create Account" : "Back to Sign In"}
+                  </span>
+                  <ChevronRight className="w-4 h-4 text-zinc-500 group-hover:text-gold group-hover:translate-x-1 transition-all" />
+                </button>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-4 text-xs font-bold text-zinc-500 tracking-widest uppercase">
+              <span>Trusted by 500+ Officials</span>
+              <div className="w-1 h-1 bg-zinc-800 rounded-full"></div>
+              <span>Secured by Firebase</span>
+            </div>
           </div>
         </div>
 
         {/* Forms Container */}
-        <div className="w-full h-full relative flex md:w-full z-10">
-
-          {/* S I G N   U P   F O R M (Left Side structurally, positioned relative) */}
+        <div className="flex-1 relative overflow-y-auto sm:overflow-hidden bg-white dark:bg-transparent">
+          
+          {/* Sign Up Form */}
           <div 
-            className={`w-full md:w-1/2 h-full p-8 md:p-12 flex flex-col justify-center absolute top-0 left-0 transition-all duration-700 ease-in-out ${
-              isLogin ? 'opacity-0 -translate-x-1/5 pointer-events-none' : 'opacity-100 translate-x-0 md:translate-x-full'
+            className={`absolute inset-0 p-8 lg:p-16 flex flex-col justify-center transition-all duration-[800ms] ${
+              isLogin ? 'opacity-0 scale-95 pointer-events-none translate-x-[-10%]' : 'opacity-100 scale-100 md:ml-[50%] z-10'
             }`}
           >
-            <div className="max-w-sm mx-auto w-full">
-              {/* Mobile toggler */}
-              <div className="md:hidden text-center mb-8">
-                <h2 className="text-2xl font-heading text-navy">Join Neeti AI</h2>
-                <button onClick={toggleMode} className="text-gold text-sm font-semibold mt-2">
-                  Already have an account? Sign In
-                </button>
+            <div className="max-w-md mx-auto w-full space-y-8">
+              <div className="space-y-2">
+                <h2 className="text-3xl font-black text-zinc-900 dark:text-white tracking-tight">Official Registration</h2>
+                <p className="text-zinc-500 dark:text-zinc-400 text-sm">Join the platform for administrative public service.</p>
               </div>
 
-              <h2 className="hidden md:block text-3xl font-heading font-bold text-navy mb-8">Official Registration</h2>
-              
               {error && !isLogin && (
-                <div className="mb-4 bg-red-50 text-red-600 p-3 rounded text-sm">{error}</div>
-              )}
-              {successMsg && !isLogin && (
-                <div className="mb-4 bg-green-50 text-green-600 p-3 rounded text-sm">{successMsg}</div>
-              )}
-
-              <form onSubmit={handleSubmit} className="space-y-4">
-                <div>
-                  <label className="block text-sm font-semibold text-navy mb-1 uppercase tracking-wider">Full Name *</label>
-                  <input 
-                    type="text" 
-                    required 
-                    value={fullName}
-                    onChange={(e) => setFullName(e.target.value)}
-                    className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-sm focus:outline-none focus:border-gold focus:ring-1 focus:ring-gold transition-colors"
-                  />
+                <div className="p-4 bg-red-500/10 border border-red-500/20 rounded-2xl flex items-center gap-3 text-red-500 text-sm animate-in fade-in slide-in-from-top-1">
+                  <AlertCircle className="w-5 h-5 shrink-0" />
+                  {error}
                 </div>
-                <div>
-                  <label className="block text-sm font-semibold text-navy mb-1 uppercase tracking-wider">Official Email *</label>
-                  <input 
-                    type="email" 
-                    required 
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-sm focus:outline-none focus:border-gold focus:ring-1 focus:ring-gold transition-colors"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-semibold text-navy mb-1 uppercase tracking-wider">Department / Role</label>
-                  <input 
-                    type="text" 
-                    value={department}
-                    onChange={(e) => setDepartment(e.target.value)}
-                    className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-sm focus:outline-none focus:border-gold focus:ring-1 focus:ring-gold transition-colors"
-                    placeholder="e.g. District Magistrate, MLA"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-semibold text-navy mb-1 uppercase tracking-wider">Password *</label>
-                  <input 
-                    type="password" 
-                    required 
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-sm focus:outline-none focus:border-gold focus:ring-1 focus:ring-gold transition-colors"
-                  />
-                </div>
-
-                <div className="pt-2">
-                  <button 
-                    type="submit" 
-                    disabled={loading}
-                    className="w-full bg-navy hover:bg-navy/90 text-white font-semibold py-3 rounded-sm shadow-md transition-colors disabled:opacity-50"
-                  >
-                    {loading ? 'Processing...' : 'Register Securely'}
-                  </button>
-                </div>
-              </form>
-
-              <div className="mt-6 flex items-center justify-between">
-                <hr className="w-full border-gray-200" />
-                <span className="p-2 text-xs text-gray-400 uppercase tracking-widest bg-white">OR</span>
-                <hr className="w-full border-gray-200" />
-              </div>
-
-              <div className="mt-6">
-                <button
-                  onClick={handleGoogleSignIn}
-                  disabled={loading}
-                  className="w-full flex items-center justify-center gap-3 px-4 py-3 border border-gray-200 rounded-sm hover:bg-gray-50 transition-colors font-semibold text-navy disabled:opacity-50"
-                >
-                  <img src="https://www.svgrepo.com/show/475656/google-color.svg" alt="Google" className="w-5 h-5" />
-                  Continue with Google
-                </button>
-              </div>
-            </div>
-          </div>
-
-
-          {/* L O G I N   F O R M (Right Side structurally, positioned relative) */}
-          <div 
-            className={`w-full md:w-1/2 h-full p-8 md:p-12 flex flex-col justify-center absolute top-0 left-0 md:left-1/2 transition-all duration-700 ease-in-out ${
-              !isLogin ? 'opacity-0 translate-x-1/5 pointer-events-none' : 'opacity-100 translate-x-0 md:-translate-x-full'
-            }`}
-          >
-             <div className="max-w-sm mx-auto w-full">
-              {/* Mobile toggler */}
-              <div className="md:hidden text-center mb-8">
-                <h2 className="text-2xl font-heading text-navy">Welcome Back</h2>
-                <button onClick={toggleMode} className="text-gold text-sm font-semibold mt-2">
-                  Need an account? Sign Up
-                </button>
-              </div>
-
-              <h2 className="hidden md:block text-3xl font-heading font-bold text-navy mb-8">Official Access</h2>
-              
-              {error && isLogin && (
-                <div className="mb-4 bg-red-50 text-red-600 p-3 rounded text-sm">{error}</div>
-              )}
-              {successMsg && isLogin && (
-                <div className="mb-4 bg-green-50 text-green-600 p-3 rounded text-sm">{successMsg}</div>
               )}
 
               <form onSubmit={handleSubmit} className="space-y-5">
-                <div>
-                  <label className="block text-sm font-semibold text-navy mb-1 uppercase tracking-wider">Official Email *</label>
-                  <input 
-                    type="email" 
-                    required 
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-sm focus:outline-none focus:border-gold focus:ring-1 focus:ring-gold transition-colors"
-                  />
-                </div>
-                <div>
-                  <div className="flex justify-between items-center mb-1">
-                    <label className="block text-sm font-semibold text-navy uppercase tracking-wider">Password *</label>
-                    <a href="#" className="text-xs text-gold hover:underline">Forgot?</a>
+                <div className="grid grid-cols-1 gap-5">
+                  <div className="space-y-2">
+                    <label className="text-[10px] font-black text-zinc-400 dark:text-zinc-500 uppercase tracking-widest pl-1">Full Name</label>
+                    <div className="relative group">
+                      <User className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400 group-focus-within:text-indigo-500 transition-colors" />
+                      <input 
+                        type="text" required value={fullName} onChange={(e) => setFullName(e.target.value)}
+                        placeholder="Hon. Rahul Sharma"
+                        className="w-full pl-12 pr-4 py-4 bg-gray-50 dark:bg-zinc-800/50 border border-gray-200 dark:border-zinc-800 rounded-2xl focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all dark:text-white"
+                      />
+                    </div>
                   </div>
-                  <input 
-                    type="password" 
-                    required 
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-sm focus:outline-none focus:border-gold focus:ring-1 focus:ring-gold transition-colors"
-                  />
+
+                  <div className="space-y-2">
+                    <label className="text-[10px] font-black text-zinc-400 dark:text-zinc-500 uppercase tracking-widest pl-1">Official Email</label>
+                    <div className="relative group">
+                      <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400 group-focus-within:text-indigo-500 transition-colors" />
+                      <input 
+                        type="email" required value={email} onChange={(e) => setEmail(e.target.value)}
+                        placeholder="official@nic.in"
+                        className="w-full pl-12 pr-4 py-4 bg-gray-50 dark:bg-zinc-800/50 border border-gray-200 dark:border-zinc-800 rounded-2xl focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all dark:text-white"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                    <div className="space-y-2">
+                      <label className="text-[10px] font-black text-zinc-400 dark:text-zinc-500 uppercase tracking-widest pl-1">Department</label>
+                      <input 
+                        type="text" value={department} onChange={(e) => setDepartment(e.target.value)}
+                        placeholder="Legislative"
+                        className="w-full px-4 py-4 bg-gray-50 dark:bg-zinc-800/50 border border-gray-200 dark:border-zinc-800 rounded-2xl focus:outline-none focus:border-indigo-500 transition-all dark:text-white"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <label className="text-[10px] font-black text-zinc-400 dark:text-zinc-500 uppercase tracking-widest pl-1">Password</label>
+                      <input 
+                        type="password" required value={password} onChange={(e) => setPassword(e.target.value)}
+                        placeholder="••••••••"
+                        className="w-full px-4 py-4 bg-gray-50 dark:bg-zinc-800/50 border border-gray-200 dark:border-zinc-800 rounded-2xl focus:outline-none focus:border-indigo-500 transition-all dark:text-white"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                <button 
+                  type="submit" disabled={loading}
+                  className="w-full py-4 bg-indigo-600 hover:bg-indigo-500 text-white font-bold rounded-2xl shadow-lg shadow-indigo-500/20 transition-all active:scale-[0.98] disabled:opacity-50 flex items-center justify-center gap-2"
+                >
+                  {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : 'Register Securely'}
+                </button>
+              </form>
+
+              <div className="relative">
+                <div className="absolute inset-0 flex items-center"><div className="w-full border-t border-gray-100 dark:border-zinc-800"></div></div>
+                <div className="relative flex justify-center text-[10px] uppercase font-bold tracking-widest"><span className="bg-white dark:bg-zinc-900 px-4 text-zinc-400">Or Continue With</span></div>
+              </div>
+
+              <button
+                onClick={handleGoogleSignIn} disabled={loading}
+                className="w-full flex items-center justify-center gap-3 px-4 py-4 border border-gray-200 dark:border-zinc-800 rounded-2xl hover:bg-gray-50 dark:hover:bg-zinc-800 transition-all font-bold text-zinc-900 dark:text-white group"
+              >
+                <img src="https://www.svgrepo.com/show/475656/google-color.svg" alt="Google" className="w-5 h-5 group-hover:scale-110 transition-transform" />
+                Google Services
+              </button>
+            </div>
+          </div>
+
+          {/* Login Form */}
+          <div 
+            className={`absolute inset-0 p-8 lg:p-16 flex flex-col justify-center transition-all duration-[800ms] ${
+              !isLogin ? 'opacity-0 scale-95 pointer-events-none translate-x-[10%]' : 'opacity-100 scale-100 md:mr-[50%] z-10'
+            }`}
+          >
+            <div className="max-w-md mx-auto w-full space-y-10">
+              <div className="space-y-4">
+                <div className="md:hidden flex flex-col items-center gap-4 mb-2">
+                   <div className="w-14 h-14 bg-indigo-600 rounded-2xl flex items-center justify-center shadow-xl shadow-indigo-600/20">
+                     <Sparkles className="w-8 h-8 text-white" />
+                   </div>
+                   <h1 className="text-2xl font-black tracking-tighter text-zinc-900 dark:text-white">NEETI AI</h1>
+                </div>
+                <div className="space-y-1">
+                  <h2 className="text-4xl font-black text-zinc-900 dark:text-white tracking-tight">Official Access</h2>
+                  <p className="text-zinc-500 dark:text-zinc-400 font-medium">Please authenticate to access your command center.</p>
+                </div>
+              </div>
+
+              {error && isLogin && (
+                <div className="p-4 bg-red-500/10 border border-red-500/20 rounded-2xl flex items-center gap-3 text-red-500 text-sm animate-in fade-in slide-in-from-top-1">
+                  <AlertCircle className="w-5 h-5 shrink-0" />
+                  {error}
+                </div>
+              )}
+
+              {successMsg && isLogin && (
+                <div className="p-4 bg-emerald-500/10 border border-emerald-500/20 rounded-2xl flex items-center gap-3 text-emerald-500 text-sm animate-in fade-in slide-in-from-top-1">
+                  <CheckCircle2 className="w-5 h-5 shrink-0" />
+                  {successMsg}
+                </div>
+              )}
+
+              <form onSubmit={handleSubmit} className="space-y-6">
+                <div className="space-y-5">
+                  <div className="space-y-2">
+                    <label className="text-[10px] font-black text-zinc-400 dark:text-zinc-500 uppercase tracking-widest pl-1">Official Email</label>
+                    <div className="relative group">
+                      <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400 group-focus-within:text-indigo-500 transition-colors" />
+                      <input 
+                        type="email" required value={email} onChange={(e) => setEmail(e.target.value)}
+                        placeholder="official@nic.in"
+                        className="w-full pl-12 pr-4 py-4 bg-gray-50 dark:bg-zinc-800/50 border border-gray-200 dark:border-zinc-800 rounded-2xl focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all dark:text-white font-medium"
+                      />
+                    </div>
+                  </div>
+                  <div className="space-y-2">
+                    <div className="flex justify-between items-center pr-1">
+                       <label className="text-[10px] font-black text-zinc-400 dark:text-zinc-500 uppercase tracking-widest pl-1">Secure Password</label>
+                       <a href="#" className="text-[10px] font-black uppercase tracking-widest text-gold hover:text-gold/80 transition-colors">Recover</a>
+                    </div>
+                    <div className="relative group">
+                      <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400 group-focus-within:text-indigo-500 transition-colors" />
+                      <input 
+                        type="password" required value={password} onChange={(e) => setPassword(e.target.value)}
+                        placeholder="••••••••"
+                        className="w-full pl-12 pr-4 py-4 bg-gray-50 dark:bg-zinc-800/50 border border-gray-200 dark:border-zinc-800 rounded-2xl focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all dark:text-white font-medium"
+                      />
+                    </div>
+                  </div>
                 </div>
 
                 <div className="pt-2">
                   <button 
-                    type="submit" 
-                    disabled={loading}
-                    className="w-full bg-navy hover:bg-navy/90 text-white font-semibold py-3 rounded-sm shadow-md transition-colors disabled:opacity-50"
+                    type="submit" disabled={loading}
+                    className="w-full py-4 bg-indigo-600 hover:bg-indigo-500 text-white font-bold rounded-2xl shadow-lg shadow-indigo-600/30 transition-all active:scale-[0.98] disabled:opacity-50 flex items-center justify-center gap-2 group"
                   >
-                    {loading ? 'Authenticating...' : 'Secure Sign In'}
+                    {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : (
+                      <>
+                        <span>Secure Sign In</span>
+                        <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                      </>
+                    )}
                   </button>
                 </div>
               </form>
 
-              <div className="mt-8 flex items-center justify-between">
-                <hr className="w-full border-gray-200" />
-                <span className="p-2 text-xs text-gray-400 uppercase tracking-widest bg-white">OR</span>
-                <hr className="w-full border-gray-200" />
+              <div className="relative">
+                <div className="absolute inset-0 flex items-center"><div className="w-full border-t border-gray-100 dark:border-zinc-800"></div></div>
+                <div className="relative flex justify-center text-[10px] uppercase font-bold tracking-widest"><span className="bg-white dark:bg-zinc-900 px-4 text-zinc-400">Authentication Gateway</span></div>
               </div>
 
-              <div className="mt-8">
+              <div className="flex flex-col sm:flex-row gap-4">
                 <button
-                  onClick={handleGoogleSignIn}
-                  disabled={loading}
-                  className="w-full flex items-center justify-center gap-3 px-4 py-3 border border-gray-200 rounded-sm hover:bg-gray-50 transition-colors font-semibold text-navy disabled:opacity-50"
+                  onClick={handleGoogleSignIn} disabled={loading}
+                  className="flex-1 flex items-center justify-center gap-3 px-4 py-4 border border-gray-200 dark:border-zinc-800 rounded-2xl hover:bg-gray-50 dark:hover:bg-zinc-800 transition-all font-bold text-zinc-900 dark:text-white group"
                 >
-                  <img src="https://www.svgrepo.com/show/475656/google-color.svg" alt="Google" className="w-5 h-5" />
-                  Sign In with Google
+                  <img src="https://www.svgrepo.com/show/475656/google-color.svg" alt="Google" className="w-5 h-5 group-hover:scale-110 transition-transform" />
+                  <span>Google</span>
+                </button>
+                <button 
+                  onClick={toggleMode}
+                  className="md:hidden flex-1 px-4 py-4 bg-zinc-900 dark:bg-zinc-800 text-white font-bold rounded-2xl flex items-center justify-center gap-2"
+                >
+                  Create Account
                 </button>
               </div>
             </div>
           </div>
         </div>
-
       </div>
+
+      {/* Footer Info */}
+      <footer className="absolute bottom-6 w-full text-center hidden sm:block">
+        <p className="text-[10px] font-black uppercase tracking-[0.4em] text-zinc-400 dark:text-zinc-600">
+           Protected by Advanced Public Safety Infrastructure
+        </p>
+      </footer>
     </div>
   );
 }
