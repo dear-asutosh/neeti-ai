@@ -255,72 +255,111 @@ export default function Schedule() {
           </div>
         </div>
 
-        {/* Days Header */}
-        <div className="grid grid-cols-7 border-b border-zinc-800 bg-zinc-950/50">
-          {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(day => (
-            <div key={day} className="py-3 text-center text-xs font-semibold text-zinc-500 uppercase tracking-wider">
-              {day}
-            </div>
-          ))}
-        </div>
-
-        {/* Calendar Grid */}
-        <div className="grid grid-cols-7 grid-rows-6">
-          {calendarCells.map((cell, idx) => {
-            const dayEvents = events.filter(e => isSameDay(e.startTime, cell.date));
-            const hasMoreEvents = dayEvents.length > 3;
-            const displayedEvents = dayEvents.slice(0, 3);
-            
-            const isTodayCell = isToday(cell.date);
-
-            return (
-              <div 
-                key={idx} 
-                className={`min-h-[120px] p-2 border-r border-b border-zinc-800/50 group relative ${!cell.isCurrentMonth ? 'bg-zinc-950/30' : 'bg-zinc-900 hover:bg-zinc-800/30'} flex flex-col gap-1 transition-colors`}
-              >
-                <div className="flex justify-between items-start mb-1 cursor-pointer">
-                  <span className={`w-7 h-7 flex items-center justify-center rounded-full text-sm font-medium
-                    ${!cell.isCurrentMonth ? 'text-zinc-600' : 'text-zinc-300'}
-                    ${isTodayCell ? 'bg-indigo-600 text-white shadow-md shadow-indigo-900/50' : ''}
-                  `}>
-                    {cell.dayNum}
-                  </span>
-                  {cell.isCurrentMonth && (
-                    <button 
-                      className="opacity-0 group-hover:opacity-100 p-1 rounded-md hover:bg-zinc-700 text-zinc-400 hover:text-zinc-200 transition-all"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setForm(prev => ({...prev, date: cell.date.toISOString().split('T')[0]}));
-                        setShowModal(true);
-                      }}
-                    >
-                      <Plus className="w-3.5 h-3.5" />
-                    </button>
-                  )}
-                </div>
-
-                <div className="flex-1 flex flex-col gap-1 overflow-y-auto hide-scrollbar">
-                  {displayedEvents.map(evt => {
-                    const isPast = isPastEvent(evt.endTime);
-                    return (
-                      <div 
-                        key={evt.id} 
-                        onClick={() => setSelectedEvent(evt)}
-                        className={`text-[10px] md:text-xs truncate px-1.5 py-1 rounded-md border cursor-pointer hover:opacity-80 transition-opacity ${CATEGORY_STYLES[evt.category] || CATEGORY_STYLES['Meeting']} ${isPast ? 'opacity-40 grayscale-[50%]' : ''}`}
-                      >
-                        {formatTime(evt.startTime)} - {evt.title}
-                      </div>
-                    );
-                  })}
-                  {hasMoreEvents && (
-                    <div className="text-[10px] text-zinc-500 px-1 font-medium cursor-pointer hover:text-zinc-400 transition-colors">
-                      +{dayEvents.length - 3} more
-                    </div>
-                  )}
-                </div>
+        {/* Calendar Grid Container (no forced scroll) */}
+        <div className="w-full">
+          {/* Days Header */}
+          <div className="grid grid-cols-7 border-b border-zinc-800 bg-zinc-950/50">
+            {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(day => (
+              <div key={day} className="py-2 md:py-3 text-center text-[10px] md:text-xs font-semibold text-zinc-500 uppercase tracking-wider">
+                <span className="md:hidden">{day.charAt(0)}</span>
+                <span className="hidden md:inline">{day}</span>
               </div>
-            );
-          })}
+            ))}
+          </div>
+
+          {/* Calendar Grid */}
+          <div className="grid grid-cols-7 grid-rows-6">
+            {calendarCells.map((cell, idx) => {
+              const dayEvents = events.filter(e => isSameDay(e.startTime, cell.date));
+              const hasMoreEvents = dayEvents.length > 3;
+              const displayedEvents = dayEvents.slice(0, 3);
+              
+              const isTodayCell = isToday(cell.date);
+
+              return (
+                <div 
+                  key={idx} 
+                  className={`min-h-[80px] md:min-h-[120px] p-1 md:p-2 border-r border-b border-zinc-800/50 group relative ${!cell.isCurrentMonth ? 'bg-zinc-950/30' : 'bg-zinc-900 hover:bg-zinc-800/30'} flex flex-col gap-1 transition-colors`}
+                  onClick={(e) => {
+                    // Quick add on mobile by tapping cell (if it's the current month)
+                    if (window.innerWidth < 768 && cell.isCurrentMonth) {
+                      const localDateStr = new Date(cell.date.getTime() - (cell.date.getTimezoneOffset() * 60000)).toISOString().split('T')[0];
+                      setForm(prev => ({...prev, date: localDateStr}));
+                      setShowModal(true);
+                    }
+                  }}
+                >
+                  <div className="flex justify-center md:justify-between items-start mb-1 cursor-pointer">
+                    <span className={`w-6 h-6 md:w-7 md:h-7 flex items-center justify-center rounded-full text-xs md:text-sm font-medium
+                      ${!cell.isCurrentMonth ? 'text-zinc-600' : 'text-zinc-300'}
+                      ${isTodayCell ? 'bg-indigo-600 text-white shadow-md shadow-indigo-900/50' : ''}
+                    `}>
+                      {cell.dayNum}
+                    </span>
+                    {cell.isCurrentMonth && (
+                      <button 
+                        className="hidden md:block opacity-0 group-hover:opacity-100 p-1 rounded-md hover:bg-zinc-700 text-zinc-400 hover:text-zinc-200 transition-all"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          const localDateStr = new Date(cell.date.getTime() - (cell.date.getTimezoneOffset() * 60000)).toISOString().split('T')[0];
+                          setForm(prev => ({...prev, date: localDateStr}));
+                          setShowModal(true);
+                        }}
+                      >
+                        <Plus className="w-3.5 h-3.5" />
+                      </button>
+                    )}
+                  </div>
+
+                  {/* Desktop Events (Text Blocks) */}
+                  <div className="hidden md:flex flex-1 flex-col gap-1 overflow-y-auto hide-scrollbar">
+                    {displayedEvents.map(evt => {
+                      const isPast = isPastEvent(evt.endTime);
+                      return (
+                        <div 
+                          key={evt.id} 
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setSelectedEvent(evt);
+                          }}
+                          className={`text-xs truncate px-1.5 py-1 rounded-md border cursor-pointer hover:opacity-80 transition-opacity ${CATEGORY_STYLES[evt.category] || CATEGORY_STYLES['Meeting']} ${isPast ? 'opacity-40 grayscale-[50%]' : ''}`}
+                        >
+                          {formatTime(evt.startTime)} - {evt.title}
+                        </div>
+                      );
+                    })}
+                    {hasMoreEvents && (
+                      <div className="text-[10px] text-zinc-500 px-1 font-medium cursor-pointer hover:text-zinc-400 transition-colors">
+                        +{dayEvents.length - 3} more
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Mobile Events (Dots) */}
+                  <div className="flex md:hidden flex-wrap justify-center gap-1 mt-auto pb-1 px-1">
+                    {dayEvents.slice(0, 4).map(evt => {
+                      const isPast = isPastEvent(evt.endTime);
+                      // Extract color roughly from CATEGORY_STYLES or fallback to indigo
+                      const dotColor = evt.category === 'Deadline' ? 'bg-rose-500' 
+                                   : evt.category === 'Public Event' ? 'bg-amber-500'
+                                   : evt.category === 'Personal' ? 'bg-emerald-500'
+                                   : 'bg-indigo-500';
+                      
+                      return (
+                        <div 
+                          key={evt.id}
+                          className={`w-1.5 h-1.5 rounded-full ${dotColor} ${isPast ? 'opacity-40 grayscale-[50%]' : ''}`}
+                        />
+                      );
+                    })}
+                    {dayEvents.length > 4 && (
+                      <div className="w-1.5 h-1.5 rounded-full bg-zinc-600" />
+                    )}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
         </div>
       </div>
     );
