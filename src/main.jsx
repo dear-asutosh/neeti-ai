@@ -13,7 +13,10 @@ import Landing from './pages/Landing';
 import Documents from './pages/Documents';
 import Speeches from './pages/Speeches';
 import Schedule from './pages/Schedule';
-import Constituency from './pages/Constituency';
+import ConstituencyDashboard from './pages/ConstituencyTracker/Dashboard';
+import AllComplaints from './pages/ConstituencyTracker/AllComplaints';
+import AddComplaint from './pages/ConstituencyTracker/AddComplaint';
+import ComplaintDetail from './pages/ConstituencyTracker/ComplaintDetail';
 import AIAssistant from './pages/AIAssistant';
 import Meetings from './pages/Meetings';
 import Insights from './pages/Insights';
@@ -33,7 +36,10 @@ createRoot(document.getElementById('root')).render(
             <Route path="/meetings" element={<Meetings />} />
             <Route path="/speeches" element={<Speeches />} />
             <Route path="/schedule" element={<Schedule />} />
-            <Route path="/constituency" element={<Constituency />} />
+            <Route path="/constituency" element={<ConstituencyDashboard />} />
+            <Route path="/constituency/complaints" element={<AllComplaints />} />
+            <Route path="/constituency/complaints/new" element={<AddComplaint />} />
+            <Route path="/constituency/complaints/:id" element={<ComplaintDetail />} />
             <Route path="/insights" element={<Insights />} />
             <Route path="/settings" element={<Settings />} />
             <Route path="/assistant" element={<AIAssistant />} />
