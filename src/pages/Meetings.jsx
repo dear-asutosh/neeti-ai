@@ -641,10 +641,10 @@ ${manualAgenda.trim() ? `\nMEETING AGENDA/CONTEXT (use this to help guide your s
               )}
 
               <h3 className="text-[15px] font-medium text-zinc-900 dark:text-white mb-1">
-                {isProcessing ? processingStatus : 'Drop audio/video file here'}
+                {isProcessing ? processingStatus : 'Drop audio file here !'}
               </h3>
               <p className="text-xs text-zinc-500 dark:text-zinc-400">
-                {isProcessing ? 'Analyzing with AI...' : 'Supports MP3, MP4, WEBM, WAV etc.'}
+                {isProcessing ? 'Analyzing with AI...' : 'Supports MP3, WAV etc.'}
               </p>
 
               <input
