@@ -9,7 +9,7 @@ import {
 } from 'firebase/auth';
 import { doc, getDoc, setDoc, serverTimestamp } from 'firebase/firestore';
 import { 
-  Sparkles, ChevronRight, AlertCircle, User, Mail, Lock, Loader2, CheckCircle2 
+  ChevronRight, AlertCircle, User, Mail, Lock, Loader2, CheckCircle2 
 } from 'lucide-react';
 import { auth, db } from '../services/firebase';
 
@@ -152,9 +152,7 @@ export default function Login() {
           
           <div className="relative z-10 w-full h-full p-12 lg:p-16 flex flex-col justify-between text-white">
             <div className="flex items-center gap-2">
-              <div className="w-10 h-10 bg-white/10 backdrop-blur-md rounded-xl flex items-center justify-center border border-white/20">
-                <Sparkles className="w-5 h-5 text-gold" />
-              </div>
+              <img src="/icon.png" alt="Neeti AI" className="w-10 h-10 rounded-xl" />
               <span className="text-xl font-black tracking-tighter">NEETI AI</span>
             </div>
 
@@ -289,9 +287,7 @@ export default function Login() {
             <div className="max-w-md mx-auto w-full space-y-10">
               <div className="space-y-4">
                 <div className="md:hidden flex flex-col items-center gap-4 mb-2">
-                   <div className="w-14 h-14 bg-indigo-600 rounded-2xl flex items-center justify-center shadow-xl shadow-indigo-600/20">
-                     <Sparkles className="w-8 h-8 text-white" />
-                   </div>
+                   <img src="/icon.png" alt="Neeti AI" className="w-14 h-14 rounded-2xl shadow-xl shadow-indigo-600/20" />
                    <h1 className="text-2xl font-black tracking-tighter text-zinc-900 dark:text-white">NEETI AI</h1>
                 </div>
                 <div className="space-y-1">

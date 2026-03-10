@@ -12,7 +12,6 @@ import {
   LogOut,
   ChevronLeft,
   ChevronRight,
-  Landmark,
   X,
   User,
   Image as ImageIcon,
@@ -81,9 +80,7 @@ export default function Sidebar({ mobileOpen, setMobileOpen }) {
         {/* Header */}
         <div className={`flex items-center justify-between h-14 px-4 border-b border-gray-100 dark:border-zinc-800 ${isCollapsed ? 'justify-center' : ''}`}>
           <NavLink to="/" onClick={() => setMobileOpen(false)} className="flex items-center gap-3 overflow-hidden cursor-pointer hover:opacity-80 transition-opacity">
-            <div className="bg-gray-100 dark:bg-[#09090B] rounded-md p-1.5 shrink-0 flex items-center justify-center">
-               <Landmark className="text-zinc-900 dark:text-white w-5 h-5" />
-            </div>
+            <img src="/icon.png" alt="Neeti AI" className="shrink-0 w-8 h-8 rounded-md" />
             {!isCollapsed && <span className="text-[15px] font-semibold tracking-tight text-zinc-900 dark:text-white whitespace-nowrap">Neeti AI</span>}
           </NavLink>
           {/* Mobile Close Button */}
