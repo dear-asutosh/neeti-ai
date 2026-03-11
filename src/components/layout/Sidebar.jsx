@@ -17,7 +17,7 @@ import {
   Image as ImageIcon,
   Sparkles,
 } from 'lucide-react';
-import { auth } from '../../services/firebase';
+import { auth, clearAuthToken } from '../../services/firebase';
 import { useAuth } from '../../hooks/useAuth';
 
 export default function Sidebar({ mobileOpen, setMobileOpen }) {
@@ -27,6 +27,7 @@ export default function Sidebar({ mobileOpen, setMobileOpen }) {
 
   const handleLogout = async () => {
     try {
+      clearAuthToken();
       await auth.signOut();
       navigate('/login');
     } catch (error) {

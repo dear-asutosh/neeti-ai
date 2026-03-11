@@ -3,7 +3,7 @@ import { Outlet, useNavigate, useLocation } from 'react-router-dom';
 import { Menu, User, LogOut, ChevronDown, Map, Sparkles, FileText, Calendar, BarChart3 } from 'lucide-react';
 import Sidebar from './Sidebar';
 import { useAuth } from '../../hooks/useAuth';
-import { auth } from '../../services/firebase';
+import { auth, clearAuthToken } from '../../services/firebase';
 import { useNotifications } from '../../hooks/useNotifications';
 
 export default function AppShell() {
@@ -27,6 +27,7 @@ export default function AppShell() {
 
   const handleLogout = async () => {
     try {
+      clearAuthToken();
       await auth.signOut();
       navigate('/login');
     } catch (error) {
