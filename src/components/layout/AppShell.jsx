@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Outlet, useNavigate, useLocation } from 'react-router-dom';
 import { Menu, User, LogOut, ChevronDown, Map, Sparkles, FileText, Calendar, BarChart3 } from 'lucide-react';
 import Sidebar from './Sidebar';
@@ -9,12 +9,21 @@ import { useNotifications } from '../../hooks/useNotifications';
 export default function AppShell() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [currentTime, setCurrentTime] = useState(new Date());
   const { currentUser, dbUser } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
 
   // Initialize background notification polling
   useNotifications();
+
+  // Update time every second
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrentTime(new Date());
+    }, 1000);
+    return () => clearInterval(timer);
+  }, []);
 
   const handleLogout = async () => {
     try {
@@ -93,16 +102,32 @@ export default function AppShell() {
             </div>
           </div>
 
+          {/* Live Time and Date Display */}
+          <div className="hidden md:flex flex-col items-end text-right mr-4">
+            <div className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">
+              {currentTime.toLocaleTimeString('en-US', { 
+                hour: '2-digit', 
+                minute: '2-digit', 
+                second: '2-digit',
+                hour12: true 
+              })}
+            </div>
+            <div className="text-xs text-zinc-500">
+              {currentTime.toLocaleDateString('en-US', { 
+                weekday: 'short', 
+                month: 'short', 
+                day: 'numeric',
+                year: 'numeric'
+              })}
+            </div>
+          </div>
+
           {/* User Profile Area (Top Right) */}
           <div className="relative shrink-0">
             <button 
               onClick={() => setDropdownOpen(!dropdownOpen)}
               className="flex items-center gap-3 px-2 py-1.5 rounded-md hover:bg-gray-100 dark:hover:bg-zinc-900 transition-colors border border-transparent focus:outline-none"
             >
-              <div className="hidden md:flex flex-col items-end">
-                <span className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">{dbUser?.displayName || currentUser?.displayName || 'Official'}</span>
-                <span className="text-xs text-zinc-500 capitalize">{dbUser?.department || dbUser?.role || 'Leader'}</span>
-              </div>
               <div className="w-8 h-8 rounded-full bg-gray-100 dark:bg-zinc-800 border border-gray-200 dark:border-gold/30 flex items-center justify-center overflow-hidden">
                 {displayPhoto ? (
                   <img src={displayPhoto} alt="Avatar" className="w-full h-full object-cover" referrerPolicy="no-referrer" />
@@ -134,7 +159,7 @@ export default function AppShell() {
                     className="w-full text-left px-4 py-2 text-sm text-zinc-600 dark:text-zinc-300 hover:bg-gray-100 dark:hover:bg-zinc-800 hover:text-zinc-900 dark:hover:text-white transition-colors flex items-center gap-2"
                   >
                     <User className="w-4 h-4" />
-                    Profile
+                    Settings
                   </button>
                   <button
                     onClick={handleLogout}
