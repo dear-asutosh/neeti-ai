@@ -93,6 +93,9 @@ export default function Settings() {
   };
 
   const currentPhotoURL = dbUser?.photoURL || currentUser?.photoURL;
+  const currentDisplayName = dbUser?.displayName || currentUser?.displayName || '';
+  const currentDesignation = dbUser?.designation || dbUser?.department || '';
+  const hasChanged = fullName !== currentDisplayName || designation !== currentDesignation;
 
   return (
     <div className="p-6 md:p-10 font-sans min-h-screen bg-transparent transition-colors duration-300 animate-in fade-in duration-700">
@@ -137,8 +140,8 @@ export default function Settings() {
                 </div>
                 <button 
                   type="submit"
-                  disabled={saving}
-                  className="px-6 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold rounded-xl shadow-lg shadow-indigo-500/20 transition-all active:scale-[0.98] disabled:opacity-50 flex items-center gap-2 group"
+                  disabled={saving || !hasChanged}
+                  className="px-6 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold rounded-xl shadow-lg shadow-indigo-500/20 transition-all active:scale-[0.98] disabled:opacity-30 disabled:grayscale-[0.5] disabled:cursor-not-allowed flex items-center gap-2 group"
                 >
                   {saving ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : 'Save Changes'}
                 </button>
