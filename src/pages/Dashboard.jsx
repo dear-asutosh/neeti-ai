@@ -161,7 +161,7 @@ export default function Dashboard() {
   ];
 
   const displayName = dbUser?.displayName || currentUser?.displayName || currentUser?.email?.split('@')[0] || 'Leader';
-  const roleDisplay = dbUser?.department || userRole || 'Administrator';
+  const roleDisplay = dbUser?.designation || dbUser?.department || userRole || 'Administrator';
 
   // Format current date and greeting
   const today = new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' });

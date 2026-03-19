@@ -23,7 +23,7 @@ export default function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [fullName, setFullName] = useState('');
-  const [department, setDepartment] = useState('');
+  const [designation, setDesignation] = useState('');
 
   const navigate = useNavigate();
   // Redirect only on newly successful registrations
@@ -101,7 +101,7 @@ export default function Login() {
         await setDoc(userRef, {
           email: user.email,
           role: 'leader',
-          department: department,
+          designation: designation,
           displayName: fullName,
           createdAt: serverTimestamp()
         });
@@ -237,10 +237,10 @@ export default function Login() {
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
                     <div className="space-y-2">
-                      <label className="text-[10px] font-black text-zinc-400 dark:text-zinc-500 uppercase tracking-widest pl-1">Department</label>
+                      <label className="text-[10px] font-black text-zinc-400 dark:text-zinc-500 uppercase tracking-widest pl-1">Designation</label>
                       <input 
-                        type="text" value={department} onChange={(e) => setDepartment(e.target.value)}
-                        placeholder="Legislative"
+                        type="text" value={designation} onChange={(e) => setDesignation(e.target.value)}
+                        placeholder="e.g. District Magistrate, MLA"
                         className="w-full px-4 py-4 bg-gray-50 dark:bg-zinc-800/50 border border-gray-200 dark:border-zinc-800 rounded-2xl focus:outline-none focus:border-indigo-500 transition-all dark:text-white"
                       />
                     </div>

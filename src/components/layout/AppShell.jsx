@@ -149,6 +149,9 @@ export default function AppShell() {
                 <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 rounded-md shadow-xl py-1 z-50">
                   <div className="px-4 py-2 border-b border-gray-100 dark:border-zinc-800 mb-1">
                     <p className="text-sm text-zinc-900 dark:text-white font-medium truncate">{dbUser?.displayName || currentUser?.displayName}</p>
+                    <p className="text-[10px] text-indigo-500 dark:text-indigo-400 font-bold uppercase tracking-wider truncate mb-0.5">
+                      {dbUser?.designation || dbUser?.department || 'Official'}
+                    </p>
                     <p className="text-xs text-zinc-400 truncate">{currentUser?.email}</p>
                   </div>
                   <button
