@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { toast } from 'react-toastify';
 import { Link, useNavigate } from 'react-router-dom';
 import { createPerson } from '../../../services/peopleService';
 import { ChevronLeft, Save } from 'lucide-react';
@@ -26,9 +27,11 @@ export default function AddPerson() {
     setLoading(true);
     try {
       await createPerson(formData);
+      toast.success("Profile created successfully!");
       navigate('/constituency/people');
     } catch (error) {
       console.error("Error creating person", error);
+      toast.error("Failed to create profile.");
     } finally {
       setLoading(false);
     }

@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { toast } from 'react-toastify';
 import { useParams, Link } from 'react-router-dom';
 import { getComplaintById, updateComplaintStatus } from '../../services/complaintsService';
 import { ChevronLeft, Clock, MapPin, Phone, User, Tag, AlertCircle } from 'lucide-react';
@@ -21,6 +22,7 @@ export default function ComplaintDetail() {
       setComplaint(data);
     } catch (error) {
       console.error("Error fetching complaint:", error);
+      toast.error("Failed to load complaint details.");
     } finally {
       setLoading(false);
     }
@@ -34,8 +36,10 @@ export default function ComplaintDetail() {
       await updateComplaintStatus(id, newStatus, statusNote);
       setStatusNote('');
       await fetchComplaint(); // refresh data
+      toast.success(`Status updated to ${newStatus}`);
     } catch (error) {
       console.error("Error updating status:", error);
+      toast.error("Failed to update status.");
     } finally {
       setUpdating(false);
     }

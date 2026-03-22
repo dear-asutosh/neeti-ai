@@ -5,6 +5,7 @@ import { doc, setDoc } from 'firebase/firestore';
 import { auth, db } from '../services/firebase';
 import { useAuth } from '../hooks/useAuth';
 import { useTheme } from '../context/ThemeContext';
+import { toast } from 'react-toastify';
 
 export default function Settings() {
   const { currentUser, dbUser } = useAuth();
@@ -17,16 +18,12 @@ export default function Settings() {
   // UI states
   const [uploading, setUploading] = useState(false);
   const [saving, setSaving] = useState(false);
-  const [error, setError] = useState('');
-  const [success, setSuccess] = useState('');
   const fileInputRef = useRef(null);
 
   const handleUpdateProfile = async (e) => {
     e.preventDefault();
     try {
       setSaving(true);
-      setError('');
-      setSuccess('');
 
       // Update Firebase Auth Profile
       await updateProfile(auth.currentUser, {
@@ -40,10 +37,10 @@ export default function Settings() {
         designation: designation 
       }, { merge: true });
 
-      setSuccess("Profile updated successfully.");
+      toast.success("Profile updated successfully.");
     } catch (err) {
       console.error("Error updating profile:", err);
-      setError("Failed to update profile.");
+      toast.error("Failed to update profile.");
     } finally {
       setSaving(false);
     }
@@ -54,14 +51,12 @@ export default function Settings() {
     if (!file) return;
 
     if (file.size > 5 * 1024 * 1024) {
-      setError("File size cannot exceed 5MB.");
+      toast.error("File size cannot exceed 5MB.");
       return;
     }
 
     try {
       setUploading(true);
-      setError('');
-      setSuccess('');
 
       const formData = new FormData();
       formData.append('file', file);
@@ -82,10 +77,10 @@ export default function Settings() {
       const userRef = doc(db, 'users', currentUser.uid);
       await setDoc(userRef, { photoURL: downloadURL }, { merge: true });
 
-      setSuccess("Profile picture updated successfully.");
+      toast.success("Profile picture updated successfully.");
     } catch (err) {
       console.error("Error uploading profile picture:", err);
-      setError("Failed to upload profile picture.");
+      toast.error("Failed to upload profile picture.");
     } finally {
       setUploading(false);
       if (fileInputRef.current) fileInputRef.current.value = '';
@@ -112,21 +107,7 @@ export default function Settings() {
           </div>
         </div>
         
-        {/* Alerts */}
-        <div className="space-y-4">
-          {error && (
-            <div className="bg-red-500/10 border border-red-500/20 text-red-500 p-4 rounded-2xl text-sm flex items-center gap-3 animate-in slide-in-from-top-2">
-              <div className="w-2 h-2 rounded-full bg-red-500 animate-pulse"></div>
-              <span className="font-medium">{error}</span>
-            </div>
-          )}
-          {success && (
-            <div className="bg-emerald-500/10 border border-emerald-500/20 text-emerald-500 p-4 rounded-2xl text-sm flex items-center gap-3 animate-in slide-in-from-top-2">
-              <div className="w-2 h-2 rounded-full bg-emerald-500"></div>
-              <span className="font-medium">{success}</span>
-            </div>
-          )}
-        </div>
+        {/* Alerts are now handled by toastify */}
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           

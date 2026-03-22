@@ -31,8 +31,10 @@ import {
   Timestamp,
   updateDoc,
 } from 'firebase/firestore';
+import { createPortal } from 'react-dom';
 import { db } from '../services/firebase';
 import { useAuth } from '../hooks/useAuth';
+import { StyledSwal } from '../utils/sweetalert';
 
 const GROQ_API_KEY = import.meta.env.VITE_GROQ_API_KEY;
 const GROQ_ENDPOINT = 'https://api.groq.com/openai/v1/chat/completions';
@@ -297,6 +299,20 @@ Always prioritize providing actionable insights based on this context.`;
   const deleteThread = async (e, threadId) => {
     e.stopPropagation();
     if (!currentUser) return;
+
+    const result = await StyledSwal.fire({
+      title: 'Delete Chat?',
+      text: "Are you sure you want to delete this conversation? This action cannot be undone.",
+      icon: 'warning',
+      iconColor: '#ef4444',
+      showCancelButton: true,
+      confirmButtonText: 'Yes, delete it',
+      cancelButtonText: 'Cancel',
+      confirmButtonColor: '#ef4444',
+    });
+
+    if (!result.isConfirmed) return;
+
     try {
       await deleteDoc(doc(db, `users/${currentUser.uid}/assistantChat`, threadId));
       if (activeThreadId === threadId) {

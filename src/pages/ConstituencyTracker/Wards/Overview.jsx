@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { toast } from 'react-toastify';
 import { Link, useNavigate } from 'react-router-dom';
 import { getComplaints } from '../../../services/complaintsService';
 import { getProjects } from '../../../services/projectsService';
@@ -49,6 +50,7 @@ export default function WardsOverview() {
       setWardData(aggregated);
     } catch (error) {
       console.error("Error aggregating ward data:", error);
+      toast.error("Failed to load ward overview.");
     } finally {
       setLoading(false);
     }

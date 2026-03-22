@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { toast } from 'react-toastify';
 import { useParams, Link } from 'react-router-dom';
 import { getProjectById, updateProjectStatus } from '../../../services/projectsService';
 import { ChevronLeft, Calendar, User, AlignLeft, AlertCircle, TrendingUp, IndianRupee } from 'lucide-react';
@@ -21,6 +22,7 @@ export default function ProjectDetail() {
       setProject(data);
     } catch (error) {
       console.error("Error fetching project:", error);
+      toast.error("Failed to load project details.");
     } finally {
       setLoading(false);
     }
@@ -34,8 +36,10 @@ export default function ProjectDetail() {
       await updateProjectStatus(id, newStatus, statusNote);
       setStatusNote('');
       await fetchProject(); // refresh data
+      toast.success(`Project status updated to ${newStatus}`);
     } catch (error) {
       console.error("Error updating status:", error);
+      toast.error("Failed to update project status.");
     } finally {
       setUpdating(false);
     }

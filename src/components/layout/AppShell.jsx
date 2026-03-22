@@ -5,6 +5,7 @@ import Sidebar from './Sidebar';
 import { useAuth } from '../../hooks/useAuth';
 import { auth, clearAuthToken } from '../../services/firebase';
 import { useNotifications } from '../../hooks/useNotifications';
+import { StyledSwal } from '../../utils/sweetalert';
 
 export default function AppShell() {
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -26,6 +27,18 @@ export default function AppShell() {
   }, []);
 
   const handleLogout = async () => {
+    const result = await StyledSwal.fire({
+      title: 'Sign Out?',
+      text: "Are you sure you want to log out?",
+      icon: 'question',
+      iconColor: '#6366f1',
+      showCancelButton: true,
+      confirmButtonText: 'Yes, sign out',
+      cancelButtonText: 'Cancel'
+    });
+
+    if (!result.isConfirmed) return;
+
     try {
       clearAuthToken();
       await auth.signOut();

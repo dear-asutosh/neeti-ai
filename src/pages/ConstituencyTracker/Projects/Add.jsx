@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { toast } from 'react-toastify';
 import { Link, useNavigate } from 'react-router-dom';
 import { createProject } from '../../../services/projectsService';
 import { ChevronLeft, Save } from 'lucide-react';
@@ -36,9 +37,11 @@ export default function AddProject() {
     setLoading(true);
     try {
       await createProject(formData);
+      toast.success("Project created successfully!");
       navigate('/constituency/projects');
     } catch (error) {
       console.error("Error creating project", error);
+      toast.error("Failed to create project.");
     } finally {
       setLoading(false);
     }

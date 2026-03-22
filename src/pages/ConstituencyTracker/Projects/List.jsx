@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { toast } from 'react-toastify';
 import { Link, useNavigate } from 'react-router-dom';
 import { getProjects } from '../../../services/projectsService';
 import { Search, Plus, Filter, Calendar, IndianRupee } from 'lucide-react';
@@ -25,6 +26,7 @@ export default function ProjectsList() {
       setProjects(data);
     } catch (error) {
       console.error("Error fetching projects:", error);
+      toast.error("Failed to load projects.");
     } finally {
       setLoading(false);
     }

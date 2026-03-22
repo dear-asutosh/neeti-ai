@@ -1,4 +1,6 @@
 import { useState, useEffect } from 'react';
+import { toast } from 'react-toastify';
+import { StyledSwal } from '../utils/sweetalert';
 import { createPortal } from 'react-dom';
 import { db } from '../services/firebase';
 import { useAuth } from '../hooks/useAuth';
@@ -47,8 +49,6 @@ export default function Schedule() {
     reminder: '15min'
   });
 
-  const [formError, setFormError] = useState('');
-
   // 1. Firebase Listener
   useEffect(() => {
     if (!currentUser?.uid) return;
@@ -80,7 +80,6 @@ export default function Schedule() {
 
   const closeCreateModal = () => {
     setShowModal(false);
-    setFormError('');
     setForm({
       title: '',
       description: '',
@@ -96,14 +95,13 @@ export default function Schedule() {
 
   const handleCreateEvent = async (e) => {
     e.preventDefault();
-    setFormError('');
 
     if (!form.title.trim()) {
-      setFormError('Title is required');
+      toast.error('Title is required');
       return;
     }
     if (!form.date) {
-      setFormError('Date is required');
+      toast.error('Date is required');
       return;
     }
 
@@ -114,7 +112,7 @@ export default function Schedule() {
     const endObj = new Date(endStr);
 
     if (endObj <= startObj) {
-      setFormError('End time must be after start time');
+      toast.error('End time must be after start time');
       return;
     }
 
@@ -138,7 +136,7 @@ export default function Schedule() {
       closeCreateModal();
     } catch (err) {
       console.error("Error creating event:", err);
-      setFormError('Failed to create event.');
+      toast.error('Failed to create event.');
     } finally {
       setIsSubmitting(false);
     }
@@ -147,15 +145,27 @@ export default function Schedule() {
   const handleDeleteEvent = async () => {
     if (!selectedEvent) return;
     
-    if (!window.confirm("Are you sure you want to delete this event?")) return;
+    const result = await StyledSwal.fire({
+      title: 'Delete Event?',
+      text: "Are you sure you want to remove this event from your schedule?",
+      icon: 'warning',
+      iconColor: '#ef4444',
+      showCancelButton: true,
+      confirmButtonText: 'Yes, delete it',
+      cancelButtonText: 'Cancel',
+      confirmButtonColor: '#ef4444',
+    });
+
+    if (!result.isConfirmed) return;
 
     try {
       // Delete from Firestore
       await deleteDoc(doc(db, 'users', currentUser.uid, 'scheduleEvents', selectedEvent.id));
       setSelectedEvent(null);
+      toast.success("Event deleted successfully");
     } catch (err) {
       console.error("Error deleting event:", err);
-      alert("Failed to delete event.");
+      toast.error("Failed to delete event.");
     }
   };
 
@@ -659,12 +669,7 @@ export default function Schedule() {
             </div>
 
             <div className="p-6 overflow-y-auto">
-              {formError && (
-                <div className="mb-4 p-3 bg-rose-500/10 border border-rose-500/30 rounded-lg flex items-start gap-3">
-                  <AlertCircle className="w-5 h-5 text-rose-400 shrink-0 mt-0.5" />
-                  <p className="text-sm font-medium text-rose-300/90">{formError}</p>
-                </div>
-              )}
+              {/* Form errors are now handled by toastify */}
 
               <form id="create-event-form" onSubmit={handleCreateEvent} className="space-y-5">
                 {/* Title */}

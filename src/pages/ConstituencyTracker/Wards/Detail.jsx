@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { toast } from 'react-toastify';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { getComplaints } from '../../../services/complaintsService';
 import { getProjects } from '../../../services/projectsService';
@@ -38,6 +39,7 @@ export default function WardDetail() {
 
     } catch (error) {
       console.error(`Error fetching data for ${wardName}:`, error);
+      toast.error(`Failed to load data for ${wardName}.`);
     } finally {
       setLoading(false);
     }

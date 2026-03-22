@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { toast } from 'react-toastify';
 import { useAuth } from '../hooks/useAuth';
 import { db } from '../services/firebase';
 import { collection, addDoc, query, orderBy, limit, onSnapshot } from 'firebase/firestore';
@@ -82,7 +83,7 @@ export default function Documents() {
 
   const processFile = async (file) => {
     if (file.size > 50 * 1024 * 1024) {
-      alert('File size exceeds 50MB limit.');
+      toast.error('File size exceeds 50MB limit.');
       return;
     }
 
@@ -207,7 +208,7 @@ Do not include any text before or after the JSON.`
 
     } catch (error) {
       console.error('Document Processing Error Detail:', error);
-      alert(error.message || 'An error occurred during processing. Check console for details.');
+      toast.error(error.message || 'An error occurred during processing.');
       setStep(1);
       setActiveDoc(null);
     } finally {
@@ -276,7 +277,7 @@ Do not include any text before or after the JSON.`
     if (!activeDoc) return;
     const textContent = `${activeDoc.filename} - Summary\n\nSummary:\n${activeDoc.summary}\n\nKey Points:\n${activeDoc.keyPoints.join('\n')}`;
     navigator.clipboard.writeText(textContent);
-    alert('Summary copied to clipboard!');
+    toast.success('Summary copied to clipboard!');
     setStep(4);
   };
 

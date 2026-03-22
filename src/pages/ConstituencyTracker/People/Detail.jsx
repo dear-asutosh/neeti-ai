@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { toast } from 'react-toastify';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { getPersonById } from '../../../services/peopleService';
 import { getComplaints } from '../../../services/complaintsService';
@@ -47,6 +48,7 @@ export default function PersonDetail() {
 
     } catch (error) {
       console.error("Error fetching detail data:", error);
+      toast.error("Failed to load profile details.");
     } finally {
       setLoading(false);
     }

@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { toast } from 'react-toastify';
 import { Link, useNavigate } from 'react-router-dom';
 import { getComplaints } from '../../services/complaintsService';
 import { Search, Plus, Filter, ChevronLeft } from 'lucide-react';
@@ -26,6 +27,7 @@ export default function AllComplaints() {
       setComplaints(data);
     } catch (error) {
       console.error("Error fetching complaints:", error);
+      toast.error("Failed to load complaints.");
     } finally {
       setLoading(false);
     }

@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { Menu, X, FileText, Mic, PenTool, Map, Calendar, Zap, Quote, User, ChevronDown, Sparkles } from 'lucide-react';
 import FadeInSection from '../components/FadeInSection';
 import { useAuth } from '../hooks/useAuth';
+import { StyledSwal } from '../utils/sweetalert';
 
 function AshokaChakra({ size, className = "" }) {
   const finalSize = size || "100%";
@@ -109,6 +110,18 @@ export default function Landing() {
   ];
 
   const handleLogout = async () => {
+    const result = await StyledSwal.fire({
+      title: 'Sign Out?',
+      text: "Are you sure you want to log out of Neeti AI?",
+      icon: 'question',
+      iconColor: '#6366f1',
+      showCancelButton: true,
+      confirmButtonText: 'Yes, sign out',
+      cancelButtonText: 'Cancel'
+    });
+
+    if (!result.isConfirmed) return;
+
     try {
       setProfileDropdownOpen(false);
       setMobileMenuOpen(false);

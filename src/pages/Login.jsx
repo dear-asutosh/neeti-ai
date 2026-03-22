@@ -9,15 +9,14 @@ import {
 } from 'firebase/auth';
 import { doc, getDoc, setDoc, serverTimestamp } from 'firebase/firestore';
 import { 
-  ChevronRight, AlertCircle, User, Mail, Lock, Loader2, CheckCircle2, ShieldCheck, ArrowLeft
+  ChevronRight, User, Mail, Lock, Loader2, CheckCircle2, ShieldCheck, ArrowLeft
 } from 'lucide-react';
 import { auth, db } from '../services/firebase';
 import { generateOTP, sendOTPEmail } from '../services/emailService';
+import { toast } from 'react-toastify';
 
 export default function Login() {
   const [isLogin, setIsLogin] = useState(true);
-  const [error, setError] = useState('');
-  const [successMsg, setSuccessMsg] = useState('');
   const [loading, setLoading] = useState(false);
   
   // Form States
@@ -33,18 +32,8 @@ export default function Login() {
   const [resendTimer, setResendTimer] = useState(0);
 
   const navigate = useNavigate();
-  // Redirect only on newly successful registrations
-  useEffect(() => {
-    if (successMsg) {
-      const timer = setTimeout(() => {
-        // Only redirect if we haven't manually navigated away
-        if (window.location.pathname === '/login') {
-          navigate('/');
-        }
-      }, 1500);
-      return () => clearTimeout(timer);
-    }
-  }, [successMsg, navigate]);
+  // Removed successMsg redirect effect as toast will handle progress if needed, 
+  // but navigation can be triggered directly.
 
   // Resend Timer Effect
   useEffect(() => {
@@ -62,7 +51,6 @@ export default function Login() {
   const handleGoogleSignIn = async () => {
     if (loading) return;
     try {
-      setError('');
       setLoading(true);
       const provider = new GoogleAuthProvider();
       const result = await signInWithPopup(auth, provider);
@@ -85,15 +73,15 @@ export default function Login() {
           photoURL: user.photoURL || null
         }, { merge: true });
       }
-      setSuccessMsg(isLogin ? 'Login successful! Redirecting to dashboard...' : 'Registration successful! Redirecting to dashboard...');
+      toast.success(isLogin ? 'Login successful!' : 'Registration successful!');
       setLoading(false);
-      
+      navigate('/');
       // Success will natively trigger navigation in the dependency array useEffect
     } catch (err) {
       console.error("Google sign in error:", err);
       // Ignore popup closed errors without displaying a scary message
       if (err.code !== 'auth/popup-closed-by-user') {
-        setError(err.message || 'Failed to sign in with Google.');
+        toast.error(err.message || 'Failed to sign in with Google.');
       }
       setLoading(false);
     }
@@ -103,15 +91,14 @@ export default function Login() {
     e.preventDefault();
     if (loading) return;
     
-    setError('');
-    setSuccessMsg('');
     setLoading(true);
 
     try {
       if (isLogin) {
         await signInWithEmailAndPassword(auth, email, password);
-        setSuccessMsg('Login successful! Redirecting to dashboard...');
+        toast.success('Login successful!');
         setLoading(false);
+        navigate('/');
       } else {
         // Step 1: Initiating Signup with OTP
         const newOTP = generateOTP();
@@ -129,13 +116,13 @@ export default function Login() {
     } catch (err) {
       console.error("Auth submit error:", err);
       if (err.code === 'auth/invalid-credential') {
-        setError("Invalid email or password. If you don't have an account, please switch to Sign Up.");
+        toast.error("Invalid email or password. If you don't have an account, please switch to Sign Up.");
       } else if (err.code === 'auth/email-already-in-use') {
-        setError("That email is already registered. Please sign in instead.");
+        toast.error("That email is already registered. Please sign in instead.");
       } else if (err.code === 'auth/weak-password') {
-        setError("Password should be at least 6 characters.");
+        toast.error("Password should be at least 6 characters.");
       } else {
-        setError(err.message || `Failed to ${isLogin ? 'sign in' : 'register'}. Please try again.`);
+        toast.error(err.message || `Failed to ${isLogin ? 'sign in' : 'register'}. Please try again.`);
       }
       setLoading(false);
     }
@@ -146,12 +133,11 @@ export default function Login() {
     if (loading) return;
 
     if (otp !== generatedOTP) {
-      setError("Invalid verification code. Please check and try again.");
+      toast.error("Invalid verification code. Please check and try again.");
       return;
     }
 
     setLoading(true);
-    setError('');
 
     try {
       const result = await createUserWithEmailAndPassword(auth, email, password);
@@ -168,16 +154,17 @@ export default function Login() {
         createdAt: serverTimestamp()
       });
       
-      setSuccessMsg('Registration successful! Redirecting to dashboard...');
+      toast.success('Registration successful!');
       setLoading(false);
+      navigate('/');
     } catch (err) {
       console.error("OTP Verification Error:", err);
       if (err.code === 'auth/email-already-in-use') {
-        setError("This email is already registered. Please go back and sign in, or use a different email.");
+        toast.error("This email is already registered. Please go back and sign in, or use a different email.");
       } else if (err.code === 'auth/weak-password') {
-        setError("The password is too weak. Please use at least 6 characters.");
+        toast.error("The password is too weak. Please use at least 6 characters.");
       } else {
-        setError(err.message || "Failed to finalize registration.");
+        toast.error(err.message || "Failed to finalize registration.");
       }
       setLoading(false);
     }
@@ -187,7 +174,6 @@ export default function Login() {
     if (resendTimer > 0 || loading) return;
     
     setLoading(true);
-    setError('');
     
     try {
       const newOTP = generateOTP();
@@ -195,12 +181,12 @@ export default function Login() {
       const sent = await sendOTPEmail(email, newOTP, fullName);
       if (sent) {
         setResendTimer(60);
-        setSuccessMsg("A new verification code has been sent.");
+        toast.success("A new verification code has been sent.");
       } else {
-        setError("Failed to resend code.");
+        toast.error("Failed to resend code.");
       }
     } catch (err) {
-      setError("An error occurred while resending.");
+      toast.error("An error occurred while resending.");
     } finally {
       setLoading(false);
     }
@@ -209,8 +195,6 @@ export default function Login() {
   const toggleMode = () => {
     setIsLogin(!isLogin);
     setShowOTP(false);
-    setError('');
-    setSuccessMsg('');
     setOtp('');
   };
 
@@ -289,12 +273,6 @@ export default function Login() {
                     <p className="text-zinc-500 dark:text-zinc-400 text-sm">Join the platform for administrative public service.</p>
                   </div>
 
-                  {error && !isLogin && (
-                    <div className="p-4 bg-red-500/10 border border-red-500/20 rounded-2xl flex items-center gap-3 text-red-500 text-sm animate-in fade-in slide-in-from-top-1">
-                      <AlertCircle className="w-5 h-5 shrink-0" />
-                      {error}
-                    </div>
-                  )}
 
                   <form onSubmit={handleSubmit} className="space-y-5">
                     <div className="grid grid-cols-1 gap-5">
@@ -381,19 +359,7 @@ export default function Login() {
                     </div>
                   </div>
 
-                  {error && (
-                    <div className="p-4 bg-red-500/10 border border-red-500/20 rounded-2xl flex items-center gap-3 text-red-500 text-sm animate-in fade-in slide-in-from-top-1">
-                      <AlertCircle className="w-5 h-5 shrink-0" />
-                      {error}
-                    </div>
-                  )}
 
-                  {successMsg && (
-                    <div className="p-4 bg-emerald-500/10 border border-emerald-500/20 rounded-2xl flex items-center gap-3 text-emerald-500 text-sm animate-in fade-in slide-in-from-top-1">
-                      <CheckCircle2 className="w-5 h-5 shrink-0" />
-                      {successMsg}
-                    </div>
-                  )}
 
                   <form onSubmit={handleVerifyOTP} className="space-y-6">
                     <div className="space-y-2">
@@ -451,19 +417,7 @@ export default function Login() {
                 </div>
               </div>
 
-              {error && isLogin && (
-                <div className="p-4 bg-red-500/10 border border-red-500/20 rounded-2xl flex items-center gap-3 text-red-500 text-sm animate-in fade-in slide-in-from-top-1">
-                  <AlertCircle className="w-5 h-5 shrink-0" />
-                  {error}
-                </div>
-              )}
-
-              {successMsg && isLogin && (
-                <div className="p-4 bg-emerald-500/10 border border-emerald-500/20 rounded-2xl flex items-center gap-3 text-emerald-500 text-sm animate-in fade-in slide-in-from-top-1">
-                  <CheckCircle2 className="w-5 h-5 shrink-0" />
-                  {successMsg}
-                </div>
-              )}
+              {/* Form errors and success messages are now handled by toastify */}
 
               <form onSubmit={handleSubmit} className="space-y-6">
                 <div className="space-y-5">

@@ -19,6 +19,7 @@ import {
 } from 'lucide-react';
 import { auth, clearAuthToken } from '../../services/firebase';
 import { useAuth } from '../../hooks/useAuth';
+import { StyledSwal } from '../../utils/sweetalert';
 
 export default function Sidebar({ mobileOpen, setMobileOpen }) {
   const [isCollapsed, setIsCollapsed] = useState(false);
@@ -26,6 +27,18 @@ export default function Sidebar({ mobileOpen, setMobileOpen }) {
   const { currentUser, dbUser } = useAuth();
 
   const handleLogout = async () => {
+    const result = await StyledSwal.fire({
+      title: 'Sign Out?',
+      text: "Are you sure you want to log out of your account?",
+      icon: 'question',
+      iconColor: '#6366f1',
+      showCancelButton: true,
+      confirmButtonText: 'Yes, sign out',
+      cancelButtonText: 'Cancel'
+    });
+
+    if (!result.isConfirmed) return;
+
     try {
       clearAuthToken();
       await auth.signOut();

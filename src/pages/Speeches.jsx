@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
+import { toast } from 'react-toastify';
 import { useAuth } from '../hooks/useAuth';
 import { db } from '../services/firebase';
 import { collection, addDoc, query, orderBy, limit, onSnapshot, doc, updateDoc } from 'firebase/firestore';
@@ -43,7 +44,6 @@ export default function Speeches() {
 
   // Generation & Result states
   const [isGenerating, setIsGenerating] = useState(false);
-  const [error, setError] = useState(null);
   const [draftContent, setDraftContent] = useState('');
   const [saveStatus, setSaveStatus] = useState('idle'); // 'idle' | 'saving' | 'saved'
   const [isEditingTitle, setIsEditingTitle] = useState(false);
@@ -117,7 +117,6 @@ export default function Speeches() {
     setAudience('');
     setContext('');
     setDraftContent('');
-    setError(null);
     setMobileSidebarOpen(false);
   };
 
@@ -134,7 +133,6 @@ export default function Speeches() {
       setDraftContent(speech.content || '');
     }, 50);
     setStep(3);
-    setError(null);
     setMobileSidebarOpen(false);
   };
 
@@ -156,7 +154,6 @@ export default function Speeches() {
 
     setStep(2);
     setIsGenerating(true);
-    setError(null);
 
     try {
       let wordLengthHint = '~700 words';
@@ -219,7 +216,7 @@ For official letters, use proper formal structure.`;
       setStep(3);
 
     } catch (err) {
-      setError(err.message || 'An error occurred during generation.');
+      toast.error(err.message || 'An error occurred during generation.');
     } finally {
       setIsGenerating(false);
     }
@@ -227,7 +224,7 @@ For official letters, use proper formal structure.`;
 
   const handleCopyToClipboard = () => {
     navigator.clipboard.writeText(draftContent);
-    // Optional: add a small toast/state to show "Copied!"
+    toast.success("Copied to clipboard!");
   };
 
   const handleDownload = () => {
@@ -495,16 +492,7 @@ For official letters, use proper formal structure.`;
               <h3 className="text-2xl font-black text-white mt-8 mb-2 tracking-tight">Drafting In Progress</h3>
               <p className="text-zinc-500 text-center max-w-70">Our legislative engine is crafting your {draftType.toLowerCase()} response...</p>
 
-              {error && (
-                <div className="mt-10 max-w-sm p-5 bg-red-950/20 border-2 border-red-900/30 rounded-3xl text-center space-y-4">
-                  <div className="flex flex-col items-center gap-2">
-                    <AlertCircle className="w-8 h-8 text-red-500" />
-                    <span className="text-sm font-bold text-red-500 uppercase tracking-widest">Error Occurred</span>
-                  </div>
-                  <p className="text-sm text-zinc-400">{error}</p>
-                  <button onClick={() => setStep(1)} className="w-full py-2.5 bg-zinc-800 rounded-xl text-xs font-bold text-white uppercase tracking-wider">Try Selection Again</button>
-                </div>
-              )}
+              {/* Errors are now handled by toastify */}
             </div>
           )}
 

@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { toast } from 'react-toastify';
 import { Link, useNavigate } from 'react-router-dom';
 import { createComplaint } from '../../services/complaintsService';
 import { ChevronLeft, Save } from 'lucide-react';
@@ -27,9 +28,11 @@ export default function AddComplaint() {
     setLoading(true);
     try {
       await createComplaint(formData);
+      toast.success("Complaint recorded successfully!");
       navigate('/constituency/complaints');
     } catch (error) {
       console.error("Error creating complaint", error);
+      toast.error("Failed to record complaint.");
     } finally {
       setLoading(false);
     }

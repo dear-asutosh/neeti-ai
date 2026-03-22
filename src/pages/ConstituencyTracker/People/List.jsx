@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { toast } from 'react-toastify';
 import { Link, useNavigate } from 'react-router-dom';
 import { getPeople } from '../../../services/peopleService';
 import { Search, Plus, User, Phone, Mail, Building, LayoutGrid, List as ListIcon } from 'lucide-react';
@@ -25,6 +26,7 @@ export default function PeopleList() {
       setPeople(data);
     } catch (error) {
       console.error("Error fetching people:", error);
+      toast.error("Failed to load people directory.");
     } finally {
       setLoading(false);
     }

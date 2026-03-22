@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { toast } from 'react-toastify';
 import { useAuth } from '../hooks/useAuth';
 import { db } from '../services/firebase';
 import { collection, addDoc, query, orderBy, limit, onSnapshot, doc, updateDoc } from 'firebase/firestore';
@@ -277,7 +278,7 @@ ${manualAgenda.trim() ? `\nMEETING AGENDA/CONTEXT (use this to help guide your s
 
     } catch (err) {
       isStartingRef.current = false;
-      alert("Microphone access denied.");
+      toast.error("Microphone access denied.");
       console.error(err);
     }
   };
@@ -390,7 +391,7 @@ ${manualAgenda.trim() ? `\nMEETING AGENDA/CONTEXT (use this to help guide your s
       setActiveMobileTab('summary');
 
     } catch (err) {
-      alert(err.message || "Failed to process meeting recording.");
+      toast.error(err.message || "Failed to process meeting recording.");
       setStep(1);
     } finally {
       setIsProcessing(false);
@@ -463,7 +464,7 @@ ${manualAgenda.trim() ? `\nMEETING AGENDA/CONTEXT (use this to help guide your s
       setActiveMobileTab('summary');
 
     } catch (err) {
-      alert(err.message || 'An error occurred during file upload processing.');
+      toast.error(err.message || 'An error occurred during file upload processing.');
       setStep(1);
     } finally {
       setIsProcessing(false);
@@ -498,7 +499,7 @@ ${manualAgenda.trim() ? `\nMEETING AGENDA/CONTEXT (use this to help guide your s
       setIsEditingTitle(false);
     } catch (err) {
       console.error(err);
-      alert("Failed to rename meeting");
+      toast.error("Failed to rename meeting");
     }
   };
 
@@ -560,7 +561,7 @@ ${manualAgenda.trim() ? `\nMEETING AGENDA/CONTEXT (use this to help guide your s
       txt += `\nAction Items:\n` + activeMeeting.actionItems.map(i => `- ${i}`).join('\n');
     }
     navigator.clipboard.writeText(txt);
-    alert('Summary copied to clipboard!');
+    toast.success('Summary copied to clipboard!');
   };
 
   // --------------------------------------------------------------------------

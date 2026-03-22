@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { toast } from 'react-toastify';
 import { Link } from 'react-router-dom';
 import { getComplaints } from '../../services/complaintsService';
 import { getProjects } from '../../services/projectsService';
@@ -27,6 +28,7 @@ export default function ConstituencyDashboard() {
       setPeople(peopleData);
     } catch (error) {
       console.error("Error fetching dashboard data:", error);
+      toast.error("Failed to load dashboard data.");
     } finally {
       setLoading(false);
     }
