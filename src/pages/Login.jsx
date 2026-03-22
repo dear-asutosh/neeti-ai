@@ -338,7 +338,7 @@ export default function Login() {
                     className="w-full flex items-center justify-center gap-3 px-4 py-4 border border-gray-200 dark:border-zinc-800 rounded-2xl hover:bg-gray-50 dark:hover:bg-zinc-800 transition-all font-bold text-zinc-900 dark:text-white group"
                   >
                     <img src="https://www.svgrepo.com/show/475656/google-color.svg" alt="Google" className="w-5 h-5 group-hover:scale-110 transition-transform" />
-                    Google Services
+                    Google
                   </button>
                 </>
               ) : (
@@ -435,7 +435,6 @@ export default function Login() {
                   <div className="space-y-2">
                     <div className="flex justify-between items-center pr-1">
                        <label className="text-[10px] font-black text-zinc-400 dark:text-zinc-500 uppercase tracking-widest pl-1">Secure Password</label>
-                       <a href="#" className="text-[10px] font-black uppercase tracking-widest text-gold hover:text-gold/80 transition-colors">Recover</a>
                     </div>
                     <div className="relative group">
                       <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400 group-focus-within:text-indigo-500 transition-colors" />
