@@ -1,15 +1,19 @@
 import React, { useState, useRef } from 'react';
 import { Settings as SettingsIcon, Camera, Loader2, User, ShieldCheck } from 'lucide-react';
-import { updateProfile } from 'firebase/auth';
-import { doc, setDoc } from 'firebase/firestore';
+import { updateProfile, deleteUser } from 'firebase/auth';
+import { doc, setDoc, deleteDoc } from 'firebase/firestore';
 import { auth, db } from '../services/firebase';
 import { useAuth } from '../hooks/useAuth';
 import { useTheme } from '../context/ThemeContext';
+import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
+import { StyledSwal } from '../utils/sweetalert';
+import { AlertTriangle, Trash2 } from 'lucide-react';
 
 export default function Settings() {
   const { currentUser, dbUser } = useAuth();
   const { theme, toggleTheme } = useTheme();
+  const navigate = useNavigate();
   
   // States for profile editing
   const [fullName, setFullName] = useState(dbUser?.displayName || currentUser?.displayName || '');
@@ -84,6 +88,46 @@ export default function Settings() {
     } finally {
       setUploading(false);
       if (fileInputRef.current) fileInputRef.current.value = '';
+    }
+  };
+
+  const handleDeleteAccount = async () => {
+    try {
+      const result = await StyledSwal.fire({
+        title: 'Delete Account?',
+        text: "This action is permanent and cannot be undone. All your data will be wiped.",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'Yes, Delete Permanently',
+        cancelButtonText: 'Cancel',
+        confirmButtonColor: '#ef4444',
+        customClass: {
+          confirmButton: 'px-8 py-3 bg-red-600 hover:bg-red-500 text-white font-bold rounded-2xl shadow-lg shadow-red-500/20 transition-all active:scale-[0.98] outline-none border-none',
+          cancelButton: 'px-8 py-3 bg-gray-100 dark:bg-zinc-800 hover:bg-gray-200 dark:hover:bg-zinc-700 text-zinc-600 dark:text-zinc-300 font-bold rounded-2xl transition-all active:scale-[0.98] outline-none border-none mr-2',
+        }
+      });
+
+      if (result.isConfirmed) {
+        setSaving(true);
+        
+        // 1. Delete Firestore Document
+        await deleteDoc(doc(db, 'users', currentUser.uid));
+        
+        // 2. Delete Auth User
+        await deleteUser(auth.currentUser);
+        
+        toast.success("Account deleted successfully.");
+        navigate('/');
+      }
+    } catch (err) {
+      console.error("Error deleting account:", err);
+      if (err.code === 'auth/requires-recent-login') {
+        toast.error("Security sensitive operation. Please log out and log back in to verify your identity, then try again.");
+      } else {
+        toast.error("Failed to delete account. Please try again.");
+      }
+    } finally {
+      setSaving(false);
     }
   };
 
@@ -208,18 +252,26 @@ export default function Settings() {
               </div>
             </form>
             
-            {/* Security Section */}
-            <div className="bg-white dark:bg-zinc-900/40 rounded-3xl shadow-sm border border-gray-100 dark:border-zinc-800/50 backdrop-blur-xl p-8 flex flex-col md:flex-row md:items-center justify-between gap-6 transition-all duration-300 hover:border-gray-200 dark:hover:border-zinc-700">
-               <div>
-                  <h3 className="text-lg font-bold text-zinc-900 dark:text-white flex items-center gap-2">
-                    <svg className="w-5 h-5 text-indigo-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
-                    Password & Security
-                  </h3>
-                  <p className="text-sm text-zinc-400 mt-1">Manage your access credentials and robust security preferences.</p>
+            
+            {/* Danger Zone */}
+            <div className="bg-red-50/50 dark:bg-red-900/10 rounded-3xl shadow-sm border border-red-100 dark:border-red-900/30 backdrop-blur-xl p-8 transition-all duration-300">
+               <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+                 <div>
+                    <h3 className="text-lg font-bold text-red-600 dark:text-red-400 flex items-center gap-2">
+                      <AlertTriangle className="w-5 h-5" />
+                      Danger Zone
+                    </h3>
+                    <p className="text-sm text-red-500/70 dark:text-red-400/60 mt-1">Permanently remove your account and all associated data from the platform.</p>
+                 </div>
+                 <button 
+                   onClick={handleDeleteAccount}
+                   disabled={saving}
+                   className="shrink-0 px-6 py-3 bg-red-600 hover:bg-red-500 text-white border border-transparent rounded-xl text-xs font-black uppercase tracking-widest transition-all active:scale-[0.98] flex items-center gap-2 shadow-lg shadow-red-500/20 disabled:opacity-50"
+                 >
+                   <Trash2 className="w-4 h-4" />
+                   Delete Account
+                 </button>
                </div>
-               <button disabled className="shrink-0 px-6 py-3 bg-zinc-100 dark:bg-zinc-800 text-zinc-400 dark:text-zinc-500 border border-transparent rounded-xl text-xs font-black uppercase tracking-widest cursor-not-allowed transition-all opacity-50">
-                 Update Password
-               </button>
             </div>
           </div>
 
