@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Menu, X, FileText, Mic, PenTool, Map, Calendar, Zap, Quote, User, ChevronDown, Sparkles } from 'lucide-react';
+import { Menu, X, FileText, Mic, PenTool, Map, Calendar, Zap, Quote, User, ChevronDown, Sparkles, Mail, Twitter, Linkedin, Github, ArrowUp, Globe } from 'lucide-react';
 import FadeInSection from '../components/FadeInSection';
 import { useAuth } from '../hooks/useAuth';
 import { StyledSwal } from '../utils/sweetalert';
@@ -36,6 +36,10 @@ export default function Landing() {
   const profileDropdownRef = useRef(null);
   const { currentUser, dbUser } = useAuth();
   const navigate = useNavigate();
+
+  const scrollToTop = () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
 
   // Handle scroll for sticky navbar styling
   useEffect(() => {
@@ -641,7 +645,7 @@ export default function Landing() {
       </section>
 
       {/* --- [8] FOOTER --- */}
-      <footer className="bg-black relative pt-3">
+      <footer className="bg-black relative pt-3 overflow-hidden">
         {/* Tricolor Line at very top */}
         <div className="absolute top-0 left-0 w-full h-[3px] flex">
           <div className="flex-1 bg-[#FF9933]"></div>
@@ -649,41 +653,91 @@ export default function Landing() {
           <div className="flex-1 bg-[#138808]"></div>
         </div>
 
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-16 pb-8 border-t border-[#1E3A5F]">
-          <div className="flex flex-col md:flex-row justify-between items-center md:items-start mb-12">
+        {/* Backdrop Glow */}
+        <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[600px] h-[300px] bg-indigo-500/5 blur-[120px] pointer-events-none"></div>
+
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-20 pb-12 relative z-10">
+          <div className="grid grid-cols-1 lg:grid-cols-4 gap-12 mb-16">
             
-            <div className="mb-8 md:mb-0 text-center md:text-left">
-              <div className="flex items-center justify-center md:justify-start gap-3 mb-4">
-                <AshokaChakra size={28} className="text-[#FF9933]" />
-                <div className="flex flex-col md:flex-row md:items-baseline gap-1 md:gap-3">
-                  <span className="text-xl font-heading text-white tracking-normal uppercase font-normal">
+            {/* Branding Column */}
+            <div className="lg:col-span-2 space-y-6 text-center md:text-left">
+              <div className="flex items-center justify-center md:justify-start gap-4 group cursor-default">
+                <div className="relative">
+                  <AshokaChakra size={36} className="text-[#FF9933] transition-transform duration-700 group-hover:rotate-[360deg]" />
+                  <div className="absolute inset-0 bg-[#FF9933]/20 blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-700"></div>
+                </div>
+                <div className="flex flex-col">
+                  <span className="text-2xl font-heading text-white tracking-widest uppercase font-black transition-colors duration-500 group-hover:text-gold">
                     NEETI AI
                   </span>
-                  <span className="text-lg font-hindi italic text-[#FF9933]">
+                  <span className="text-lg font-hindi italic text-[#FF9933] opacity-80 group-hover:opacity-100 transition-opacity">
                     नीति AI
                   </span>
                 </div>
               </div>
-              <span className="text-xs text-[#8BA3BC] uppercase tracking-normal font-normal">
-                Intelligence in Service of the Nation.
-              </span>
+              <p className="text-sm text-[#8BA3BC] max-w-sm leading-relaxed mx-auto md:mx-0">
+                The premier AI command center for India's public leadership. Empowering governance with state-of-the-art intelligence and domestic focus.
+              </p>
+              
+              <div className="flex items-center justify-center md:justify-start gap-4">
+                 <a 
+                   href="mailto:neeti.organisation@gmail.com" 
+                   className="flex items-center gap-2 px-4 py-2 bg-white/5 border border-white/10 rounded-xl text-xs font-bold text-[#8BA3BC] hover:text-[#FF9933] hover:border-[#FF9933]/30 transition-all duration-300 group"
+                 >
+                   <Mail size={14} className="group-hover:scale-110 transition-transform" />
+                   neeti.organisation@gmail.com
+                 </a>
+              </div>
             </div>
 
-            <div className="flex flex-col items-center md:items-end gap-6">
-              <div className="flex flex-wrap justify-center md:justify-end gap-8 text-[11px] text-[#8BA3BC] font-heading font-bold uppercase tracking-[0.2em]">
-                <a href="#" className="hover:text-[#FF9933] transition-colors">About</a>
-                <a href="#features" className="hover:text-[#FF9933] transition-colors">Features</a>
-                <a href="#" className="hover:text-[#FF9933] transition-colors">Security</a>
-                <a href="#" className="hover:text-[#FF9933] transition-colors">Privacy</a>
-                <a href="#" className="hover:text-[#FF9933] transition-colors">Contact</a>
+            {/* Quick Links Column */}
+            <div className="space-y-6 text-center md:text-left">
+              <h4 className="text-[10px] font-black uppercase tracking-[0.3em] text-[#FF9933]">Platform</h4>
+              <nav className="flex flex-col gap-4 text-xs font-bold text-[#8BA3BC] uppercase tracking-widest">
+                <a href="#" className="hover:text-white transition-all transform hover:translate-x-1 inline-block">About Us</a>
+                <a href="#features" className="hover:text-white transition-all transform hover:translate-x-1 inline-block">Features</a>
+                <a href="#" className="hover:text-white transition-all transform hover:translate-x-1 inline-block">Security Core</a>
+                <a href="#" className="hover:text-white transition-all transform hover:translate-x-1 inline-block">Privacy Trust</a>
+              </nav>
+            </div>
+
+            {/* Support Column */}
+            <div className="space-y-6 text-center md:text-left">
+              <h4 className="text-[10px] font-black uppercase tracking-[0.3em] text-[#FF9933]">System Status</h4>
+              <div className="flex flex-col gap-6">
+                <div className="inline-flex items-center justify-center md:justify-start gap-2 bg-[#138808]/10 border border-[#138808]/20 px-4 py-2 rounded-full w-fit mx-auto md:mx-0">
+                  <div className="w-2 h-2 rounded-full bg-[#138808] animate-pulse"></div>
+                  <span className="text-[10px] font-bold text-[#138808] uppercase tracking-widest text-center">All Systems Operational</span>
+                </div>
               </div>
-              <p className="font-hindi italic text-lg text-[#FF9933]">जय हिन्द 🇮🇳</p>
             </div>
           </div>
 
-          <div className="pt-8 border-t border-[#1E3A5F] flex flex-col md:flex-row justify-between items-center gap-4 text-[10px] text-[#8BA3BC] font-heading font-bold uppercase tracking-tight">
-            <div>&copy; 2026 Neeti AI. Built for Bharat's Public Leaders.</div>
-            <div className="text-[#FF9933] font-hindi italic text-lg opacity-90">सत्यमेव जयते</div>
+          <div className="pt-12 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-8 text-[13px] text-[#8BA3BC] font-heading font-medium tracking-tight">
+            <div className="text-center md:text-left space-y-2">
+              <p>&copy; 2026 Neeti AI. Built for Bharat's Public Leaders.</p>
+              <div className="flex items-center justify-center md:justify-start gap-4 text-[10px] font-black uppercase tracking-widest text-[#8BA3BC]/40">
+                <a href="#" className="hover:text-[#FF9933] transition-colors">Terms of Service</a>
+                <span className="w-1 h-1 bg-white/10 rounded-full"></span>
+                <a href="#" className="hover:text-[#FF9933] transition-colors">Data Ethics</a>
+              </div>
+            </div>
+
+            <div className="flex flex-col items-center md:items-end gap-6">
+              <div className="flex items-center gap-4 group cursor-default">
+                  <span className="text-[#FF9933] font-hindi italic text-lg opacity-80 group-hover:opacity-100 transition-all group-hover:scale-110">सत्यमेव जयते</span>
+                  <div className="h-8 w-px bg-white/10 mx-2"></div>
+                  <p className="font-hindi italic text-lg text-[#FF9933] opacity-80 group-hover:opacity-100 transition-all group-hover:scale-110">जय हिन्द 🇮🇳</p>
+              </div>
+              
+              <button 
+                onClick={scrollToTop}
+                className="group flex items-center gap-3 px-6 py-3 bg-white/5 hover:bg-[#FF9933] border border-white/10 hover:border-transparent rounded-2xl transition-all duration-500 shadow-xl"
+              >
+                <span className="text-[10px] font-black uppercase tracking-widest text-white transition-colors">Return to Top</span>
+                <ArrowUp size={14} className="text-[#FF9933] group-hover:text-white group-hover:-translate-y-1 transition-all" />
+              </button>
+            </div>
           </div>
         </div>
       </footer>
@@ -735,7 +789,7 @@ function TestimonialCard({ quote, author, index }) {
   const borderColor = borderColors[index % 3];
 
   return (
-    <div className={`bg-[#0D1B2A] p-6 sm:p-8 border-t-4 ${borderColor} rounded-none h-full flex flex-col relative border border-[#1E3A5F] shadow-xl group hover:-translate-y-2 hover:shadow-2xl hover:shadow-[#FF9933]/5 transition-all duration-500`}>
+    <div className={`bg-[#0D1B2A] p-6 sm:p-8 rounded-none h-full flex flex-col relative shadow-xl group hover:-translate-y-2 hover:shadow-2xl hover:shadow-[#FF9933]/5 transition-all duration-500`}>
       <span className="text-6xl text-[#FF9933]/20 font-hindi leading-none absolute top-4 left-4 pointer-events-none select-none transition-transform duration-500 group-hover:scale-110 group-hover:-translate-y-1">“</span>
       <p className="text-[#8BA3BC] text-lg italic font-hindi leading-relaxed mb-8 grow relative z-10 pt-4 group-hover:text-[#F8F4ED] transition-colors duration-500">"{quote}"</p>
       <p className="text-[#FF9933]/60 text-[10px] font-bold tracking-[0.2em] font-heading uppercase group-hover:text-[#FF9933] transition-colors duration-500">{author}</p>
