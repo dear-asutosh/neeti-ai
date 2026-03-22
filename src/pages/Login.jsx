@@ -9,9 +9,10 @@ import {
 } from 'firebase/auth';
 import { doc, getDoc, setDoc, serverTimestamp } from 'firebase/firestore';
 import { 
-  ChevronRight, AlertCircle, User, Mail, Lock, Loader2, CheckCircle2 
+  ChevronRight, AlertCircle, User, Mail, Lock, Loader2, CheckCircle2, ShieldCheck, ArrowLeft
 } from 'lucide-react';
 import { auth, db } from '../services/firebase';
+import { generateOTP, sendOTPEmail } from '../services/emailService';
 
 export default function Login() {
   const [isLogin, setIsLogin] = useState(true);
@@ -25,16 +26,36 @@ export default function Login() {
   const [fullName, setFullName] = useState('');
   const [designation, setDesignation] = useState('');
 
+  // OTP Verification States
+  const [showOTP, setShowOTP] = useState(false);
+  const [otp, setOtp] = useState('');
+  const [generatedOTP, setGeneratedOTP] = useState('');
+  const [resendTimer, setResendTimer] = useState(0);
+
   const navigate = useNavigate();
   // Redirect only on newly successful registrations
   useEffect(() => {
     if (successMsg) {
       const timer = setTimeout(() => {
-        navigate('/');
+        // Only redirect if we haven't manually navigated away
+        if (window.location.pathname === '/login') {
+          navigate('/');
+        }
       }, 1500);
       return () => clearTimeout(timer);
     }
   }, [successMsg, navigate]);
+
+  // Resend Timer Effect
+  useEffect(() => {
+    let interval;
+    if (resendTimer > 0) {
+      interval = setInterval(() => {
+        setResendTimer(prev => prev - 1);
+      }, 1000);
+    }
+    return () => clearInterval(interval);
+  }, [resendTimer]);
 
   // Removed getRedirectResult useEffect as we will use signInWithPopup now
 
@@ -92,21 +113,18 @@ export default function Login() {
         setSuccessMsg('Login successful! Redirecting to dashboard...');
         setLoading(false);
       } else {
-        const result = await createUserWithEmailAndPassword(auth, email, password);
-        const user = result.user;
+        // Step 1: Initiating Signup with OTP
+        const newOTP = generateOTP();
+        setGeneratedOTP(newOTP);
         
-        await updateProfile(user, { displayName: fullName });
-        
-        const userRef = doc(db, 'users', user.uid);
-        await setDoc(userRef, {
-          email: user.email,
-          role: 'leader',
-          designation: designation,
-          displayName: fullName,
-          createdAt: serverTimestamp()
-        });
-        setSuccessMsg('Registration successful! Redirecting to dashboard...');
-        setLoading(false);
+        const sent = await sendOTPEmail(email, newOTP, fullName);
+        if (sent) {
+          setShowOTP(true);
+          setResendTimer(60); // 60 seconds cooldown
+          setLoading(false);
+        } else {
+          throw new Error("Failed to send verification email. Please try again.");
+        }
       }
     } catch (err) {
       console.error("Auth submit error:", err);
@@ -123,10 +141,77 @@ export default function Login() {
     }
   };
 
+  const handleVerifyOTP = async (e) => {
+    e.preventDefault();
+    if (loading) return;
+
+    if (otp !== generatedOTP) {
+      setError("Invalid verification code. Please check and try again.");
+      return;
+    }
+
+    setLoading(true);
+    setError('');
+
+    try {
+      const result = await createUserWithEmailAndPassword(auth, email, password);
+      const user = result.user;
+      
+      await updateProfile(user, { displayName: fullName });
+      
+      const userRef = doc(db, 'users', user.uid);
+      await setDoc(userRef, {
+        email: user.email,
+        role: 'leader',
+        designation: designation,
+        displayName: fullName,
+        createdAt: serverTimestamp()
+      });
+      
+      setSuccessMsg('Registration successful! Redirecting to dashboard...');
+      setLoading(false);
+    } catch (err) {
+      console.error("OTP Verification Error:", err);
+      if (err.code === 'auth/email-already-in-use') {
+        setError("This email is already registered. Please go back and sign in, or use a different email.");
+      } else if (err.code === 'auth/weak-password') {
+        setError("The password is too weak. Please use at least 6 characters.");
+      } else {
+        setError(err.message || "Failed to finalize registration.");
+      }
+      setLoading(false);
+    }
+  };
+
+  const handleResendOTP = async () => {
+    if (resendTimer > 0 || loading) return;
+    
+    setLoading(true);
+    setError('');
+    
+    try {
+      const newOTP = generateOTP();
+      setGeneratedOTP(newOTP);
+      const sent = await sendOTPEmail(email, newOTP, fullName);
+      if (sent) {
+        setResendTimer(60);
+        setSuccessMsg("A new verification code has been sent.");
+      } else {
+        setError("Failed to resend code.");
+      }
+    } catch (err) {
+      setError("An error occurred while resending.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const toggleMode = () => {
     setIsLogin(!isLogin);
+    setShowOTP(false);
     setError('');
     setSuccessMsg('');
+    setOtp('');
   };
 
   return (
@@ -197,84 +282,154 @@ export default function Login() {
             }`}
           >
             <div className="max-w-md mx-auto w-full space-y-8">
-              <div className="space-y-2">
-                <h2 className="text-3xl font-black text-zinc-900 dark:text-white tracking-tight">Official Registration</h2>
-                <p className="text-zinc-500 dark:text-zinc-400 text-sm">Join the platform for administrative public service.</p>
-              </div>
+              {!showOTP ? (
+                <>
+                  <div className="space-y-2">
+                    <h2 className="text-3xl font-black text-zinc-900 dark:text-white tracking-tight">Official Registration</h2>
+                    <p className="text-zinc-500 dark:text-zinc-400 text-sm">Join the platform for administrative public service.</p>
+                  </div>
 
-              {error && !isLogin && (
-                <div className="p-4 bg-red-500/10 border border-red-500/20 rounded-2xl flex items-center gap-3 text-red-500 text-sm animate-in fade-in slide-in-from-top-1">
-                  <AlertCircle className="w-5 h-5 shrink-0" />
-                  {error}
-                </div>
+                  {error && !isLogin && (
+                    <div className="p-4 bg-red-500/10 border border-red-500/20 rounded-2xl flex items-center gap-3 text-red-500 text-sm animate-in fade-in slide-in-from-top-1">
+                      <AlertCircle className="w-5 h-5 shrink-0" />
+                      {error}
+                    </div>
+                  )}
+
+                  <form onSubmit={handleSubmit} className="space-y-5">
+                    <div className="grid grid-cols-1 gap-5">
+                      <div className="space-y-2">
+                        <label className="text-[10px] font-black text-zinc-400 dark:text-zinc-500 uppercase tracking-widest pl-1">Full Name</label>
+                        <div className="relative group">
+                          <User className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400 group-focus-within:text-indigo-500 transition-colors" />
+                          <input 
+                            type="text" required value={fullName} onChange={(e) => setFullName(e.target.value)}
+                            placeholder="Hon. Rahul Sharma"
+                            className="w-full pl-12 pr-4 py-4 bg-gray-50 dark:bg-zinc-800/50 border border-gray-200 dark:border-zinc-800 rounded-2xl focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all dark:text-white"
+                          />
+                        </div>
+                      </div>
+
+                      <div className="space-y-2">
+                        <label className="text-[10px] font-black text-zinc-400 dark:text-zinc-500 uppercase tracking-widest pl-1">Official Email</label>
+                        <div className="relative group">
+                          <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400 group-focus-within:text-indigo-500 transition-colors" />
+                          <input 
+                            type="email" required value={email} onChange={(e) => setEmail(e.target.value)}
+                            placeholder="official@nic.in"
+                            className="w-full pl-12 pr-4 py-4 bg-gray-50 dark:bg-zinc-800/50 border border-gray-200 dark:border-zinc-800 rounded-2xl focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all dark:text-white"
+                          />
+                        </div>
+                      </div>
+
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                        <div className="space-y-2">
+                          <label className="text-[10px] font-black text-zinc-400 dark:text-zinc-500 uppercase tracking-widest pl-1">Designation</label>
+                          <input 
+                            type="text" value={designation} onChange={(e) => setDesignation(e.target.value)}
+                            placeholder="e.g. District Magistrate, MLA"
+                            className="w-full px-4 py-4 bg-gray-50 dark:bg-zinc-800/50 border border-gray-200 dark:border-zinc-800 rounded-2xl focus:outline-none focus:border-indigo-500 transition-all dark:text-white"
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <label className="text-[10px] font-black text-zinc-400 dark:text-zinc-500 uppercase tracking-widest pl-1">Password</label>
+                          <input 
+                            type="password" required value={password} onChange={(e) => setPassword(e.target.value)}
+                            placeholder="••••••••"
+                            className="w-full px-4 py-4 bg-gray-50 dark:bg-zinc-800/50 border border-gray-200 dark:border-zinc-800 rounded-2xl focus:outline-none focus:border-indigo-500 transition-all dark:text-white"
+                          />
+                        </div>
+                      </div>
+                    </div>
+
+                    <button 
+                      type="submit" disabled={loading}
+                      className="w-full py-4 bg-indigo-600 hover:bg-indigo-500 text-white font-bold rounded-2xl shadow-lg shadow-indigo-500/20 transition-all active:scale-[0.98] disabled:opacity-50 flex items-center justify-center gap-2"
+                    >
+                      {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : 'Register Securely'}
+                    </button>
+                  </form>
+
+                  <div className="relative">
+                    <div className="absolute inset-0 flex items-center"><div className="w-full border-t border-gray-100 dark:border-zinc-800"></div></div>
+                    <div className="relative flex justify-center text-[10px] uppercase font-bold tracking-widest"><span className="bg-white dark:bg-zinc-900 px-4 text-zinc-400">Or Continue With</span></div>
+                  </div>
+
+                  <button
+                    onClick={handleGoogleSignIn} disabled={loading}
+                    className="w-full flex items-center justify-center gap-3 px-4 py-4 border border-gray-200 dark:border-zinc-800 rounded-2xl hover:bg-gray-50 dark:hover:bg-zinc-800 transition-all font-bold text-zinc-900 dark:text-white group"
+                  >
+                    <img src="https://www.svgrepo.com/show/475656/google-color.svg" alt="Google" className="w-5 h-5 group-hover:scale-110 transition-transform" />
+                    Google Services
+                  </button>
+                </>
+              ) : (
+                <>
+                  <div className="space-y-4">
+                    <button 
+                      onClick={() => setShowOTP(false)}
+                      className="flex items-center gap-2 text-zinc-500 hover:text-indigo-500 transition-colors text-xs font-bold uppercase tracking-widest"
+                    >
+                      <ArrowLeft className="w-4 h-4" />
+                      Change Email
+                    </button>
+                    <div className="space-y-2">
+                       <h2 className="text-3xl font-black text-zinc-900 dark:text-white tracking-tight">Verify Identity</h2>
+                       <p className="text-zinc-500 dark:text-zinc-400 text-sm">
+                         We've sent a 6-digit verification code to <span className="text-indigo-500 font-bold">{email}</span>.
+                       </p>
+                    </div>
+                  </div>
+
+                  {error && (
+                    <div className="p-4 bg-red-500/10 border border-red-500/20 rounded-2xl flex items-center gap-3 text-red-500 text-sm animate-in fade-in slide-in-from-top-1">
+                      <AlertCircle className="w-5 h-5 shrink-0" />
+                      {error}
+                    </div>
+                  )}
+
+                  {successMsg && (
+                    <div className="p-4 bg-emerald-500/10 border border-emerald-500/20 rounded-2xl flex items-center gap-3 text-emerald-500 text-sm animate-in fade-in slide-in-from-top-1">
+                      <CheckCircle2 className="w-5 h-5 shrink-0" />
+                      {successMsg}
+                    </div>
+                  )}
+
+                  <form onSubmit={handleVerifyOTP} className="space-y-6">
+                    <div className="space-y-2">
+                      <label className="text-[10px] font-black text-zinc-400 dark:text-zinc-500 uppercase tracking-widest pl-1">Verification Code</label>
+                      <div className="relative group">
+                        <ShieldCheck className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400 group-focus-within:text-indigo-500 transition-colors" />
+                        <input 
+                          type="text" required value={otp} onChange={(e) => setOtp(e.target.value.replace(/\D/g, '').slice(0, 6))}
+                          placeholder="000000"
+                          className="w-full pl-12 pr-4 py-4 bg-gray-50 dark:bg-zinc-800/50 border border-gray-200 dark:border-zinc-800 rounded-2xl focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all dark:text-white text-2xl tracking-[0.5em] font-black text-center"
+                        />
+                      </div>
+                    </div>
+
+                    <button 
+                      type="submit" disabled={loading || otp.length !== 6}
+                      className="w-full py-4 bg-indigo-600 hover:bg-indigo-500 text-white font-bold rounded-2xl shadow-lg shadow-indigo-500/20 transition-all active:scale-[0.98] disabled:opacity-50 flex items-center justify-center gap-2"
+                    >
+                      {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : 'Complete Registration'}
+                    </button>
+                  </form>
+
+                  <div className="text-center pt-2">
+                    <p className="text-sm text-zinc-500">
+                      Didn't receive the code?{' '}
+                      <button 
+                        onClick={handleResendOTP}
+                        disabled={resendTimer > 0 || loading}
+                        className={`font-bold transition-colors ${resendTimer > 0 ? 'text-zinc-400 cursor-not-allowed' : 'text-indigo-500 hover:text-indigo-400'}`}
+                      >
+                        {resendTimer > 0 ? `Resend in ${resendTimer}s` : 'Resend Code'}
+                      </button>
+                    </p>
+                  </div>
+                </>
               )}
-
-              <form onSubmit={handleSubmit} className="space-y-5">
-                <div className="grid grid-cols-1 gap-5">
-                  <div className="space-y-2">
-                    <label className="text-[10px] font-black text-zinc-400 dark:text-zinc-500 uppercase tracking-widest pl-1">Full Name</label>
-                    <div className="relative group">
-                      <User className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400 group-focus-within:text-indigo-500 transition-colors" />
-                      <input 
-                        type="text" required value={fullName} onChange={(e) => setFullName(e.target.value)}
-                        placeholder="Hon. Rahul Sharma"
-                        className="w-full pl-12 pr-4 py-4 bg-gray-50 dark:bg-zinc-800/50 border border-gray-200 dark:border-zinc-800 rounded-2xl focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all dark:text-white"
-                      />
-                    </div>
-                  </div>
-
-                  <div className="space-y-2">
-                    <label className="text-[10px] font-black text-zinc-400 dark:text-zinc-500 uppercase tracking-widest pl-1">Official Email</label>
-                    <div className="relative group">
-                      <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400 group-focus-within:text-indigo-500 transition-colors" />
-                      <input 
-                        type="email" required value={email} onChange={(e) => setEmail(e.target.value)}
-                        placeholder="official@nic.in"
-                        className="w-full pl-12 pr-4 py-4 bg-gray-50 dark:bg-zinc-800/50 border border-gray-200 dark:border-zinc-800 rounded-2xl focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all dark:text-white"
-                      />
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-                    <div className="space-y-2">
-                      <label className="text-[10px] font-black text-zinc-400 dark:text-zinc-500 uppercase tracking-widest pl-1">Designation</label>
-                      <input 
-                        type="text" value={designation} onChange={(e) => setDesignation(e.target.value)}
-                        placeholder="e.g. District Magistrate, MLA"
-                        className="w-full px-4 py-4 bg-gray-50 dark:bg-zinc-800/50 border border-gray-200 dark:border-zinc-800 rounded-2xl focus:outline-none focus:border-indigo-500 transition-all dark:text-white"
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <label className="text-[10px] font-black text-zinc-400 dark:text-zinc-500 uppercase tracking-widest pl-1">Password</label>
-                      <input 
-                        type="password" required value={password} onChange={(e) => setPassword(e.target.value)}
-                        placeholder="••••••••"
-                        className="w-full px-4 py-4 bg-gray-50 dark:bg-zinc-800/50 border border-gray-200 dark:border-zinc-800 rounded-2xl focus:outline-none focus:border-indigo-500 transition-all dark:text-white"
-                      />
-                    </div>
-                  </div>
-                </div>
-
-                <button 
-                  type="submit" disabled={loading}
-                  className="w-full py-4 bg-indigo-600 hover:bg-indigo-500 text-white font-bold rounded-2xl shadow-lg shadow-indigo-500/20 transition-all active:scale-[0.98] disabled:opacity-50 flex items-center justify-center gap-2"
-                >
-                  {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : 'Register Securely'}
-                </button>
-              </form>
-
-              <div className="relative">
-                <div className="absolute inset-0 flex items-center"><div className="w-full border-t border-gray-100 dark:border-zinc-800"></div></div>
-                <div className="relative flex justify-center text-[10px] uppercase font-bold tracking-widest"><span className="bg-white dark:bg-zinc-900 px-4 text-zinc-400">Or Continue With</span></div>
-              </div>
-
-              <button
-                onClick={handleGoogleSignIn} disabled={loading}
-                className="w-full flex items-center justify-center gap-3 px-4 py-4 border border-gray-200 dark:border-zinc-800 rounded-2xl hover:bg-gray-50 dark:hover:bg-zinc-800 transition-all font-bold text-zinc-900 dark:text-white group"
-              >
-                <img src="https://www.svgrepo.com/show/475656/google-color.svg" alt="Google" className="w-5 h-5 group-hover:scale-110 transition-transform" />
-                Google Services
-              </button>
             </div>
           </div>
 
