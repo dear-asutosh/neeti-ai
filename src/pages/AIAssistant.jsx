@@ -1,10 +1,10 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { 
-  Send, 
-  Sparkles, 
-  Trash2, 
-  Loader2, 
-  User, 
+import {
+  Send,
+  Sparkles,
+  Trash2,
+  Loader2,
+  User,
   ChevronRight,
   AlertCircle,
   Plus,
@@ -17,15 +17,15 @@ import {
   Check
 } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
-import { 
-  collection, 
-  query, 
+import {
+  collection,
+  query,
   where,
-  orderBy, 
-  limit, 
-  getDocs, 
-  doc, 
-  onSnapshot, 
+  orderBy,
+  limit,
+  getDocs,
+  doc,
+  onSnapshot,
   addDoc,
   deleteDoc,
   Timestamp,
@@ -46,14 +46,14 @@ export default function AIAssistant() {
   const [isLoading, setIsLoading] = useState(false);
   const [initialLoading, setInitialLoading] = useState(true);
   const [contextSnapshot, setContextSnapshot] = useState('');
-  
+
   // History State
   const [threads, setThreads] = useState([]);
   const [activeThreadId, setActiveThreadId] = useState(null);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false); // Mobile sidebar
   const [editingThreadId, setEditingThreadId] = useState(null);
   const [editingTitle, setEditingTitle] = useState('');
-  
+
   const messagesEndRef = useRef(null);
   const textareaRef = useRef(null);
 
@@ -83,7 +83,7 @@ export default function AIAssistant() {
         // 1. Documents & Meetings
         const docsQuery = query(collection(db, `users/${uid}/documents`), orderBy('createdAt', 'desc'), limit(10));
         const meetingsQuery = query(collection(db, `users/${uid}/meetings`), orderBy('createdAt', 'desc'), limit(10));
-        
+
         // 2. Schedule Events (Upcoming)
         const now = Timestamp.now();
         const eventsQuery = query(
@@ -99,7 +99,7 @@ export default function AIAssistant() {
           getDocs(meetingsQuery),
           getDocs(eventsQuery)
         ]);
-        
+
         const docTitles = docsSnap.docs.map(d => d.data().title).join(', ');
         const meetingTitles = meetingsSnap.docs.map(m => m.data().title).join(', ');
         const upcomingEvents = eventsSnap.docs.map(e => {
@@ -116,7 +116,7 @@ export default function AIAssistant() {
 
         const totalComplaints = complaintsSnap.size;
         const pendingComplaints = complaintsSnap.docs.filter(d => ['pending', 'Pending'].includes(d.data().status)).length;
-        
+
         const totalProjects = projectsSnap.size;
         const activeProjects = projectsSnap.docs.filter(d => ['active', 'Active', 'ongoing'].includes(d.data().status)).length;
 
@@ -155,7 +155,7 @@ export default function AIAssistant() {
           ...doc.data()
         }));
       setThreads(threadsList);
-      
+
       // Auto-select latest if none active
       if (threadsList.length > 0 && !activeThreadId && initialLoading) {
         // setActiveThreadId(threadsList[0].id); // Optional: auto-load latest
@@ -360,7 +360,7 @@ Always prioritize providing actionable insights based on this context.`;
 
   return (
     <div className="flex h-full bg-gray-50 dark:bg-zinc-950 font-sans text-zinc-900 dark:text-zinc-100 overflow-hidden relative transition-colors duration-300">
-      
+
       {/* ── Sidebar (Desktop) / Drawer (Mobile) ── */}
       <aside className={`
         fixed inset-y-0 left-0 z-40 w-72 bg-white dark:bg-zinc-950 border-r border-gray-200 dark:border-zinc-900 transition-transform duration-300 lg:relative lg:translate-x-0
@@ -375,7 +375,7 @@ Always prioritize providing actionable insights based on this context.`;
           </div>
 
           <div className="p-4">
-            <button 
+            <button
               onClick={handleNewChat}
               className="w-full flex items-center justify-center gap-2 py-3 px-4 bg-gray-50 dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 hover:border-gray-300 dark:hover:border-zinc-700 rounded-xl text-sm font-semibold transition-all active:scale-95 text-zinc-900 dark:text-white"
             >
@@ -388,9 +388,8 @@ Always prioritize providing actionable insights based on this context.`;
               <div
                 key={thread.id}
                 onClick={() => { setActiveThreadId(thread.id); setIsSidebarOpen(false); }}
-                className={`w-full text-left p-3 rounded-xl transition-all group relative flex gap-3 cursor-pointer ${
-                  activeThreadId === thread.id ? 'bg-gray-100 dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800' : 'hover:bg-gray-100/50 dark:hover:bg-zinc-900/50'
-                }`}
+                className={`w-full text-left p-3 rounded-xl transition-all group relative flex gap-3 cursor-pointer ${activeThreadId === thread.id ? 'bg-gray-100 dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800' : 'hover:bg-gray-100/50 dark:hover:bg-zinc-900/50'
+                  }`}
               >
                 <div className="mt-1 shrink-0">
                   <MessageSquare className={`w-4 h-4 ${activeThreadId === thread.id ? 'text-blue-500' : 'text-zinc-600'}`} />
@@ -425,17 +424,17 @@ Always prioritize providing actionable insights based on this context.`;
                     </>
                   )}
                 </div>
-                
+
                 {editingThreadId !== thread.id && (
                   <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                    <button 
+                    <button
                       onClick={(e) => startRenaming(e, thread)}
                       className="p-1 text-zinc-600 hover:text-blue-400"
                       title="Rename"
                     >
                       <Edit2 className="w-3.5 h-3.5" />
                     </button>
-                    <button 
+                    <button
                       onClick={(e) => deleteThread(e, thread.id)}
                       className="p-1 text-zinc-600 hover:text-red-400"
                       title="Delete"
@@ -452,7 +451,7 @@ Always prioritize providing actionable insights based on this context.`;
 
       {/* Mobile Backdrop */}
       {isSidebarOpen && (
-        <div 
+        <div
           className="fixed inset-0 z-30 bg-black/60 backdrop-blur-sm lg:hidden"
           onClick={() => setIsSidebarOpen(false)}
         />
@@ -460,7 +459,7 @@ Always prioritize providing actionable insights based on this context.`;
 
       {/* ── Main Chat Area ── */}
       <main className="flex-1 flex flex-col min-w-0 bg-gray-50 dark:bg-zinc-950">
-        
+
         {/* Header (Title + Mobile Menu) */}
         <header className="h-14 border-b border-gray-200 dark:border-zinc-900 flex items-center justify-between px-4 sticky top-0 bg-white/80 dark:bg-zinc-950/80 backdrop-blur-md z-10">
           <div className="flex items-center gap-3">
@@ -475,9 +474,9 @@ Always prioritize providing actionable insights based on this context.`;
               )}
             </div>
           </div>
-          
+
           <div className="flex items-center gap-2">
-            <button 
+            <button
               onClick={handleNewChat}
               className="p-2 text-zinc-500 dark:text-zinc-400 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/10 rounded-lg transition-all"
               title="New Chat"
@@ -492,31 +491,29 @@ Always prioritize providing actionable insights based on this context.`;
           <div className="max-w-3xl mx-auto space-y-8 pb-10">
             {messages.map((msg, idx) => (
               <div key={idx} className={`flex gap-4 ${msg.role === 'user' ? 'flex-row-reverse' : ''}`}>
-                <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 mt-1 overflow-hidden shadow-lg ${
-                  msg.role === 'user' ? 'bg-white dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700' : 'bg-blue-900/20 border border-blue-800/30'
-                }`}>
+                <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 mt-1 overflow-hidden shadow-lg ${msg.role === 'user' ? 'bg-white dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700' : 'bg-blue-900/20 border border-blue-800/30'
+                  }`}>
                   {msg.role === 'user' ? (
                     displayPhoto ? <img src={displayPhoto} alt="U" className="w-full h-full object-cover" /> : <User className="w-4 h-4 text-zinc-400" />
                   ) : (
                     <Sparkles className="w-4 h-4 text-blue-500" />
                   )}
                 </div>
-                <div className={`max-w-[85%] px-5 py-3.5 rounded-2xl text-[15px] leading-relaxed transition-all duration-300 ${
-                  msg.role === 'user' 
-                    ? 'bg-blue-600 text-white shadow-sm' 
+                <div className={`max-w-[85%] px-5 py-3.5 rounded-2xl text-[15px] leading-relaxed transition-all duration-300 ${msg.role === 'user'
+                    ? 'bg-blue-600 text-white shadow-sm'
                     : 'bg-white dark:bg-zinc-900/50 text-zinc-900 dark:text-zinc-200 border border-gray-200 dark:border-zinc-800/50 shadow-sm'
-                }`}>
+                  }`}>
                   <div className="markdown-style overflow-hidden">
                     <ReactMarkdown
                       components={{
-                        p: ({...props}) => <p className="mb-3 last:mb-0" {...props} />,
-                        ul: ({...props}) => <ul className="list-disc pl-5 mb-3 space-y-1" {...props} />,
-                        ol: ({...props}) => <ol className="list-decimal pl-5 mb-3 space-y-1" {...props} />,
-                        li: ({...props}) => <li {...props} />,
-                        h1: ({...props}) => <h1 className="text-xl font-black mb-3 text-white" {...props} />,
-                        h2: ({...props}) => <h2 className="text-lg font-black mb-3 text-white" {...props} />,
-                        code: ({inline, ...props}) => (
-                          inline 
+                        p: ({ ...props }) => <p className="mb-3 last:mb-0" {...props} />,
+                        ul: ({ ...props }) => <ul className="list-disc pl-5 mb-3 space-y-1" {...props} />,
+                        ol: ({ ...props }) => <ol className="list-decimal pl-5 mb-3 space-y-1" {...props} />,
+                        li: ({ ...props }) => <li {...props} />,
+                        h1: ({ ...props }) => <h1 className="text-xl font-black mb-3 text-white" {...props} />,
+                        h2: ({ ...props }) => <h2 className="text-lg font-black mb-3 text-white" {...props} />,
+                        code: ({ inline, ...props }) => (
+                          inline
                             ? <code className="bg-gray-100 dark:bg-zinc-950 px-1.5 py-0.5 rounded text-blue-600 dark:text-blue-400 font-bold" {...props} />
                             : <code className="block bg-gray-100 dark:bg-zinc-950 p-4 rounded-xl text-blue-600 dark:text-blue-400 overflow-x-auto my-4 text-sm font-mono border border-gray-200 dark:border-zinc-800/50" {...props} />
                         )
@@ -528,7 +525,7 @@ Always prioritize providing actionable insights based on this context.`;
                 </div>
               </div>
             ))}
-            
+
             {isLoading && (
               <div className="flex gap-4 animate-in fade-in duration-300">
                 <div className="w-8 h-8 rounded-lg bg-blue-900/20 border border-blue-800/30 flex items-center justify-center shrink-0">
@@ -578,11 +575,10 @@ Always prioritize providing actionable insights based on this context.`;
                 <button
                   onClick={() => handleSend()}
                   disabled={!input.trim() || isLoading}
-                  className={`p-3 rounded-xl transition-all duration-300 ${
-                    input.trim() && !isLoading 
-                      ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/30 hover:scale-105 active:scale-95' 
+                  className={`p-3 rounded-xl transition-all duration-300 ${input.trim() && !isLoading
+                      ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/30 hover:scale-105 active:scale-95'
                       : 'bg-gray-100 dark:bg-zinc-800 text-zinc-400 dark:text-zinc-600 cursor-not-allowed'
-                  }`}
+                    }`}
                 >
                   <Send className="w-5 h-5" />
                 </button>

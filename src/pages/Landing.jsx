@@ -4,6 +4,27 @@ import { Menu, X, FileText, Mic, PenTool, Map, Calendar, Zap, Quote, User, Chevr
 import FadeInSection from '../components/FadeInSection';
 import { useAuth } from '../hooks/useAuth';
 
+function AshokaChakra({ size, className = "" }) {
+  const finalSize = size || "100%";
+  return (
+    <svg width={finalSize} height={finalSize} viewBox="0 0 200 200" className={className}>
+      <circle cx="100" cy="100" r="90" fill="none" 
+        stroke="currentColor" strokeWidth="4"/>
+      <circle cx="100" cy="100" r="14" fill="currentColor"/>
+      {Array.from({ length: 24 }).map((_, i) => {
+        const angle = (i * 360) / 24;
+        const rad = (angle * Math.PI) / 180;
+        const x1 = 100 + 14 * Math.cos(rad);
+        const y1 = 100 + 14 * Math.sin(rad);
+        const x2 = 100 + 85 * Math.cos(rad);
+        const y2 = 100 + 85 * Math.sin(rad);
+        return <line key={i} x1={x1} y1={y1} x2={x2} y2={y2} 
+          stroke="currentColor" strokeWidth="2.5"/>;
+      })}
+    </svg>
+  );
+}
+
 export default function Landing() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -103,33 +124,42 @@ export default function Landing() {
   const displayPhoto = dbUser?.photoURL || currentUser?.photoURL;
 
   return (
-    <div className="min-h-screen bg-offwhite text-navy font-body overflow-x-hidden">
+    <div className="min-h-screen bg-[#0D1B2A] text-[#F8F4ED] font-sans overflow-x-hidden relative">
+      {/* Global Grid Texture Overlay */}
+      <div className="fixed inset-0 pointer-events-none z-0 opacity-[0.025]"
+        style={{
+          backgroundImage: 'linear-gradient(#FF9933 1px, transparent 1px), linear-gradient(90deg, #FF9933 1px, transparent 1px)',
+          backgroundSize: '48px 48px'
+        }}
+      ></div>
       
       {/* --- [1] NAVBAR --- */}
       <nav 
         className={`fixed w-full z-50 transition-all duration-300 ${
-          isScrolled ? 'bg-navy/95 backdrop-blur-md shadow-md py-3' : 'bg-transparent py-5'
+          isScrolled ? 'bg-[#0D1B2A]/95 backdrop-blur-md shadow-lg py-3 border-b border-[#1E3A5F]' : 'bg-transparent py-5'
         }`}
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex justify-between items-center">
-          {/* Logo & Tagline */}
-          <div className="flex flex-col">
-            <span className="text-2xl font-bold font-heading text-white tracking-wide">
-              Neeti AI
-            </span>
-            <span className={`text-xs opacity-70 ${isScrolled ? 'text-white' : 'text-gray-300'} hidden sm:block`}>
-              Empowering Governance. Powered by Intelligence.
-            </span>
+          <div className="flex items-center gap-3">
+            <AshokaChakra size={36} className="text-[#FF9933]" />
+            <div className="flex flex-col">
+              <span className="text-2xl font-heading text-white tracking-normal leading-none font-bold">
+                NEETI AI
+              </span>
+              <span className="text-xs font-hindi italic text-[#FF9933] mt-1">
+                नीति AI
+              </span>
+            </div>
           </div>
 
           {/* Desktop Nav Links */}
           <div className="hidden md:flex items-center space-x-8">
-            <a href="#home" onClick={(e) => handleSmoothScroll(e, 'home')} className="text-gray-200 hover:text-white transition-colors text-sm font-medium">Home</a>
+            <a href="#home" onClick={(e) => handleSmoothScroll(e, 'home')} className="text-[#8BA3BC] hover:text-white transition-colors text-sm font-medium uppercase tracking-wider font-heading">Home</a>
             
             {/* Desktop Features Dropdown */}
             <div className="relative" ref={dropdownRef}>
               <button 
-                className="flex items-center gap-1 text-gray-200 hover:text-white transition-colors text-sm font-medium focus:outline-none"
+                className="flex items-center gap-1 text-[#8BA3BC] hover:text-white transition-colors text-sm font-medium focus:outline-none uppercase tracking-wider font-heading"
                 onClick={() => setFeaturesDropdownOpen(!featuresDropdownOpen)}
                 onMouseEnter={() => setFeaturesDropdownOpen(true)}
               >
@@ -137,39 +167,39 @@ export default function Landing() {
               </button>
               
               <div 
-                className={`absolute left-1/2 -translate-x-1/2 top-full mt-4 w-150 bg-white rounded-xl shadow-2xl border border-gray-100 overflow-hidden transition-all duration-300 origin-top ${
+                className={`absolute left-1/2 -translate-x-1/2 top-full mt-4 w-150 bg-[#112236] rounded-none shadow-2xl border border-[#1E3A5F] overflow-hidden transition-all duration-300 origin-top ${
                   featuresDropdownOpen ? 'opacity-100 scale-100 visible' : 'opacity-0 scale-95 invisible'
                 }`}
                 onMouseLeave={() => setFeaturesDropdownOpen(false)}
               >
                 <div className="p-6">
-                  <h3 className="text-navy font-heading font-bold text-lg mb-4 pb-2 border-b border-gray-100">Neeti AI Capabilities</h3>
+                  <h3 className="text-[#F8F4ED] font-heading font-extrabold text-lg mb-4 pb-2 border-b border-[#1E3A5F] uppercase tracking-tight">Neeti AI Capabilities</h3>
                   <div className="grid grid-cols-2 gap-4">
                     {featureLinks.map((feature) => (
                       <button 
                         key={feature.route}
                         onClick={(e) => handleFeatureClick(e, feature.route)}
-                        className="flex items-start gap-3 p-3 rounded-lg hover:bg-offwhite transition-colors group cursor-pointer text-left w-full focus:outline-none"
+                        className="flex items-start gap-3 p-3 rounded-none hover:bg-[#1E3A5F] transition-colors group cursor-pointer text-left w-full focus:outline-none"
                       >
-                        <div className="bg-navy/5 text-gold p-2 rounded-md group-hover:bg-gold group-hover:text-navy transition-colors shrink-0">
+                        <div className="bg-[#1E3A5F] text-[#FF9933] p-2 rounded-none group-hover:bg-[#FF9933] group-hover:text-[#0D1B2A] transition-colors shrink-0">
                           <feature.icon size={18} />
                         </div>
                         <div>
-                          <p className="text-sm font-bold text-navy mb-0.5 group-hover:text-gold transition-colors">{feature.label}</p>
+                          <p className="text-sm font-bold text-[#F8F4ED] mb-0.5 group-hover:text-[#FF9933] transition-colors font-heading uppercase tracking-wide">{feature.label}</p>
                         </div>
                       </button>
                     ))}
                   </div>
                 </div>
-                <div className="bg-offwhite px-6 py-4 flex justify-between items-center border-t border-gray-100">
-                   <p className="text-xs text-gray-500 font-medium tracking-wide">Explore all governance tools.</p>
-                   <a href="#features" onClick={(e) => handleSmoothScroll(e, 'features')} className="text-xs font-bold text-navy hover:text-gold transition-colors">View All &rarr;</a>
+                <div className="bg-[#0A1628] px-6 py-4 flex justify-between items-center border-t border-[#1E3A5F]">
+                   <p className="text-xs text-[#8BA3BC] font-medium tracking-wide">Explore all governance tools.</p>
+                   <a href="#features" onClick={(e) => handleSmoothScroll(e, 'features')} className="text-xs font-extrabold text-[#FF9933] hover:text-white transition-colors uppercase tracking-tight font-heading">View All &rarr;</a>
                 </div>
               </div>
             </div>
 
-            <a href="#how-it-works" onClick={(e) => handleSmoothScroll(e, 'how-it-works')} className="text-gray-200 hover:text-white transition-colors text-sm font-medium">How It Works</a>
-            <a href="#testimonials" onClick={(e) => handleSmoothScroll(e, 'testimonials')} className="text-gray-200 hover:text-white transition-colors text-sm font-medium">Testimonials</a>
+            <a href="#how-it-works" onClick={(e) => handleSmoothScroll(e, 'how-it-works')} className="text-[#8BA3BC] hover:text-white transition-colors text-sm font-medium uppercase tracking-wider font-heading">How It Works</a>
+            <a href="#testimonials" onClick={(e) => handleSmoothScroll(e, 'testimonials')} className="text-[#8BA3BC] hover:text-white transition-colors text-sm font-medium uppercase tracking-wider font-heading">Testimonials</a>
             
             {currentUser ? (
               <div className="flex items-center gap-4 pl-4 border-l border-white/20">
@@ -196,33 +226,33 @@ export default function Landing() {
 
                   {/* Profile Dropdown */}
                   <div 
-                    className={`absolute right-0 top-full mt-3 w-56 bg-white rounded-xl shadow-2xl border border-gray-100 overflow-hidden transition-all duration-300 origin-top-right ${
+                    className={`absolute right-0 top-full mt-3 w-56 bg-[#112236] rounded-none shadow-2xl border border-[#1E3A5F] overflow-hidden transition-all duration-300 origin-top-right ${
                       profileDropdownOpen ? 'opacity-100 scale-100 visible' : 'opacity-0 scale-95 invisible'
                     }`}
                     onMouseLeave={() => setProfileDropdownOpen(false)}
                   >
-                    <div className="px-4 py-3 border-b border-gray-100 bg-gray-50/50">
-                      <p className="text-sm font-bold text-navy truncate">{displayName}</p>
-                      <p className="text-xs text-gray-500 truncate">{currentUser.email}</p>
+                    <div className="px-4 py-3 border-b border-[#1E3A5F] bg-[#0A1628]">
+                      <p className="text-sm font-bold text-[#F8F4ED] truncate uppercase tracking-wide font-heading">{displayName}</p>
+                      <p className="text-xs text-[#8BA3BC] truncate">{currentUser.email}</p>
                     </div>
                     <div className="p-2 space-y-1">
                       <Link 
                         to="/dashboard" 
                         onClick={() => setProfileDropdownOpen(false)}
-                        className="flex items-center px-3 py-2 text-sm text-navy hover:bg-offwhite rounded-md transition-colors font-medium"
+                        className="flex items-center px-3 py-2 text-sm text-[#F8F4ED] hover:bg-[#1E3A5F] rounded-none transition-colors font-medium"
                       >
                         Go to Dashboard
                       </Link>
                       <Link 
                         to="/settings" 
                         onClick={() => setProfileDropdownOpen(false)}
-                        className="flex items-center px-3 py-2 text-sm text-navy hover:bg-offwhite rounded-md transition-colors font-medium"
+                        className="flex items-center px-3 py-2 text-sm text-[#F8F4ED] hover:bg-[#1E3A5F] rounded-none transition-colors font-medium"
                       >
                         Profile Configuration
                       </Link>
                       <button 
                         onClick={handleLogout}
-                        className="w-full text-left flex items-center px-3 py-2 text-sm text-red-600 hover:bg-red-50 rounded-md transition-colors font-medium border-t border-gray-100 mt-1 pt-2"
+                        className="w-full text-left flex items-center px-3 py-2 text-sm text-red-400 hover:bg-red-900/20 rounded-none transition-colors font-medium border-t border-[#1E3A5F] mt-1 pt-2"
                       >
                         Sign Out
                       </button>
@@ -230,12 +260,12 @@ export default function Landing() {
                   </div>
                 </div>
                 
-                <Link to="/dashboard" className="hidden sm:flex bg-gold hover:bg-gold/90 text-navy px-5 py-2.5 rounded-sm font-semibold transition-colors text-sm items-center shadow-lg shadow-gold/20">
+                <Link to="/dashboard" className="hidden sm:flex bg-[#FF9933] hover:bg-[#FF9933]/90 text-[#0D1B2A] px-5 py-2.5 rounded-none font-bold transition-colors text-sm items-center shadow-lg shadow-[#FF9933]/20 uppercase tracking-tight font-heading" style={{ borderRadius: '2px' }}>
                   Dashboard
                 </Link>
               </div>
             ) : (
-              <Link to="/login" className="bg-gold hover:bg-gold/90 text-navy px-6 py-2 rounded-sm font-semibold transition-colors text-sm">
+              <Link to="/login" className="bg-[#FF9933] hover:bg-[#FF9933]/90 text-[#0D1B2A] px-4 sm:px-6 py-2 rounded-none font-bold transition-colors text-sm uppercase tracking-tight font-heading" style={{ borderRadius: '2px' }}>
                 Sign Up &rarr;
               </Link>
             )}
@@ -251,43 +281,43 @@ export default function Landing() {
 
         {/* Mobile Menu Panel */}
         {mobileMenuOpen && (
-          <div className="md:hidden absolute top-full left-0 w-full bg-navy border-t border-gray-800 shadow-xl max-h-[calc(100vh-80px)] overflow-y-auto">
+          <div className="md:hidden absolute top-full left-0 w-full bg-[#0D1B2A] border-t border-[#1E3A5F] shadow-xl max-h-[calc(100vh-80px)] overflow-y-auto">
             <div className="flex flex-col px-4 py-6 space-y-4">
-              <a href="#home" onClick={(e) => handleSmoothScroll(e, 'home')} className="text-white text-lg">Home</a>
+              <a href="#home" onClick={(e) => handleSmoothScroll(e, 'home')} className="text-[#F8F4ED] text-lg font-heading uppercase tracking-tight">Home</a>
               
               {/* Mobile Features Accordion */}
-              <div className="flex flex-col border-b border-navy-light/20 pb-2">
+              <div className="flex flex-col border-b border-[#1E3A5F] pb-2">
                 <button 
                   onClick={() => setMobileFeaturesExpanded(!mobileFeaturesExpanded)}
-                  className="flex items-center justify-between text-white text-lg w-full text-left"
+                  className="flex items-center justify-between text-[#F8F4ED] text-lg w-full text-left font-heading uppercase tracking-tight"
                 >
                   Features 
                   <ChevronDown className={`transition-transform duration-200 ${mobileFeaturesExpanded ? 'rotate-180' : ''}`} size={20} />
                 </button>
                 
                 <div className={`overflow-hidden transition-all duration-300 ${mobileFeaturesExpanded ? 'max-h-96 opacity-100 mt-4' : 'max-h-0 opacity-0'}`}>
-                  <div className="flex flex-col space-y-3 pl-4 border-l-2 border-white/10 ml-2">
+                  <div className="flex flex-col space-y-3 pl-4 border-l-2 border-[#FF9933]/30 ml-2">
                     {featureLinks.map((feature) => (
                       <button 
                         key={feature.route}
                         onClick={(e) => handleFeatureClick(e, feature.route)}
-                        className="flex items-center gap-3 text-white/80 hover:text-white py-1 w-full text-left"
+                        className="flex items-center gap-3 text-[#8BA3BC] hover:text-[#FF9933] py-1 w-full text-left transition-colors"
                       >
-                       <feature.icon size={16} className="text-gold shrink-0" />
-                       <span className="text-base">{feature.label}</span>
+                       <feature.icon size={16} className="text-[#FF9933] shrink-0" />
+                       <span className="text-base font-heading uppercase tracking-wide">{feature.label}</span>
                       </button>
                     ))}
                   </div>
                 </div>
               </div>
 
-              <a href="#how-it-works" onClick={(e) => handleSmoothScroll(e, 'how-it-works')} className="text-white text-lg">How It Works</a>
-              <a href="#testimonials" onClick={(e) => handleSmoothScroll(e, 'testimonials')} className="text-white text-lg">Testimonials</a>
+              <a href="#how-it-works" onClick={(e) => handleSmoothScroll(e, 'how-it-works')} className="text-[#F8F4ED] text-lg font-heading uppercase tracking-tight">How It Works</a>
+              <a href="#testimonials" onClick={(e) => handleSmoothScroll(e, 'testimonials')} className="text-[#F8F4ED] text-lg font-heading uppercase tracking-tight">Testimonials</a>
               
               {currentUser ? (
                 <>
-                  <div className="flex items-center gap-3 pt-4 border-t border-white/10 mt-4">
-                    <div className="w-10 h-10 rounded-full bg-navy border border-gold flex items-center justify-center overflow-hidden shrink-0">
+                  <div className="flex items-center gap-3 pt-4 border-t border-[#1E3A5F] mt-4">
+                    <div className="w-10 h-10 rounded-full bg-[#112236] border border-[#FF9933] flex items-center justify-center overflow-hidden shrink-0">
                       {displayPhoto ? (
                         <img src={displayPhoto} alt="Avatar" className="w-full h-full object-cover" referrerPolicy="no-referrer" />
                       ) : (
@@ -295,24 +325,24 @@ export default function Landing() {
                       )}
                     </div>
                     <div className="overflow-hidden">
-                      <p className="text-white font-semibold truncate">{displayName}</p>
-                      <p className="text-white/60 text-xs truncate">{currentUser.email}</p>
+                      <p className="text-[#F8F4ED] font-bold truncate font-heading uppercase">{displayName}</p>
+                      <p className="text-[#8BA3BC] text-xs truncate">{currentUser.email}</p>
                     </div>
                   </div>
                   <div className="flex flex-col gap-2 mt-4">
-                    <Link to="/dashboard" onClick={toggleMobileMenu} className="bg-gold text-navy px-4 py-3 text-center rounded-sm font-semibold">
+                    <Link to="/dashboard" onClick={toggleMobileMenu} className="bg-[#FF9933] text-[#0D1B2A] px-4 py-3 text-center rounded-none font-bold uppercase tracking-tight font-heading" style={{ borderRadius: '2px' }}>
                       Go to Dashboard &rarr;
                     </Link>
-                    <Link to="/settings" onClick={toggleMobileMenu} className="bg-white/10 text-white px-4 py-3 text-center rounded-sm font-semibold">
+                    <Link to="/settings" onClick={toggleMobileMenu} className="bg-white/5 text-[#F8F4ED] px-4 py-3 text-center rounded-none font-bold uppercase tracking-tight font-heading border border-[#1E3A5F]" style={{ borderRadius: '2px' }}>
                       Profile Configuration
                     </Link>
-                    <button onClick={handleLogout} className="text-red-400 py-3 text-center border border-red-500/30 rounded-sm font-semibold mt-2">
+                    <button onClick={handleLogout} className="text-red-400 py-3 text-center border border-red-500/30 rounded-none font-bold uppercase tracking-tight font-heading mt-2" style={{ borderRadius: '2px' }}>
                       Sign Out
                     </button>
                   </div>
                 </>
               ) : (
-                <Link to="/login" onClick={toggleMobileMenu} className="bg-gold text-navy px-4 py-3 text-center rounded-sm font-semibold mt-4">
+                <Link to="/login" onClick={toggleMobileMenu} className="bg-[#FF9933] text-[#0D1B2A] px-4 py-3 text-center rounded-none font-bold uppercase tracking-tight font-heading mt-4" style={{ borderRadius: '2px' }}>
                   Sign Up &rarr;
                 </Link>
               )}
@@ -321,69 +351,83 @@ export default function Landing() {
         )}
       </nav>
 
-      {/* --- [2] HERO SECTION --- */}
-      <section id="home" className="relative pt-32 pb-20 lg:pt-48 lg:pb-32 bg-navy min-h-[90vh] flex items-center overflow-hidden">
-        {/* Subtle geometric pattern background via CSS gradients */}
-        <div className="absolute inset-0 opacity-[0.03]" 
-             style={{ backgroundImage: 'linear-gradient(#ffffff 1px, transparent 1px), linear-gradient(90deg, #ffffff 1px, transparent 1px)', backgroundSize: '40px 40px' }}>
+      <section id="home" className="relative pt-24 pb-16 lg:pt-48 lg:pb-32 bg-[#0D1B2A] min-h-[85vh] flex items-center overflow-hidden">
+        {/* Ashoka Chakra Watermark */}
+        <div className="absolute inset-0 flex items-center justify-center pointer-events-none opacity-[0.05] z-0 overflow-hidden">
+          <AshokaChakra className="text-[#FF9933] transform rotate-12 w-[300px] h-[300px] md:w-[600px] md:h-[600px] lg:w-[800px] lg:h-[800px]" />
         </div>
-        {/* Central Radial Gradient for depth */}
-        <div className="absolute inset-0 bg-radial from-transparent to-navy/80"></div>
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center">
           <FadeInSection>
-            <h1 className="text-4xl md:text-6xl lg:text-7xl font-heading font-medium text-white mb-6 leading-tight max-w-5xl mx-auto">
-              India's First AI Co-Pilot<br />
-              Built for Public Leaders.
+            <h1 className="text-3xl sm:text-5xl md:text-6xl lg:text-7xl font-heading font-bold text-[#F8F4ED] mb-6 leading-tight max-w-4xl mx-auto tracking-tight px-2">
+             Powering the People <br /> Who Power <span className="text-[#FF9933] italic">In</span><span className='text-[#F8F4ED] italic'>d</span><span className='text-[#138808] italic'>ia</span>.
             </h1>
-            <p className="text-lg md:text-xl text-white/60 mb-10 max-w-3xl mx-auto leading-relaxed">
+
+            <div className="mb-8 px-4">
+              <p className="font-hindi italic text-lg sm:text-xl md:text-2xl text-[#FF9933] mb-1">"जनसेवा ही ईश्वर सेवा है"</p>
+              <p className="text-[#8BA3BC] text-[10px] sm:text-xs uppercase tracking-[0.2em] font-heading font-medium">Service to people is service to God</p>
+            </div>
+
+            <p className="text-lg md:text-xl text-[#8BA3BC] mb-10 max-w-3xl mx-auto leading-relaxed font-medium">
               Neeti AI assists government officials, administrators, and public representatives in making faster, informed, and impactful decisions — securely and intelligently.
             </p>
             
-            <div className="flex flex-col items-center gap-4 mt-10">
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-6 mt-10">
               {currentUser ? (
-                <Link to="/dashboard" className="bg-gold hover:bg-gold/90 text-navy px-8 py-4 rounded-sm text-lg font-bold transition-colors shadow-lg shadow-gold/20 inline-flex items-center">
+                <Link to="/dashboard" className="bg-[#FF9933] hover:bg-[#FF9933]/90 text-[#0D1B2A] px-10 py-4 rounded-none text-lg font-bold transition-all shadow-xl shadow-[#FF9933]/20 inline-flex items-center uppercase tracking-tight font-heading hover:-translate-y-1" style={{ borderRadius: '2px' }}>
                   Continue to Dashboard &rarr;
                 </Link>
               ) : (
                 <>
-                  <Link to="/login" className="bg-gold hover:bg-gold/90 text-navy px-8 py-4 rounded-sm text-lg font-bold transition-colors shadow-lg shadow-gold/20 inline-flex items-center">
-                    Register for Early Access &rarr;
+                  <Link to="/login" className="group bg-[#FF9933] hover:bg-[#FF9933]/90 text-[#0D1B2A] px-8 sm:px-10 py-4 sm:py-4 rounded-none text-base sm:text-lg font-bold transition-all shadow-xl shadow-[#FF9933]/20 inline-flex items-center uppercase tracking-tight font-heading hover:-translate-y-1" style={{ borderRadius: '2px' }}>
+                    Register for Early Access 
+                    <span className="ml-2 group-hover:translate-x-1 transition-transform">&rarr;</span>
                   </Link>
-                  <Link to="/login" className="text-white/80 hover:text-white text-sm transition-colors border-b border-transparent hover:border-white/50 pb-1">
-                    Already a registered official? Sign In here
+                  <Link to="/login" className="bg-transparent border-2 border-[#1E3A5F] text-white hover:border-[#FF9933] hover:text-[#FF9933] px-8 sm:px-10 py-4 sm:py-4 rounded-none text-base sm:text-lg font-bold transition-all inline-flex items-center uppercase tracking-tight font-heading hover:-translate-y-1" style={{ borderRadius: '2px' }}>
+                    Sign In
                   </Link>
                 </>
               )}
             </div>
             
-            <p className="mt-16 text-xs text-gold uppercase tracking-widest font-semibold opacity-90">
-              Designed exclusively for verified Government Officials & Public Administrators.
-            </p>
           </FadeInSection>
+        </div>
+
+        {/* Tricolor Bar at Bottom */}
+        <div className="absolute bottom-0 left-0 w-full h-[3px] flex">
+          <div className="flex-1 bg-[#FF9933]"></div>
+          <div className="flex-1 bg-white"></div>
+          <div className="flex-1 bg-[#138808]"></div>
         </div>
       </section>
 
       {/* --- [3] STATS BAR --- */}
-      <section className="bg-white py-12 border-b border-gray-100 relative z-20 shadow-sm -mt-2">
+      <section className="bg-[#112236] py-12 border-b border-[#1E3A5F] relative z-20 shadow-2xl overflow-hidden">
+        {/* Subtle Horizontal Glow */}
+        <div className="absolute top-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-[#FF9933]/20 to-transparent"></div>
+        
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <FadeInSection>
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-0 divide-y lg:divide-y-0 lg:divide-x divide-gold/20 text-center">
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-0 divide-y lg:divide-y-0 lg:divide-x divide-[#1E3A5F] text-center">
               <div className="p-4">
-                <div className="text-4xl lg:text-5xl font-bold text-navy mb-2">500+</div>
-                <div className="text-gray-500 text-sm uppercase tracking-wider font-semibold">Officials Onboarded</div>
+                <div className="text-3xl lg:text-4xl font-bold text-[#F8F4ED] mb-2 font-heading tracking-tight">500+</div>
+                <p className="font-hindi italic text-base text-[#FF9933]/70 mb-1">अधिकारी</p>
+                <div className="text-[#8BA3BC] text-[10px] uppercase tracking-normal font-normal font-heading">Officials Onboarded</div>
               </div>
               <div className="p-4">
-                <div className="text-4xl lg:text-5xl font-bold text-navy mb-2">10,000+</div>
-                <div className="text-gray-500 text-sm uppercase tracking-wider font-semibold">Documents Processed</div>
+                <div className="text-3xl lg:text-4xl font-bold text-[#F8F4ED] mb-2 font-heading tracking-tight">10,000+</div>
+                <p className="font-hindi italic text-base text-[#FF9933]/70 mb-1">दस्तावेज़</p>
+                <div className="text-[#8BA3BC] text-[10px] uppercase tracking-normal font-normal font-heading">Documents Processed</div>
               </div>
               <div className="p-4">
-                <div className="text-4xl lg:text-5xl font-bold text-navy mb-2">40+</div>
-                <div className="text-gray-500 text-sm uppercase tracking-wider font-semibold">Districts Covered</div>
+                <div className="text-3xl lg:text-4xl font-bold text-[#F8F4ED] mb-2 font-heading tracking-tight">40+</div>
+                <p className="font-hindi italic text-base text-[#FF9933]/70 mb-1">जिले</p>
+                <div className="text-[#8BA3BC] text-[10px] uppercase tracking-normal font-normal font-heading">Districts Covered</div>
               </div>
               <div className="p-4">
-                <div className="text-4xl lg:text-5xl font-bold text-navy mb-2">99.9%</div>
-                <div className="text-gray-500 text-sm uppercase tracking-wider font-semibold">Uptime Guaranteed</div>
+                <div className="text-3xl lg:text-4xl font-bold text-[#F8F4ED] mb-2 font-heading tracking-tight">99.9%</div>
+                <p className="font-hindi italic text-base text-[#FF9933]/70 mb-1">विश्वसनीयता</p>
+                <div className="text-[#8BA3BC] text-[10px] uppercase tracking-normal font-normal font-heading">Uptime Guaranteed</div>
               </div>
             </div>
           </FadeInSection>
@@ -391,15 +435,15 @@ export default function Landing() {
       </section>
 
       {/* --- [4] KEY FEATURES SECTION --- */}
-      <section id="features" className="py-24 bg-offwhite">
+      <section id="features" className="py-24 bg-[#0A1628] relative">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <FadeInSection className="text-center mb-16">
-            <span className="text-gold text-sm font-bold uppercase tracking-[0.2em] block mb-4">Capabilities</span>
-            <h2 className="text-4xl md:text-5xl font-heading text-navy mb-6">
+            <span className="text-[#FF9933] text-sm font-bold uppercase tracking-[0.3em] block mb-4 font-heading">CAPABILITIES · क्षमताएं</span>
+             <h2 className="text-3xl md:text-4xl font-heading font-normal text-[#F8F4ED] mb-6 uppercase tracking-normal">
               Everything a Public Leader Needs.<br />
               In One Secure Platform.
             </h2>
-            <p className="text-gray-600 max-w-3xl mx-auto text-lg leading-relaxed">
+            <p className="text-[#8BA3BC] max-w-3xl mx-auto text-lg leading-relaxed">
               From drafting official communications to tracking constituency data in real time — Neeti AI is purpose-built for the demands of public administration.
             </p>
           </FadeInSection>
@@ -407,37 +451,43 @@ export default function Landing() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             <FeatureCard 
               id="feature-summarization"
-              icon={<FileText className="text-gold" size={32} />}
+              index={0}
+              icon={<FileText size={32} />}
               title="Intelligent Document Summarization"
               description="Process hundreds of pages of reports, circulars, and policy documents in seconds. Neeti AI extracts key decisions, action points, and critical information — so you focus on governance, not paperwork."
             />
             <FeatureCard 
               id="feature-transcription"
-              icon={<Mic className="text-gold" size={32} />}
+              index={1}
+              icon={<Mic size={32} />}
               title="Meeting Transcription & Briefing"
               description="Automatically transcribe, summarize, and generate action items from official meetings and conferences. Every word captured. Nothing missed."
             />
             <FeatureCard 
               id="feature-drafting"
-              icon={<PenTool className="text-gold" size={32} />}
+              index={2}
+              icon={<PenTool size={32} />}
               title="Speech & Official Response Drafting"
               description="Generate contextually accurate speeches, press statements, and official correspondence in your voice — reviewed, refined, and ready to deliver."
             />
             <FeatureCard 
               id="feature-tracking"
-              icon={<Map className="text-gold" size={32} />}
+              index={3}
+              icon={<Map size={32} />}
               title="Constituency & Community Data Tracking"
               description="Monitor development indices, grievance statuses, and demographic data across your jurisdiction — all on a single, real-time intelligence dashboard."
             />
             <FeatureCard 
               id="feature-calendar"
-              icon={<Calendar className="text-gold" size={32} />}
+              index={4}
+              icon={<Calendar size={32} />}
               title="Schedule & Priority Management"
               description="Intelligently organise your calendar, flag urgent matters, and ensure no critical appointment, deadline, or follow-up ever goes unattended."
             />
             <FeatureCard 
               id="feature-assistant"
-              icon={<Sparkles className="text-gold" size={32} />}
+              index={5}
+              icon={<Sparkles size={32} />}
               title="Workplace AI Assistant & Copilot"
               description="Interact with your documents, transcriptions, and constituency data using natural language. Draft responses, ask questions, and get intelligent insights across your entire workspace."
             />
@@ -446,15 +496,20 @@ export default function Landing() {
       </section>
 
       {/* --- [5] HOW IT WORKS SECTION --- */}
-      <section id="how-it-works" className="py-24 bg-white relative">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <section id="how-it-works" className="py-24 bg-[#0D1B2A] relative">
+        {/* Local Grid Texture */}
+        <div className="absolute inset-0 opacity-[0.025] pointer-events-none"
+             style={{ backgroundImage: 'linear-gradient(#FF9933 1px, transparent 1px), linear-gradient(90deg, #FF9933 1px, transparent 1px)', backgroundSize: '48px 48px' }}>
+        </div>
+
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           <FadeInSection className="text-center mb-20">
-            <span className="text-gold text-sm font-bold uppercase tracking-[0.2em] block mb-4">Process</span>
-            <h2 className="text-4xl md:text-5xl font-heading text-navy mb-6">
+            <span className="text-[#FF9933] text-sm font-bold uppercase tracking-[0.3em] block mb-4 font-heading">PROCESS · प्रक्रिया</span>
+            <h2 className="text-3xl md:text-4xl font-heading font-bold text-[#F8F4ED] mb-6 uppercase tracking-tight">
               Simple to Use.<br />
               Serious in Purpose.
             </h2>
-            <p className="text-gray-600 max-w-2xl mx-auto text-lg leading-relaxed">
+            <p className="text-[#8BA3BC] max-w-2xl mx-auto text-lg leading-relaxed">
               Neeti AI is designed so that any government official — regardless of technical background — can be fully operational within minutes.
             </p>
           </FadeInSection>
@@ -462,26 +517,30 @@ export default function Landing() {
           <FadeInSection>
             <div className="relative">
               {/* Connecting Line between steps (desktop only) */}
-              <div className="hidden lg:block absolute top-6 left-[10%] right-[10%] h-px bg-gold/50 z-0"></div>
+              <div className="hidden lg:block absolute top-6 left-[12%] right-[12%] h-px bg-[#FF9933]/40 z-0"></div>
               
               <div className="grid grid-cols-1 lg:grid-cols-4 gap-12 lg:gap-6 relative z-10">
                 <StepCard 
                   number="1"
+                  hindiTag="पंजीकरण"
                   title="Register & Verify"
                   description="Sign up using your official government credentials. Your identity is verified through a secure, multi-layer authentication process."
                 />
                 <StepCard 
                   number="2"
+                  hindiTag="स्थापना"
                   title="Set Up Your Profile"
                   description="Define your department, jurisdiction, and areas of priority. Neeti AI personalises your dashboard based on your role and responsibilities."
                 />
                 <StepCard 
                   number="3"
+                  hindiTag="अपलोड"
                   title="Upload, Interact & Decide"
                   description="Upload documents, ask questions in plain language, schedule meetings, and receive intelligent recommendations — all within a single interface."
                 />
                 <StepCard 
                   number="4"
+                  hindiTag="निर्णय"
                   title="Act with Confidence"
                   description="With accurate summaries, reliable data, and AI-drafted communications at hand, take decisions faster and govern with greater impact."
                 />
@@ -492,30 +551,33 @@ export default function Landing() {
       </section>
 
       {/* --- [6] TESTIMONIALS SECTION --- */}
-      <section id="testimonials" className="py-24 bg-navy">
+      <section id="testimonials" className="py-24 bg-[#112236] relative">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <FadeInSection className="text-center mb-16">
-            <span className="text-gold text-sm font-bold uppercase tracking-[0.2em] block mb-4">Trusted By Leaders</span>
-            <h2 className="text-4xl md:text-5xl font-heading text-white">
+            <span className="text-[#FF9933] text-sm font-bold uppercase tracking-[0.3em] block mb-4 font-heading">TRUSTED BY LEADERS</span>
+            <h2 className="text-3xl md:text-4xl font-heading font-bold text-[#F8F4ED] uppercase tracking-tight">
               What Public Officials Are Saying.
             </h2>
           </FadeInSection>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <FadeInSection>
+            <FadeInSection className="h-full">
               <TestimonialCard 
+                index={0}
                 quote="Neeti AI has fundamentally changed how I prepare for district reviews. What used to take my team three days now takes three hours."
                 author="District Collector, Rajasthan"
               />
             </FadeInSection>
-            <FadeInSection>
+            <FadeInSection className="h-full">
               <TestimonialCard 
+                index={1}
                 quote="The document summarisation feature alone has saved countless hours of administrative effort. Every official should have access to this."
                 author="Additional Secretary, Ministry of Rural Development"
               />
             </FadeInSection>
-            <FadeInSection>
+            <FadeInSection className="h-full">
               <TestimonialCard 
+                index={2}
                 quote="For the first time, I have a real-time view of grievance redressal across my entire constituency. Neeti AI delivers what governance demands."
                 author="Member of Legislative Assembly, Maharashtra"
               />
@@ -525,25 +587,38 @@ export default function Landing() {
       </section>
 
       {/* --- [7] FINAL CTA SECTION --- */}
-      <section className="py-24 bg-offwhite">
-        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+      <section className="py-24 bg-[#0D1B2A] relative">
+        {/* Grid Texture */}
+        <div className="absolute inset-0 opacity-[0.025] pointer-events-none"
+             style={{ backgroundImage: 'linear-gradient(#FF9933 1px, transparent 1px), linear-gradient(90deg, #FF9933 1px, transparent 1px)', backgroundSize: '48px 48px' }}>
+        </div>
+
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           <FadeInSection>
-            <div className="bg-navy p-12 md:p-16 text-center shadow-2xl relative overflow-hidden">
-              <div className="absolute top-0 left-0 w-full h-1 bg-gold"></div>
+            <div className="bg-[#112236] p-12 md:p-16 text-center shadow-2xl relative overflow-hidden border border-[#1E3A5F]">
+              <div className="absolute top-0 left-0 w-full h-1 bg-[#FF9933]"></div>
               
-              <h2 className="text-3xl md:text-5xl font-heading text-white mb-6">
+              <h2 className="text-3xl md:text-4xl font-heading font-bold text-[#F8F4ED] mb-6 uppercase tracking-tight">
                 Governance Deserves Better Tools.<br />
                 Start Today.
               </h2>
-              <p className="text-white/70 text-lg mb-10 max-w-2xl mx-auto">
+              <p className="font-hindi italic text-xl text-[#FF9933] mb-10 max-w-2xl mx-auto">
                 Join hundreds of officials already using Neeti AI to serve their citizens faster, smarter, and with greater accountability.
               </p>
               
-              <Link to="/login" className="bg-gold hover:bg-gold/90 text-navy px-8 py-4 rounded-sm text-lg font-bold transition-colors inline-block mb-8 shadow-lg">
-                Create Your Official Account &rarr;
-              </Link>
+              <div className="flex flex-col items-center">
+                <Link to="/login" className="bg-[#FF9933] hover:bg-[#FF9933]/90 text-[#0D1B2A] px-8 sm:px-12 py-4 sm:py-5 rounded-none text-lg sm:text-xl font-bold transition-all inline-block mb-1 shadow-2xl shadow-[#FF9933]/25 uppercase tracking-tight font-heading w-full max-w-md hover:-translate-y-1" style={{ borderRadius: '2px' }}>
+                  Create Your Official Account &rarr;
+                </Link>
+                {/* Tricolor bar below button */}
+                <div className="w-full max-w-md h-1 flex mb-8">
+                  <div className="flex-1 bg-[#FF9933]"></div>
+                  <div className="flex-1 bg-white"></div>
+                  <div className="flex-1 bg-[#138808]"></div>
+                </div>
+              </div>
               
-              <div className="text-white/60 text-sm space-y-1">
+              <div className="text-[#8BA3BC] text-xs space-y-1 uppercase tracking-normal font-normal opacity-80 mt-4">
                 <p>Access is restricted to verified government officials and public administrators only.</p>
                 <p>Your data is protected under the highest standards of government-grade security.</p>
               </div>
@@ -553,30 +628,49 @@ export default function Landing() {
       </section>
 
       {/* --- [8] FOOTER --- */}
-      <footer className="bg-navy border-t border-white/10 pt-16 pb-8">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <footer className="bg-black relative pt-3">
+        {/* Tricolor Line at very top */}
+        <div className="absolute top-0 left-0 w-full h-[3px] flex">
+          <div className="flex-1 bg-[#FF9933]"></div>
+          <div className="flex-1 bg-white"></div>
+          <div className="flex-1 bg-[#138808]"></div>
+        </div>
+
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-16 pb-8 border-t border-[#1E3A5F]">
           <div className="flex flex-col md:flex-row justify-between items-center md:items-start mb-12">
             
             <div className="mb-8 md:mb-0 text-center md:text-left">
-              <span className="text-2xl font-bold font-heading text-white tracking-wide block mb-2">
-                Neeti AI
-              </span>
-              <span className="text-sm text-white/70">
+              <div className="flex items-center justify-center md:justify-start gap-3 mb-4">
+                <AshokaChakra size={28} className="text-[#FF9933]" />
+                <div className="flex flex-col md:flex-row md:items-baseline gap-1 md:gap-3">
+                  <span className="text-xl font-heading text-white tracking-normal uppercase font-normal">
+                    NEETI AI
+                  </span>
+                  <span className="text-lg font-hindi italic text-[#FF9933]">
+                    नीति AI
+                  </span>
+                </div>
+              </div>
+              <span className="text-xs text-[#8BA3BC] uppercase tracking-normal font-normal">
                 Intelligence in Service of the Nation.
               </span>
             </div>
 
-            <div className="flex flex-wrap justify-center md:justify-end gap-6 text-sm text-white/80">
-              <a href="#" className="hover:text-gold transition-colors">About Us</a>
-              <a href="#features" className="hover:text-gold transition-colors">Features</a>
-              <a href="#" className="hover:text-gold transition-colors">Security & Privacy</a>
-              <a href="#" className="hover:text-gold transition-colors">Contact Us</a>
-              <a href="#" className="hover:text-gold transition-colors">Terms of Use</a>
+            <div className="flex flex-col items-center md:items-end gap-6">
+              <div className="flex flex-wrap justify-center md:justify-end gap-8 text-[11px] text-[#8BA3BC] font-heading font-bold uppercase tracking-[0.2em]">
+                <a href="#" className="hover:text-[#FF9933] transition-colors">About</a>
+                <a href="#features" className="hover:text-[#FF9933] transition-colors">Features</a>
+                <a href="#" className="hover:text-[#FF9933] transition-colors">Security</a>
+                <a href="#" className="hover:text-[#FF9933] transition-colors">Privacy</a>
+                <a href="#" className="hover:text-[#FF9933] transition-colors">Contact</a>
+              </div>
+              <p className="font-hindi italic text-lg text-[#FF9933]">जय हिन्द 🇮🇳</p>
             </div>
           </div>
 
-          <div className="pt-8 border-t border-white/10 text-center text-xs text-white/50">
-            &copy; 2025 Neeti AI. All Rights Reserved. | Built for Bharat's Public Leaders.
+          <div className="pt-8 border-t border-[#1E3A5F] flex flex-col md:flex-row justify-between items-center gap-4 text-[10px] text-[#8BA3BC] font-heading font-bold uppercase tracking-tight">
+            <div>&copy; 2026 Neeti AI. Built for Bharat's Public Leaders.</div>
+            <div className="text-[#FF9933] font-hindi italic text-lg opacity-90">सत्यमेव जयते</div>
           </div>
         </div>
       </footer>
@@ -586,40 +680,52 @@ export default function Landing() {
 
 // Sub-components for repeatable sections
 
-function FeatureCard({ id, icon, title, description }) {
+function FeatureCard({ id, icon, title, description, index }) {
+  const borderColors = ['border-[#FF9933]', 'border-white', 'border-[#138808]'];
+  const borderColor = borderColors[index % 3];
+
   return (
     <div id={id} className="scroll-mt-24 h-full">
-      <FadeInSection>
-        <div className="bg-white p-8 border-l-4 border-navy shadow-sm hover:shadow-md transition-shadow h-full flex flex-col group">
-          <div className="mb-6 bg-offwhite w-16 h-16 flex items-center justify-center rounded-sm transition-colors group-hover:bg-navy/5">
+      <FadeInSection className="h-full">
+        <div className={`bg-[#112236] p-6 sm:p-8 border-l-4 ${borderColor} border border-[#1E3A5F] shadow-sm hover:shadow-2xl hover:shadow-[#FF9933]/5 transition-all duration-500 h-full flex flex-col group hover:-translate-y-2 relative overflow-hidden`}>
+          {/* Subtle Glow Overlay */}
+          <div className={`absolute inset-0 opacity-0 group-hover:opacity-10 transition-opacity duration-500 bg-gradient-to-br from-white/10 to-transparent pointer-events-none`}></div>
+          
+          <div className="mb-6 bg-[#1E3A5F] w-16 h-16 flex items-center justify-center rounded-none transition-all duration-500 group-hover:bg-[#FF9933] group-hover:text-[#0D1B2A] text-[#FF9933] shadow-inner">
             {icon}
           </div>
-          <h3 className="text-xl font-bold text-navy mb-4 font-heading">{title}</h3>
-          <p className="text-gray-600 leading-relaxed grow">{description}</p>
+          <h3 className="text-xl font-bold text-[#F8F4ED] mb-4 font-heading uppercase tracking-tight">{title}</h3>
+          <p className="font-sans leading-relaxed text-[#8BA3BC] font-normal">{description}</p>
         </div>
       </FadeInSection>
     </div>
   );
 }
 
-function StepCard({ number, title, description }) {
+function StepCard({ number, title, description, hindiTag }) {
   return (
-    <div className="flex flex-col items-center text-center lg:items-start lg:text-left">
-      <div className="w-12 h-12 rounded-full border-2 border-gold bg-white text-navy font-bold text-xl flex items-center justify-center mb-6 z-10 mx-auto lg:mx-0 shadow-sm relative">
-        {number}
+    <div className="flex flex-col items-center text-center lg:items-start lg:text-left group">
+      <div className="flex flex-col items-center lg:items-start mb-6">
+        <div className="w-12 h-12 rounded-none bg-[#FF9933] text-[#0D1B2A] font-bold text-xl flex items-center justify-center z-10 shadow-lg font-heading transition-transform duration-500 group-hover:scale-110 group-hover:rotate-3" style={{ borderRadius: '2px' }}>
+          {number}
+        </div>
+        <span className="font-hindi italic text-xs text-[#FF9933]/60 mt-2 transition-opacity duration-500 group-hover:opacity-100">{hindiTag}</span>
       </div>
-      <h3 className="text-xl font-bold text-navy mb-3">{title}</h3>
-      <p className="text-gray-600 leading-relaxed lg:pr-4">{description}</p>
+      <h3 className="text-xl font-bold text-[#F8F4ED] mb-3 font-heading uppercase tracking-tight">{title}</h3>
+      <p className="text-[#8BA3BC] leading-relaxed lg:pr-4">{description}</p>
     </div>
   );
 }
 
-function TestimonialCard({ quote, author }) {
+function TestimonialCard({ quote, author, index }) {
+  const borderColors = ['border-[#FF9933]', 'border-white', 'border-[#138808]'];
+  const borderColor = borderColors[index % 3];
+
   return (
-    <div className="bg-[#0f213a] p-8 border-t-2 border-gold rounded-sm h-full flex flex-col relative">
-      <Quote className="text-gold/20 absolute top-6 right-6" size={48} />
-      <p className="text-white text-lg italic leading-relaxed mb-8 grow relative z-10">"{quote}"</p>
-      <p className="text-white/50 text-sm font-semibold tracking-wider uppercase">{author}</p>
+    <div className={`bg-[#0D1B2A] p-6 sm:p-8 border-t-4 ${borderColor} rounded-none h-full flex flex-col relative border border-[#1E3A5F] shadow-xl group hover:-translate-y-2 hover:shadow-2xl hover:shadow-[#FF9933]/5 transition-all duration-500`}>
+      <span className="text-6xl text-[#FF9933]/20 font-hindi leading-none absolute top-4 left-4 pointer-events-none select-none transition-transform duration-500 group-hover:scale-110 group-hover:-translate-y-1">“</span>
+      <p className="text-[#8BA3BC] text-lg italic font-hindi leading-relaxed mb-8 grow relative z-10 pt-4 group-hover:text-[#F8F4ED] transition-colors duration-500">"{quote}"</p>
+      <p className="text-[#FF9933]/60 text-[10px] font-bold tracking-[0.2em] font-heading uppercase group-hover:text-[#FF9933] transition-colors duration-500">{author}</p>
     </div>
   );
 }

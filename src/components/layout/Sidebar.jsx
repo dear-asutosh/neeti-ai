@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
-import { 
-  Home, 
-  FileText, 
+import {
+  Home,
+  FileText,
   Mic,
   MessageSquare,
-  Calendar, 
+  Calendar,
   BarChart3,
   Map,
   Settings,
@@ -70,7 +70,7 @@ export default function Sidebar({ mobileOpen, setMobileOpen }) {
     <>
       {/* Mobile Overlay */}
       {mobileOpen && (
-        <div 
+        <div
           className="fixed inset-0 bg-black/50 z-10 md:hidden transition-opacity"
           onClick={() => setMobileOpen(false)}
         />
@@ -144,14 +144,14 @@ export default function Sidebar({ mobileOpen, setMobileOpen }) {
             {isCollapsed ? <ChevronRight className="w-4 h-4" /> : <ChevronLeft className="w-4 h-4" />}
             {!isCollapsed && <span>Collapse</span>}
           </button>
-          
+
           {/* Profile Section */}
           <div className="relative group">
             {/* Hover Menu */}
             <div className={`absolute bottom-full left-0 mb-2 bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 rounded-md shadow-lg overflow-hidden transition-all duration-200 opacity-0 invisible group-hover:opacity-100 group-hover:visible flex flex-col z-50
               ${isCollapsed ? 'left-full ml-2 w-48' : 'w-full'}
             `}>
-              <NavLink 
+              <NavLink
                 to="/settings"
                 onClick={() => setMobileOpen(false)}
                 className="flex items-center gap-3 px-3 py-2 text-sm text-zinc-600 dark:text-zinc-300 hover:bg-gray-100 dark:hover:bg-zinc-800 hover:text-zinc-900 dark:hover:text-zinc-50 w-full text-left transition-colors font-medium"

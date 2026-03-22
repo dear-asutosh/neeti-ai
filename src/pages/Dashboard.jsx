@@ -4,13 +4,13 @@ import { useAuth } from '../hooks/useAuth';
 import { db } from '../services/firebase';
 import { collection, onSnapshot, query, orderBy, limit, where, Timestamp } from 'firebase/firestore';
 import {
-  FileText, 
-  Mic, 
-  ImageIcon, 
-  Map, 
-  TrendingUp, 
-  Clock, 
-  Calendar as CalendarIcon, 
+  FileText,
+  Mic,
+  ImageIcon,
+  Map,
+  TrendingUp,
+  Clock,
+  Calendar as CalendarIcon,
   ChevronRight,
   Activity,
   CheckCircle2,
@@ -41,7 +41,7 @@ export default function Dashboard() {
     const unsubMeetings = onSnapshot(qMeetings, (snap) => {
       setMeetingCount(snap.size);
     });
-    
+
     // Listen to Constituents (Assuming this collection might exist later)
     const qConst = query(collection(db, 'users', currentUser.uid, 'constituents'), limit(5));
     const unsubConst = onSnapshot(qConst, (snap) => {
@@ -51,9 +51,9 @@ export default function Dashboard() {
     // Listen to Next Schedule Event
     const now = new Date();
     const qUpcoming = query(
-      collection(db, 'users', currentUser.uid, 'scheduleEvents'), 
+      collection(db, 'users', currentUser.uid, 'scheduleEvents'),
       where('startTime', '>=', now),
-      orderBy('startTime', 'asc'), 
+      orderBy('startTime', 'asc'),
       limit(1)
     );
     const unsubUpcoming = onSnapshot(qUpcoming, (snap) => {
@@ -80,7 +80,7 @@ export default function Dashboard() {
   // Combine recent activity
   useEffect(() => {
     if (!currentUser?.uid) return;
-    
+
     let docsData = [];
     let meetingsData = [];
 
@@ -165,7 +165,7 @@ export default function Dashboard() {
 
   // Format current date and greeting
   const today = new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' });
-  
+
   const getGreeting = () => {
     const hour = new Date().getHours();
     if (hour >= 4 && hour < 12) return "Good morning";
@@ -181,12 +181,12 @@ export default function Dashboard() {
     const todayDate = new Date();
     const tomorrowDate = new Date(todayDate);
     tomorrowDate.setDate(tomorrowDate.getDate() + 1);
-    
+
     const isToday = todayDate.getDate() === dateObj.getDate() && todayDate.getMonth() === dateObj.getMonth() && todayDate.getFullYear() === dateObj.getFullYear();
     const isTomorrow = tomorrowDate.getDate() === dateObj.getDate() && tomorrowDate.getMonth() === dateObj.getMonth() && tomorrowDate.getFullYear() === dateObj.getFullYear();
-    
+
     const timeStr = dateObj.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true });
-    
+
     if (isToday) return `Today, ${timeStr}`;
     if (isTomorrow) return `Tomorrow, ${timeStr}`;
     return `${dateObj.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })}, ${timeStr}`;
@@ -202,7 +202,7 @@ export default function Dashboard() {
   return (
     <div className="min-h-full bg-gray-50 dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100 p-4 md:p-2 lg:p-4 font-sans transition-colors duration-300">
       <div className="max-w-7xl mx-auto space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700 relative">
-        
+
         {/* Decorative Background Elements */}
         <div className="absolute top-0 left-1/4 w-96 h-96 bg-indigo-500/10 rounded-full blur-[120px] -z-10 pointer-events-none"></div>
         <div className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-emerald-500/10 rounded-full blur-[100px] -z-10 pointer-events-none"></div>
@@ -232,10 +232,10 @@ export default function Dashboard() {
 
         {/* 2. Bento Grid Layout */}
         <div className="grid grid-cols-1 md:grid-cols-12 gap-6 lg:gap-8">
-          
+
           {/* Main Left Column (Stats + Quick Actions) */}
           <div className="md:col-span-8 space-y-6 lg:space-y-8">
-            
+
             {/* Top Stats Row */}
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 lg:gap-6">
               {stats.map((stat, i) => (
@@ -283,7 +283,7 @@ export default function Dashboard() {
 
           {/* Right Column (Recent Activity + Mini Schedule) */}
           <div className="md:col-span-4 space-y-6 lg:space-y-8">
-            
+
             {/* Recent Activity List */}
             <div className="bg-white dark:bg-zinc-900/80 backdrop-blur-md border border-gray-200 dark:border-zinc-800 rounded-2xl p-6 shadow-sm h-full max-h-[400px] flex flex-col">
               <div className="flex items-center justify-between mb-6 shrink-0">
@@ -336,8 +336,8 @@ export default function Dashboard() {
                 {nextEvent ? (
                   <div className="bg-gray-50 dark:bg-zinc-950/50 backdrop-blur-md rounded-xl p-4 border border-gray-100 dark:border-zinc-800/80">
                     <div className="flex items-center justify-between mb-2">
-                       <p className="text-[11px] font-black text-indigo-600 dark:text-indigo-400 uppercase tracking-wider transition-colors">{formatEventTime(nextEvent.startTime)}</p>
-                       <span className="flex items-center gap-1.5 transition-colors"><span className={`w-1.5 h-1.5 rounded-full ${CATEGORY_COLORS[nextEvent.category] || CATEGORY_COLORS['Meeting']}`}></span><span className="text-[10px] text-zinc-500 dark:text-zinc-400 font-bold uppercase tracking-wider">{nextEvent.category}</span></span>
+                      <p className="text-[11px] font-black text-indigo-600 dark:text-indigo-400 uppercase tracking-wider transition-colors">{formatEventTime(nextEvent.startTime)}</p>
+                      <span className="flex items-center gap-1.5 transition-colors"><span className={`w-1.5 h-1.5 rounded-full ${CATEGORY_COLORS[nextEvent.category] || CATEGORY_COLORS['Meeting']}`}></span><span className="text-[10px] text-zinc-500 dark:text-zinc-400 font-bold uppercase tracking-wider">{nextEvent.category}</span></span>
                     </div>
                     <p className="text-sm font-black text-zinc-900 dark:text-zinc-100 leading-snug mb-1 transition-colors">{nextEvent.title}</p>
                     {nextEvent.description && <p className="text-xs text-zinc-500 dark:text-zinc-400 line-clamp-1 transition-colors">{nextEvent.description}</p>}
@@ -347,7 +347,7 @@ export default function Dashboard() {
                     <p className="text-sm text-zinc-500 dark:text-zinc-500 font-bold tracking-wide transition-colors">No upcoming events</p>
                   </div>
                 )}
-                <button 
+                <button
                   onClick={() => navigate('/schedule')}
                   className="w-full mt-4 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-medium rounded-xl transition-all shadow-md shadow-indigo-900/20"
                 >
