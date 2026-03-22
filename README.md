@@ -102,7 +102,7 @@ VITE_GROQ_API_KEY=your_groq_key
 ### **Local Deployment**
 ```bash
 # Clone
-git clone https://github.com/asutosh/neeti-ai.git
+git clone https://github.com/dear-asutosh/neeti-ai.git
 
 # Install
 npm install
