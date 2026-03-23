@@ -9,6 +9,7 @@ import mammoth from 'mammoth';
 import { UploadCloud, FileText, CheckCircle, Clock, Download, Share2, Send, Loader2, BookOpen, Book, File, CornerDownRight, MessageSquare, History } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import { createPortal } from 'react-dom';
+import Tesseract from 'tesseract.js';
 
 if (typeof window !== 'undefined') {
   pdfjsLib.GlobalWorkerOptions.workerSrc = pdfWorkerUrl;
@@ -113,6 +114,26 @@ export default function Documents() {
         // Log individual page items for debugging
         if (text.trim().length === 0) {
           console.error("PDF text extraction returned empty text. PDF might be a scanned image.");
+          setProcessingStatus('Performing OCR (this may take a minute)...');
+          
+          let ocrText = '';
+          for (let i = 1; i <= pdf.numPages; i++) {
+            setProcessingStatus(`Performing OCR on page ${i} of ${pdf.numPages}...`);
+            const page = await pdf.getPage(i);
+            const viewport = page.getViewport({ scale: 2.0 }); // Higher scale for better OCR
+            const canvas = document.createElement('canvas');
+            const context = canvas.getContext('2d');
+            canvas.height = viewport.height;
+            canvas.width = viewport.width;
+            
+            await page.render({ canvasContext: context, viewport: viewport }).promise;
+            
+            const { data: { text: pageText } } = await Tesseract.recognize(canvas, 'eng', {
+              logger: m => console.log(m)
+            });
+            ocrText += pageText + '\n';
+          }
+          text = ocrText;
         }
       } else if (file.type === 'text/plain' || file.name.endsWith('.txt')) {
         text = await file.text();
@@ -294,7 +315,12 @@ Do not include any text before or after the JSON.`
   const uploadPanelContent = (
     <div
       className={`bg-white dark:bg-zinc-900/50 rounded-2xl shadow-sm border ${isProcessing ? 'border-indigo-500/30 bg-indigo-500/5' : 'border-gray-200 dark:border-zinc-800 border-dashed hover:border-indigo-500/50 hover:bg-gray-50 dark:hover:bg-zinc-900'} p-4 md:p-5 flex flex-col items-center justify-center text-center transition-all cursor-pointer shadow-xs`}
-      onClick={() => !isProcessing && fileInputRef.current?.click()}
+      onClick={(e) => {
+        // Only trigger programmatic click if not clicking the label directly
+        if (!isProcessing && !e.target.closest('label')) {
+          fileInputRef.current?.click();
+        }
+      }}
       onDragOver={handleDragOver}
       onDrop={handleDrop}
     >
@@ -314,17 +340,26 @@ Do not include any text before or after the JSON.`
       </p>
 
       <input
+        id="document-upload-input"
         type="file"
         className="hidden"
         ref={fileInputRef}
         accept=".pdf,.docx,.txt"
-        onChange={(e) => { if (e.target.files?.[0]) processFile(e.target.files[0]); }}
+        onChange={(e) => { 
+          if (e.target.files?.[0]) {
+            processFile(e.target.files[0]);
+            e.target.value = ''; 
+          }
+        }}
       />
 
       {!isProcessing && (
-        <button className="mt-6 px-4 py-2 bg-white dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 rounded-lg text-sm font-medium text-zinc-700 dark:text-zinc-200 hover:bg-gray-50 dark:hover:bg-zinc-700 hover:text-zinc-900 dark:hover:text-white transition-colors shadow-sm">
+        <label 
+          htmlFor="document-upload-input"
+          className="mt-6 px-4 py-2 bg-white dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 rounded-lg text-sm font-medium text-zinc-700 dark:text-zinc-200 hover:bg-gray-50 dark:hover:bg-zinc-700 hover:text-zinc-900 dark:hover:text-white transition-colors shadow-sm cursor-pointer"
+        >
           Browse Files
-        </button>
+        </label>
       )}
 
       {activeDoc && isProcessing && (
