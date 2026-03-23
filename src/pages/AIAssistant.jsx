@@ -168,17 +168,16 @@ export default function AIAssistant() {
     return () => unsubscribe();
   }, [currentUser, activeThreadId, initialLoading]);
 
-  // Load Active Thread Messages
   useEffect(() => {
-    if (!currentUser || !activeThreadId) {
-      // If no active thread and not loading, show welcome
-      if (!initialLoading && !activeThreadId) {
-        setMessages([{
-          role: 'assistant',
-          content: "Welcome to Neeti AI Assistant. I have access to your workspace — your documents, meetings, schedule, constituency complaints, and projects. How can I help you today?",
-          timestamp: Date.now()
-        }]);
-      }
+    if (!currentUser) return;
+
+    if (!activeThreadId) {
+      // Show welcome message for a new, empty chat
+      setMessages([{
+        role: 'assistant',
+        content: "Welcome to Neeti AI Assistant. I have access to your workspace — your documents, meetings, schedule, constituency complaints, and projects. How can I help you today?",
+        timestamp: Date.now()
+      }]);
       return;
     }
 
@@ -190,11 +189,10 @@ export default function AIAssistant() {
     });
 
     return () => unsubscribe();
-  }, [currentUser, activeThreadId, initialLoading]);
+  }, [currentUser, activeThreadId]);
 
   const handleNewChat = () => {
     setActiveThreadId(null);
-    setMessages([]);
     setInput('');
     setIsSidebarOpen(false);
     setEditingThreadId(null);
