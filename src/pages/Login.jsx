@@ -9,11 +9,12 @@ import {
 } from 'firebase/auth';
 import { doc, getDoc, setDoc, serverTimestamp } from 'firebase/firestore';
 import { 
-  ChevronRight, User, Mail, Lock, Loader2, CheckCircle2, ShieldCheck, ArrowLeft
+  ChevronRight, User, Mail, Lock, Loader2, CheckCircle2, ShieldCheck, ArrowLeft, Eye, EyeOff
 } from 'lucide-react';
 import { auth, db } from '../services/firebase';
 import { generateOTP, sendOTPEmail } from '../services/emailService';
 import { toast } from 'react-toastify';
+import { checkPasswordStrength, generateStrongPassword } from '../utils/passwordUtils';
 
 export default function Login() {
   const [isLogin, setIsLogin] = useState(true);
@@ -24,6 +25,8 @@ export default function Login() {
   const [password, setPassword] = useState('');
   const [fullName, setFullName] = useState('');
   const [designation, setDesignation] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [passwordStrength, setPasswordStrength] = useState({ score: 0, feedback: [], isStrong: false });
 
   // OTP Verification States
   const [showOTP, setShowOTP] = useState(false);
@@ -45,6 +48,12 @@ export default function Login() {
     }
     return () => clearInterval(interval);
   }, [resendTimer]);
+
+  useEffect(() => {
+    if (!isLogin) {
+      setPasswordStrength(checkPasswordStrength(password));
+    }
+  }, [password, isLogin]);
 
   // Removed getRedirectResult useEffect as we will use signInWithPopup now
 
@@ -100,6 +109,14 @@ export default function Login() {
         setLoading(false);
         navigate('/');
       } else {
+        // Enforce strong password for registration
+        const strength = checkPasswordStrength(password);
+        if (!strength.isStrong) {
+          toast.error("Please use a stronger password. It should be at least 8 characters with upper, lower, and numbers/symbols.");
+          setLoading(false);
+          return;
+        }
+
         // Step 1: Initiating Signup with OTP
         const newOTP = generateOTP();
         setGeneratedOTP(newOTP);
@@ -196,6 +213,7 @@ export default function Login() {
     setIsLogin(!isLogin);
     setShowOTP(false);
     setOtp('');
+    setShowPassword(false);
   };
 
   return (
@@ -310,12 +328,69 @@ export default function Login() {
                           />
                         </div>
                         <div className="space-y-2">
-                          <label className="text-[10px] font-black text-zinc-400 dark:text-zinc-500 uppercase tracking-widest pl-1">Password</label>
-                          <input 
-                            type="password" required value={password} onChange={(e) => setPassword(e.target.value)}
-                            placeholder="••••••••"
-                            className="w-full px-4 py-4 bg-gray-50 dark:bg-zinc-800/50 border border-gray-200 dark:border-zinc-800 rounded-2xl focus:outline-none focus:border-indigo-500 transition-all dark:text-white"
-                          />
+                          <div className="flex justify-between items-center pr-1">
+                            <label className="text-[10px] font-black text-zinc-400 dark:text-zinc-500 uppercase tracking-widest pl-1">Password</label>
+                            <button 
+                              type="button"
+                              onClick={() => {
+                                const strong = generateStrongPassword();
+                                setPassword(strong);
+                                toast.info("Strong password suggested!");
+                              }}
+                              className="text-[10px] font-bold text-indigo-500 hover:text-indigo-400 uppercase tracking-widest"
+                            >
+                              Suggest Strong
+                            </button>
+                          </div>
+                          <div className="relative group">
+                            <input 
+                              type={showPassword ? 'text' : 'password'} required value={password} onChange={(e) => setPassword(e.target.value)}
+                              placeholder="••••••••"
+                              className="w-full pl-4 pr-12 py-4 bg-gray-50 dark:bg-zinc-800/50 border border-gray-200 dark:border-zinc-800 rounded-2xl focus:outline-none focus:border-indigo-500 transition-all dark:text-white"
+                            />
+                            <button
+                              type="button"
+                              onClick={() => setShowPassword(!showPassword)}
+                              className="absolute right-4 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-indigo-500 transition-colors z-10"
+                            >
+                              {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                            </button>
+                          </div>
+                          {password && (
+                            <div className="px-1 pt-1">
+                              <div className="flex gap-1 mb-1">
+                                {[...Array(4)].map((_, i) => (
+                                  <div 
+                                    key={i} 
+                                    className={`h-1 flex-1 rounded-full transition-all duration-500 ${
+                                      i < passwordStrength.score 
+                                        ? (passwordStrength.score <= 1 ? 'bg-red-500' : 
+                                           passwordStrength.score <= 3 ? 'bg-yellow-500' : 'bg-green-500')
+                                        : 'bg-gray-200 dark:bg-zinc-800'
+                                    }`}
+                                  />
+                                ))}
+                              </div>
+                              <p className={`text-[10px] font-medium transition-colors ${
+                                passwordStrength.score <= 1 ? 'text-red-500' : 
+                                passwordStrength.score <= 3 ? 'text-yellow-500' : 'text-green-500'
+                              }`}>
+                                {passwordStrength.score <= 1 ? 'Weak' : 
+                                 passwordStrength.score <= 2 ? 'Fair' : 
+                                 passwordStrength.score <= 3 ? 'Good' : 'Very Strong'}
+                              </p>
+                              {passwordStrength.feedback.length > 0 && passwordStrength.score < 4 && (
+                                <ul className="mt-1 space-y-0.5">
+                                  {passwordStrength.feedback.map((f, i) => (
+                                    <li key={i} className="text-[9px] text-zinc-500 flex items-center gap-1">
+                                      <div className="w-1 h-1 rounded-full bg-zinc-400" />
+                                      {f}
+                                    </li>
+                                  ))}
+                                </ul>
+                              )}
+                            </div>
+                          )}
                         </div>
                       </div>
                     </div>
@@ -439,10 +514,17 @@ export default function Login() {
                     <div className="relative group">
                       <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400 group-focus-within:text-indigo-500 transition-colors" />
                       <input 
-                        type="password" required value={password} onChange={(e) => setPassword(e.target.value)}
+                        type={showPassword ? 'text' : 'password'} required value={password} onChange={(e) => setPassword(e.target.value)}
                         placeholder="••••••••"
-                        className="w-full pl-12 pr-4 py-4 bg-gray-50 dark:bg-zinc-800/50 border border-gray-200 dark:border-zinc-800 rounded-2xl focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all dark:text-white font-medium"
+                        className="w-full pl-12 pr-12 py-4 bg-gray-50 dark:bg-zinc-800/50 border border-gray-200 dark:border-zinc-800 rounded-2xl focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all dark:text-white font-medium"
                       />
+                      <button
+                        type="button"
+                        onClick={() => setShowPassword(!showPassword)}
+                        className="absolute right-4 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-indigo-500 transition-colors z-10"
+                      >
+                        {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                      </button>
                     </div>
                   </div>
                 </div>
