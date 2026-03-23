@@ -1,6 +1,13 @@
 import React, { useState, useRef } from 'react';
-import { Settings as SettingsIcon, Camera, Loader2, User, ShieldCheck } from 'lucide-react';
-import { updateProfile, deleteUser } from 'firebase/auth';
+import { Settings as SettingsIcon, Camera, Loader2, User, ShieldCheck, AlertTriangle, Trash2, Mail } from 'lucide-react';
+import { 
+  updateProfile, 
+  deleteUser, 
+  reauthenticateWithCredential, 
+  reauthenticateWithPopup, 
+  GoogleAuthProvider, 
+  EmailAuthProvider 
+} from 'firebase/auth';
 import { doc, setDoc, deleteDoc } from 'firebase/firestore';
 import { auth, db } from '../services/firebase';
 import { useAuth } from '../hooks/useAuth';
@@ -8,7 +15,7 @@ import { useTheme } from '../context/ThemeContext';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { StyledSwal } from '../utils/sweetalert';
-import { AlertTriangle, Trash2 } from 'lucide-react';
+import { generateOTP, sendOTPEmail, EMAIL_TEMPLATES } from '../services/emailService';
 
 export default function Settings() {
   const { currentUser, dbUser } = useAuth();
@@ -93,12 +100,42 @@ export default function Settings() {
 
   const handleDeleteAccount = async () => {
     try {
-      const result = await StyledSwal.fire({
-        title: 'Delete Account?',
-        text: "This action is permanent and cannot be undone. All your data will be wiped.",
+      // 1. Initial Confirmation & Process Explanation
+      const confirmResult = await StyledSwal.fire({
+        title: 'Begin Account Deletion?',
+        html: `
+          <div class="space-y-4 text-left">
+            <p class="text-sm text-zinc-600 dark:text-zinc-400 leading-relaxed mb-6">
+              To ensure the security of your administrative data, the deletion process follows a <strong>two-step verification protocol</strong>:
+            </p>
+            <div class="space-y-3">
+              <div class="flex items-start gap-4 p-4 bg-gray-50 dark:bg-zinc-800/40 rounded-2xl border border-gray-100 dark:border-zinc-800/60 transition-all hover:bg-white dark:hover:bg-zinc-800 group shadow-sm">
+                <div class="bg-indigo-600/10 dark:bg-indigo-400/10 p-2.5 rounded-xl group-hover:scale-110 transition-transform flex-shrink-0">
+                  <span class="text-indigo-600 dark:text-indigo-400 font-black text-xs px-1">01</span>
+                </div>
+                <div>
+                  <h4 class="text-sm font-bold text-zinc-900 dark:text-white">Account Verification</h4>
+                  <p class="text-[11px] text-zinc-500 dark:text-zinc-400 leading-normal mt-0.5">Verify your session via your linked provider (Google or Account Password).</p>
+                </div>
+              </div>
+              <div class="flex items-start gap-4 p-4 bg-gray-50 dark:bg-zinc-800/40 rounded-2xl border border-gray-100 dark:border-zinc-800/60 transition-all hover:bg-white dark:hover:bg-zinc-800 group shadow-sm">
+                <div class="bg-indigo-600/10 dark:bg-indigo-400/10 p-2.5 rounded-xl group-hover:scale-110 transition-transform flex-shrink-0">
+                  <span class="text-indigo-600 dark:text-indigo-400 font-black text-xs px-1">02</span>
+                </div>
+                <div>
+                  <h4 class="text-sm font-bold text-zinc-900 dark:text-white">OTP Confirmation</h4>
+                  <p class="text-[11px] text-zinc-500 dark:text-zinc-400 leading-normal mt-0.5">Enter the security code sent to your registered email to confirm the data wipe.</p>
+                </div>
+              </div>
+            </div>
+            <div class="mt-6 pt-4 border-t border-gray-100 dark:border-zinc-800">
+               <p class="text-[10px] text-red-500 font-black uppercase tracking-widest pl-1">⚠ This action is permanent and completely irreversible.</p>
+            </div>
+          </div>
+        `,
         icon: 'warning',
         showCancelButton: true,
-        confirmButtonText: 'Yes, Delete Permanently',
+        confirmButtonText: 'Start Verification',
         cancelButtonText: 'Cancel',
         confirmButtonColor: '#ef4444',
         customClass: {
@@ -107,13 +144,130 @@ export default function Settings() {
         }
       });
 
-      if (result.isConfirmed) {
+      if (!confirmResult.isConfirmed) return;
+
+      setSaving(true);
+
+      // 2. High-Security Identity Re-verification (In-place)
+      const providerId = currentUser.providerData[0]?.providerId;
+      
+      if (providerId === 'google.com') {
+        try {
+          const provider = new GoogleAuthProvider();
+          await reauthenticateWithPopup(currentUser, provider);
+          toast.success("Identity verified successfully.");
+        } catch (reauthErr) {
+          console.error("Google reauth error:", reauthErr);
+          if (reauthErr.code !== 'auth/popup-closed-by-user') {
+            toast.error("Security verification failed. Please try again.");
+          }
+          setSaving(false);
+          return;
+        }
+      } else {
+        // Password re-authentication for email-based login
+        const { isConfirmed: pwdConfirmed } = await StyledSwal.fire({
+          title: 'Confirm Identity',
+          text: 'To proceed with deletion, please enter your account password for verification.',
+          input: 'password',
+          inputAttributes: {
+            autocapitalize: 'off',
+            autofocus: 'true',
+            placeholder: 'Enter your password'
+          },
+          showCancelButton: true,
+          confirmButtonText: 'Verify Identity',
+          cancelButtonText: 'Cancel',
+          showLoaderOnConfirm: true,
+          customClass: {
+            input: 'dark:bg-zinc-950 dark:text-white border-zinc-200 dark:border-zinc-800 rounded-xl focus:ring-indigo-500 mx-auto max-w-[80%]',
+            confirmButton: 'px-8 py-3 bg-indigo-600 hover:bg-indigo-500 text-white font-bold rounded-2xl shadow-lg shadow-indigo-500/20 transition-all active:scale-[0.98] outline-none border-none',
+            cancelButton: 'px-8 py-3 bg-gray-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-300 font-bold rounded-2xl transition-all active:scale-[0.98] outline-none border-none mr-2',
+          },
+          preConfirm: async (val) => {
+            if (!val) {
+              StyledSwal.showValidationMessage('Password is required');
+              return false;
+            }
+            try {
+              const credential = EmailAuthProvider.credential(currentUser.email, val);
+              await reauthenticateWithCredential(currentUser, credential);
+              return true;
+            } catch (err) {
+              console.error("Password reauth error:", err);
+              StyledSwal.showValidationMessage('Incorrect password. Please try again.');
+              return false;
+            }
+          }
+        });
+
+        if (!pwdConfirmed) {
+          setSaving(false);
+          return;
+        }
+        toast.success("Identity verified successfully.");
+      }
+
+      // 3. Generate and Send OTP (Secondary Verification)
+      const otp = generateOTP();
+      const userEmail = currentUser?.email || dbUser?.email;
+
+      const emailSent = await sendOTPEmail(
+        userEmail,
+        otp,
+        dbUser?.displayName || currentUser?.displayName || 'User',
+        EMAIL_TEMPLATES.ACCOUNT_DELETE
+      );
+
+      if (!emailSent) {
+        toast.error("Failed to send verification code. Please try again.");
+        setSaving(false);
+        return;
+      }
+
+      toast.info("Verification code sent to your email.");
+
+      // 4. OTP Verification Modal
+      const { value: enteredOTP, isConfirmed: otpConfirmed } = await StyledSwal.fire({
+        title: 'Security Verification',
+        text: 'Enter the 6-digit code sent to your email to confirm deletion.',
+        input: 'text',
+        inputAttributes: {
+          autocapitalize: 'off',
+          maxlength: 6,
+          autofocus: 'true',
+          style: 'text-align: center; letter-spacing: 0.5em; font-size: 1.5rem; font-weight: bold;',
+        },
+        showCancelButton: true,
+        confirmButtonText: 'Verify & Delete',
+        cancelButtonText: 'Cancel',
+        showLoaderOnConfirm: true,
+        customClass: {
+          input: 'dark:bg-zinc-950 dark:text-white border-zinc-200 dark:border-zinc-800 rounded-xl focus:ring-indigo-500',
+          confirmButton: 'px-8 py-3 bg-red-600 hover:bg-red-500 text-white font-bold rounded-2xl shadow-lg shadow-red-500/20 transition-all active:scale-[0.98] outline-none border-none',
+          cancelButton: 'px-8 py-3 bg-gray-100 dark:bg-zinc-800 hover:bg-gray-200 dark:hover:bg-zinc-700 text-zinc-600 dark:text-zinc-300 font-bold rounded-2xl transition-all active:scale-[0.98] outline-none border-none mr-2',
+        },
+        preConfirm: (value) => {
+          if (!value || value.length !== 6) {
+            StyledSwal.showValidationMessage('Please enter a valid 6-digit code');
+            return false;
+          }
+          if (value !== otp) {
+            StyledSwal.showValidationMessage('Incorrect verification code');
+            return false;
+          }
+          return value;
+        }
+      });
+
+      if (otpConfirmed && enteredOTP === otp) {
+        // 5. Final Deletion
         setSaving(true);
         
-        // 1. Delete Firestore Document
+        // Delete Firestore Document
         await deleteDoc(doc(db, 'users', currentUser.uid));
         
-        // 2. Delete Auth User
+        // Delete Auth User
         await deleteUser(auth.currentUser);
         
         toast.success("Account deleted successfully.");
@@ -122,9 +276,11 @@ export default function Settings() {
     } catch (err) {
       console.error("Error deleting account:", err);
       if (err.code === 'auth/requires-recent-login') {
-        toast.error("Security sensitive operation. Please log out and log back in to verify your identity, then try again.");
+        // This should no longer happen frequently due to our re-auth step,
+        // but we'll keep a clean fallback just in case.
+        toast.error("Security session expired. Please refresh the page and try again.");
       } else {
-        toast.error("Failed to delete account. Please try again.");
+        toast.error("An error occurred during account deletion. please try again.");
       }
     } finally {
       setSaving(false);
