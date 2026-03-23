@@ -4,9 +4,185 @@
     <meta charset="UTF-8" />
     <link rel="icon" type="image/png" href="/icon.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <style>
+      /* Local Font Definitions for instant loader */
+      @font-face {
+        font-family: 'DM Sans';
+        src: url('/fonts/DMSans-Regular.ttf') format('truetype');
+        font-weight: 400; font-style: normal;
+      }
+      @font-face {
+        font-family: 'DM Sans';
+        src: url('/fonts/DMSans-Bold.ttf') format('truetype');
+        font-weight: 700; font-style: normal;
+      }
+      @font-face {
+        font-family: 'Sentient';
+        src: url('/fonts/Sentient-Bold.otf') format('opentype');
+        font-weight: 700; font-style: normal;
+      }
+    </style>
     <title>Neeti AI - Build for Bharat's Public Leaders</title>
   </head>
-  <body>
+  <body style="background-color: #0d1117; margin: 0; overflow: hidden;">
+    <!-- PRELOADER -->
+    <div id="preloader" style="font-family: 'DM Sans', system-ui, sans-serif;">
+      <div class="bracket tl"></div>
+      <div class="bracket tr"></div>
+      <div class="bracket bl"></div>
+      <div class="bracket br"></div>
+
+      <div class="pre-logo" style="font-family: 'Sentient', serif; font-weight: 700;">
+        NEETI AI
+        <div class="pre-logo-fill" id="logoFill">NEETI AI</div>
+      </div>
+
+      <div class="loader-ring">
+        <svg viewBox="0 0 72 72">
+          <circle class="ring-track" cx="36" cy="36" r="32"/>
+          <circle class="ring-arc a2" cx="36" cy="36" r="32"/>
+          <circle class="ring-arc a1" cx="36" cy="36" r="32"/>
+        </svg>
+        <div class="ring-center-dot"></div>
+      </div>
+
+      <div class="pre-count">INITIALIZING GOVERNANCE INTELLIGENCE <span id="pct">0</span>%</div>
+    </div>
+
+    <style>
+      :root {
+        --bg: #09090b;
+        --white: #f8fafc;
+        --gold: #C9A84C;
+      }
+
+      body {
+        background: var(--bg);
+        color: var(--white);
+        font-family: 'DM Sans', sans-serif;
+      }
+
+      #preloader {
+        position: fixed;
+        inset: 0;
+        z-index: 9999;
+        background: var(--bg);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-direction: column;
+        gap: 40px;
+        transition: opacity 0.7s ease, visibility 0.7s ease;
+      }
+
+      #preloader.hide {
+        opacity: 0;
+        visibility: hidden;
+        pointer-events: none;
+      }
+
+      .bracket { position: absolute; width: 40px; height: 40px; }
+      .bracket::before, .bracket::after { content: ''; position: absolute; background: rgba(201,168,76,0.4); }
+      .bracket::before { width: 100%; height: 1.5px; top: 0; left: 0; }
+      .bracket::after  { width: 1.5px; height: 100%; top: 0; left: 0; }
+      .bracket.tl { top: 32px; left: 32px; }
+      .bracket.tr { top: 32px; right: 32px; transform: scaleX(-1); }
+      .bracket.bl { bottom: 32px; left: 32px; transform: scaleY(-1); }
+      .bracket.br { bottom: 32px; right: 32px; transform: scale(-1,-1); }
+
+      .pre-logo {
+        font-family: 'Sentient', serif;
+        font-weight: 700;
+        font-size: clamp(3rem, 10vw, 6rem);
+        letter-spacing: 0.1em;
+        color: transparent;
+        -webkit-text-stroke: 1px rgba(255,255,255,0.1);
+        position: relative;
+        line-height: 1;
+        user-select: none;
+      }
+      .pre-logo-fill {
+        position: absolute;
+        top: 0; left: 0;
+        font-family: 'Sentient', serif;
+        font-weight: 700;
+        font-size: inherit;
+        letter-spacing: inherit;
+        line-height: inherit;
+        color: var(--white);
+        white-space: nowrap;
+        clip-path: inset(100% 0 0 0);
+        transition: clip-path 1.2s cubic-bezier(0.76,0,0.24,1);
+        text-shadow: 0 0 20px rgba(255,255,255,0.2);
+      }
+      .pre-logo-fill.reveal { clip-path: inset(0% 0 0 0); }
+
+      .loader-ring { position: relative; width: 80px; height: 80px; }
+      .loader-ring svg { border-radius: 50%;position: absolute; inset: 0; width: 100%; height: 100%; animation: ring-spin 2s linear infinite; }
+      .ring-track { fill: none; stroke: rgba(255,255,255,0.05); stroke-width: 2; }
+      .ring-arc { fill: none; stroke-width: 2.5; stroke-linecap: round; stroke-dasharray: 180 226; stroke-dashoffset: 0; animation: arc-chase 2s ease-in-out infinite; }
+      .ring-arc.a1 { stroke: var(--gold); filter: drop-shadow(0 0 8px var(--gold)); }
+      .ring-arc.a2 { stroke: rgba(201,168,76,0.2); stroke-dasharray: 60 346; animation: arc-chase2 2s ease-in-out infinite; }
+      .ring-center-dot { position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%); width: 8px; height: 8px; background: var(--gold); border-radius: 50%; box-shadow: 0 0 15px var(--gold); animation: dot-breathe 2s ease-in-out infinite; }
+
+      @keyframes ring-spin { to { transform: rotate(360deg); } }
+      @keyframes arc-chase { 0% { stroke-dashoffset: 0; } 50% { stroke-dashoffset: -180; } 100% { stroke-dashoffset: -406; } }
+      @keyframes arc-chase2 { 0% { stroke-dashoffset: 0; } 50% { stroke-dashoffset: -80; } 100% { stroke-dashoffset: -406; } }
+      @keyframes dot-breathe { 0%,100% { transform: translate(-50%,-50%) scale(1); opacity: 0.7; } 50% { transform: translate(-50%,-50%) scale(1.4); opacity: 1; } }
+
+      .pre-count { font-family: 'DM Sans', sans-serif; font-size: 0.65rem; letter-spacing: 0.3em; color: rgba(255,255,255,0.3); text-transform: uppercase; }
+      .pre-count span { color: var(--gold); font-weight: 700; }
+
+      #root { opacity: 0; transform: translateY(20px); transition: opacity 1s ease 0.3s, transform 1s ease 0.3s; }
+      #root.visible { opacity: 1; transform: translateY(0); }
+    </style>
+
+    <script>
+      window.addEventListener('load', function() {
+        const pct = document.getElementById('pct');
+        const fill = document.getElementById('logoFill');
+        const loader = document.getElementById('preloader');
+        const root = document.getElementById('root');
+
+        let count = 0;
+        const duration = 2400; // 2.4s total visible experience
+        const interval = 30;
+        const steps = duration / interval;
+        let step = 0;
+
+        const ease = t => t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t;
+
+        const timer = setInterval(() => {
+          step++;
+          const progress = step / steps;
+          count = Math.min(100, Math.round(progress * 100));
+          pct.textContent = count;
+
+          const fromTop = 100 - count;
+          fill.style.clipPath = `inset(${fromTop}% 0 0 0)`;
+
+          if (count >= 100) {
+            clearInterval(timer);
+            setTimeout(() => {
+              // Remove inline style to let CSS transition take over
+              fill.style.clipPath = '';
+              fill.classList.add('reveal');
+              
+              setTimeout(() => {
+                loader.classList.add('hide');
+                window.scrollTo(0, 0);
+                document.body.style.overflow = 'auto';
+                
+                // Add a tiny extra delay to ensure root is ready to fade
+                setTimeout(() => {
+                  root.classList.add('visible');
+                }, 100);
+              }, 600);
+            }, 200);
+          }
+        }, interval);
+      });
+    </script>
     <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>
   </body>

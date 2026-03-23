@@ -81,6 +81,20 @@
   --font-sans: 'DM Sans', system-ui, sans-serif;
   --font-heading: 'Sentient', serif;
   --font-hindi: 'Tiro Devanagari Hindi', serif;
+
+  @keyframes logo-entrance {
+    0% { transform: scale(0.8); opacity: 0; filter: blur(10px); }
+    100% { transform: scale(1); opacity: 1; filter: blur(0); }
+  }
+
+  @keyframes spin {
+    to { transform: rotate(360deg); }
+  }
+
+  @keyframes fade-pulse {
+    0%, 100% { opacity: 0.4; transform: scale(0.98); }
+    50% { opacity: 1; transform: scale(1); }
+  }
 }
 
 
