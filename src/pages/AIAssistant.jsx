@@ -95,40 +95,93 @@ export default function AIAssistant() {
           limit(5)
         );
 
-        // 3. Fetch all in parallel
-        const [docsSnap, meetingsSnap, eventsSnap] = await Promise.all([
+        // 3. Speeches & Drafts
+        const speechesQuery = query(collection(db, `users/${uid}/speeches`), orderBy('createdAt', 'desc'), limit(10));
+
+        // 5. Complaints & Projects (Detailed)
+        const complaintsQuery = query(collection(db, `users/${uid}/complaints`), orderBy('createdAt', 'desc'), limit(10));
+        const projectsQuery = query(collection(db, `users/${uid}/projects`), orderBy('createdAt', 'desc'), limit(10));
+
+        // 6. Fetch everything in parallel
+        const [docsSnap, meetingsSnap, eventsSnap, speechesSnap, complaintsSnap, projectsSnap] = await Promise.all([
           getDocs(docsQuery),
           getDocs(meetingsQuery),
-          getDocs(eventsQuery)
+          getDocs(eventsQuery),
+          getDocs(speechesQuery),
+          getDocs(complaintsQuery),
+          getDocs(projectsQuery)
         ]);
 
-        const docTitles = docsSnap.docs.map(d => d.data().title).join(', ');
-        const meetingTitles = meetingsSnap.docs.map(m => m.data().title).join(', ');
+        const docContexts = docsSnap.docs.map(d => {
+          const data = d.data();
+          return `Document: ${data.filename}\nSummary: ${data.summary || 'N/A'}\nKey Points: ${(data.keyPoints || []).join(', ')}`;
+        }).join('\n\n');
+
+        const meetingContexts = meetingsSnap.docs.map(m => {
+          const data = m.data();
+          return `Meeting: ${data.title}\nSummary: ${data.summary || 'N/A'}\nAction Items: ${(data.actionItems || []).join(', ')}\nDecisions: ${(data.decisions || []).join(', ')}`;
+        }).join('\n\n');
+
+        const speechContexts = speechesSnap.docs.map(s => {
+          const data = s.data();
+          return `Draft: ${data.title} (${data.type})\nTone: ${data.tone || 'N/A'}\nContext: ${data.context || 'N/A'}\nContent Snippet: ${data.content?.substring(0, 200)}...`;
+        }).join('\n\n');
+
+        const complaintContexts = complaintsSnap.docs.map(d => {
+          const data = d.data();
+          return `- [${data.status}] ${data.issueType} by ${data.citizenName} (Ward: ${data.ward}, Priority: ${data.priority})`;
+        }).join('\n');
+
+        const projectContexts = projectsSnap.docs.map(d => {
+          const data = d.data();
+          return `- [${data.status}] ${data.projectName} (Ward: ${data.ward}, Budget: ₹${data.budgetAllocated})`;
+        }).join('\n');
+
         const upcomingEvents = eventsSnap.docs.map(e => {
           const data = e.data();
           const date = data.startTime?.toDate()?.toLocaleDateString() || 'N/A';
           return `${data.title} (${data.category}) on ${date}`;
         }).join('; ');
 
-        // 4. Complaints & Projects (Totals and Status)
-        const [complaintsSnap, projectsSnap] = await Promise.all([
+        // 7. Get full counts for status overview
+        const [complaintsAllSnap, projectsAllSnap] = await Promise.all([
           getDocs(collection(db, `users/${uid}/complaints`)),
           getDocs(collection(db, `users/${uid}/projects`))
         ]);
 
-        const totalComplaints = complaintsSnap.size;
-        const pendingComplaints = complaintsSnap.docs.filter(d => ['pending', 'Pending'].includes(d.data().status)).length;
+        const totalOverallComplaints = complaintsAllSnap.size;
+        const pendingOverallComplaints = complaintsAllSnap.docs.filter(d => ['pending', 'Pending'].includes(d.data().status)).length;
 
-        const totalProjects = projectsSnap.size;
-        const activeProjects = projectsSnap.docs.filter(d => ['active', 'Active', 'ongoing'].includes(d.data().status)).length;
+        const totalOverallProjects = projectsAllSnap.size;
+        const activeOverallProjects = projectsAllSnap.docs.filter(d => ['active', 'Active', 'ongoing', 'In Progress'].includes(d.data().status)).length;
 
         const snapshot = `
-          **Recent Documents**: ${docTitles || 'None'}.
-          **Recent Meetings**: ${meetingTitles || 'None'}.
-          **Upcoming Schedule**: ${upcomingEvents || 'No upcoming events'}.
-          **Constituency Complaints**: ${totalComplaints} total (${pendingComplaints} pending).
-          **Active Projects**: ${activeProjects} out of ${totalProjects} total.
-        `.trim();
+### USER PROFILE
+- Name: ${dbUser?.displayName || currentUser?.displayName || 'N/A'}
+- Designation: ${dbUser?.designation || dbUser?.department || 'Official'}
+
+### RECENT DOCUMENTS (Summaries)
+${docContexts || 'None available.'}
+
+### RECENT MEETINGS (Summaries & Action Items)
+${meetingContexts || 'None available.'}
+
+### RECENT SPEECHES & DRAFTS
+${speechContexts || 'None available.'}
+
+### RECENT COMPLAINTS
+${complaintContexts || 'None available.'}
+
+### RECENT PROJECTS
+${projectContexts || 'None available.'}
+
+### UPCOMING SCHEDULE
+${upcomingEvents || 'No upcoming events.'}
+
+### CONSTITUENCY STATUS (OVERALL)
+- Complaints: ${totalOverallComplaints} total (${pendingOverallComplaints} pending)
+- Active Projects: ${activeOverallProjects} out of ${totalOverallProjects}
+`.trim();
 
         setContextSnapshot(snapshot);
       } catch (err) {
@@ -215,13 +268,16 @@ export default function AIAssistant() {
     try {
       const systemPrompt = `You are Neeti AI Assistant, an advanced governance copilot built for public officials and administrators in India. You are professional, concise, helpful, and empathetic. 
 
-CRITICAL: You have DIRECT access to the user's workspace data provided in the context below. If the user asks about their schedule, meetings, documents, complaints, or projects, use THIS specific data to answer. Do not guess or hallucinate.
+CRITICAL: You have DIRECT access to the user's workspace data provided in the context below. This includes details on recent documents, meetings, speeches, drafts, constituency complaints, projects, and upcoming schedules.
+
+You are assisting ${dbUser?.displayName || 'the user'}, who is a ${dbUser?.designation || dbUser?.department || 'public official'}.
+
+If the user asks about the content of a document, the outcome of a meeting, a specific speech draft, or the status of a complaint/project, use the provided context. If specific data is missing, inform them honestly.
 
 WORKSPACE CONTEXT (Current Time: ${new Date().toLocaleString()}):
 ${contextSnapshot}
 
-If the user asks for their upcoming schedule, refer to the "**Upcoming Schedule**" section in the context. If it says "No upcoming events", inform them accordingly.
-Always prioritize providing actionable insights based on this context.`;
+Always prioritize providing actionable insights and accurate summaries based on this context. Answer concisely and professionally as a governance copilot.`;
 
       const historyToSend = messages.slice(-10).map(m => ({
         role: m.role,
