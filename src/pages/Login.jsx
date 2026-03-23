@@ -185,7 +185,7 @@ export default function Login() {
       } else {
         toast.error("Failed to resend code.");
       }
-    } catch (err) {
+    } catch {
       toast.error("An error occurred while resending.");
     } finally {
       setLoading(false);
