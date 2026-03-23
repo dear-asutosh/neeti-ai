@@ -153,7 +153,7 @@ export default function Landing() {
       {/* --- [1] NAVBAR --- */}
       <nav 
         className={`fixed w-full z-50 transition-all duration-300 ${
-          isScrolled ? 'bg-[#0D1B2A]/95 backdrop-blur-md shadow-lg py-3 border-b border-[#1E3A5F]' : 'bg-transparent py-5'
+          isScrolled ? 'bg-[#0D1B2A]/95 backdrop-blur-md shadow-lg py-3 border-b border-[#1E3A5F]' : 'bg-transparent py-4'
         }`}
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex justify-between items-center">
