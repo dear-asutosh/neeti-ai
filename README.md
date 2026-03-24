@@ -1,116 +1,106 @@
 # Neeti AI: The Governance Intelligence OS
 
-> **India's First AI-Native Command Center for Public Leaders.**
+![Team Run-Neeti](https://img.shields.io/badge/Team-Run--Neeti-indigo?style=for-the-badge)
 
-Neeti AI is a high-performance administrative operating system designed to empower government officials, legislators, and public administrators. By fusing real-time constituency data with cutting-edge Large Language Models (LLMs), Neeti AI transforms fragmented paperwork into a unified, actionable intelligence dashboard.
+> **A high-performance command center for public leaders.**
 
----
-
-## 🏛️ Executive Summary
-
-In a landscape of data overload and manual bureaucracy, Neeti AI acts as a **Strategic Force Multiplier**. It automates the "labor" of governance—summarizing 100-page circulars, transcribing hours of meetings, and drafting official communications—allowing leaders to focus on **high-impact vision and decision-making**.
-
-**Core Value Proposition:**
-- **Zero-Latency Intelligence:** Instant extraction of insights from complex documents and audio.
-- **360° Jurisdiction Pulse:** Real-time tracking of complaints, projects, and stakeholders.
-- **AI-Native Workflow:** A legislative copilot that "reasons" across your specific administrative context.
+Neeti AI is designed to help government officials, legislators, and administrators handle the daily complexities of governance. It transforms fragmented data—from meeting recordings and lengthy documents to constituency grievances—into a unified, actionable intelligence dashboard.
 
 ---
 
-## 🚀 Key Feature Matrix (Exhaustive)
+## The Product Workflow
 
-| Module | Eye-Catching Features | Technical Implementation |
-| :--- | :--- | :--- |
-| **Leader Dashboard** | Dynamic time-aware greetings, mission-critical stats, real-time activity feed, and upcoming event highlights. | **Firestore Real-time Listeners** + Dynamic JS Stats Engine. |
-| **Constituency Tracker** | End-to-end grievance management, ward-wise health monitoring, and community stakeholder directory. | Relational Firestore architecture with modular CRUD sub-pages. |
-| **AI Assistant** | Context-aware reasoning; answers questions about your specific complaints, projects, and meetings. | **Groq Llama 3.3-70B** with RAG-lite system prompts. |
-| **Document Brain** | Turbo-charged summarization of PDF, DOCX, and TXT; interactive "Ask AI" for deep-dive analysis. | `pdfjs-dist` + `mammoth` + Recursive AI Summarization. |
-| **Meeting Intelligence** | Real-time audio recording, auto-transcription, and automated Action-Item/Decision extraction. | **Whisper-Large-V3-Turbo** + Semantic Llama Analysis. |
-| **AI Speechwriter** | Multi-tone editor for Speeches, Press Statements, and Official Letters in local/global voices. | **Llama 3.1-8B** logic + `react-quill-new` rich text editor. |
-| **Schedule Optimizer** | Advanced calendar views (Month, Week, Agenda) with high-priority categorized events. | Native Notifications (Web Push API) + Firebase Persistence. |
+The following diagram illustrates how Neeti AI processes information to provide clear insights for decision-making.
 
----
-
-## 🛠️ Technical Architecture
-
-### **1. The "Zinc" Frontend Stack**
-- **Framework:** React 18 + Vite (Sub-second HMR for rapid development).
-- **Design System:** Custom "Zinc/Slate" aesthetic using **Tailwind CSS**.
-- **Aesthetics:** High-fidelity glassmorphism, precise micro-animations, and full **Theme-Awareness** (Light/Dark mode).
-- **Interactions:** Responsive layouts optimized for both field-tablet use and desktop command centers.
-
-### **2. The Intelligence Layer (AI)**
-- **Inference Engine:** **Groq Cloud** (Industry-leading tokens/sec for sub-second responses).
-- **Model Orchestration:**
-  - **Llama 3.3-70B Versatile:** Primary brain for complex reasoning and document analysis.
-  - **Llama 3.1-8B Instant:** Specialized for lightweight drafting and fast interactions.
-  - **Whisper-Large-V3-Turbo:** High-accuracy, low-latency speech-to-text.
-- **Context Injection:** Dynamic workspace snapshots (current complaints, recent meetings) are injected into system prompts for "hallucination-free" grounding.
-
-### **3. The Backend Infrastructure**
-- **Unified Auth:** **Firebase Authentication** with multi-channel login (Email/OTP ready).
-- **Real-time Database:** **Google Cloud Firestore** for NoSQL scalability and instant state synchronization across devices.
-- **Storage:** Secure processing of documents (>50MB support) and long-form meeting audio chunks.
-
----
-
-## 📦 Deep-Dive: Implementation Details
-
-### **1. AI Meeting Intelligence (`/meetings`)**
-- **Recording:** Leverages the `MediaRecorder API` with auto-flushing chunks to prevent data loss.
-- **Analysis:** Automatically extracts:
-  - **Summary:** Concise narrative of the proceedings.
-  - **Action Items:** Precise "Who/What/When" checklist.
-  - **Decisions:** Documented final verdicts to prevent future ambiguity.
-  - **Attendees:** Automatically identified participants from transcript context.
-
-### **2. Document Intelligence (`/documents`)**
-- **Parsing:** Professional-grade text extraction using `pdfjs-dist` (for complex PDFs) and `mammoth` (for legacy DOCX).
-- **Iterative Q&A:** Users can "chat" with their documents, leveraging a 128k context window to find obscure clauses or budget figures instantly.
-
-### **3. Legislative Speechwriter (`/speeches`)**
-- **Tone Control:** Toggle between *Formal, Inspirational, Assertive,* or *Empathetic* voices.
-- **Modular Drafting:** Specifically tuned prompts for regional press statements versus formal legislative letters.
-- **Rich Interaction:** Integrated suite with `ReactQuill` for manual refinement of AI-generated drafts.
-
-### **4. Constituency Command (`/constituency`)**
-- **Grievance Pipeline:** Tracking complaints from entry to resolution with category-based analytics.
-- **Ward Health:** High-level overview of infrastructure projects and scheme implementation at the localized level.
-
----
-
-## 🔒 Security & Data Sovereignty
-
-- **Verified Access:** Domain-restricted authentication for authenticated government personnel.
-- **Data Isolation:** Enterprise-grade multi-tenancy at the Firestore document level.
-- **Privacy Assurance:** Workspace data is **strictly used for inference context** and is **never** used to train public AI models.
-- **Cloud Compliance:** Hosted on Google Cloud Platform (GCP) ensuring 99.9% uptime and global security standards.
-
----
-
-## 🚀 Getting Started
-
-### **Environment Configuration**
-Create a `.env` in the root directory:
-```env
-VITE_FIREBASE_API_KEY=your_key
-VITE_FIREBASE_AUTH_DOMAIN=your_domain
-VITE_FIREBASE_PROJECT_ID=your_id
-VITE_GROQ_API_KEY=your_groq_key
+```mermaid
+graph LR
+    Input["Data Entry (Upload/Record/Input)"] --> Processing["Intelligence Engine"]
+    Processing --> Transcription["Voice-to-Text (Whisper V3)"]
+    Processing --> Analysis["Reasoning & Summarization (Llama 3.3)"]
+    Processing --> Drafting["Generation & Editing (Llama 3.1)"]
+    
+    Transcription --> Storage["Secure Firestore Cloud"]
+    Analysis --> Storage
+    Drafting --> Storage
+    
+    Storage --> Dashboard["Live Dashboard Stats"]
+    Storage --> Assistant["Context-Aware AI Assistant"]
+    Storage --> Output["Speeches, Letters & Reports"]
 ```
 
-### **Local Deployment**
+---
+
+## Core Capabilities
+
+### Strategic Dashboard
+Get an immediate pulse on your jurisdiction. The dashboard summarizes mission-critical stats, tracks real-time activity, and highlights upcoming priorities. It is built to give leaders clarity at a glance.
+
+### Meeting Intelligence
+Stop worrying about manual note-taking. Record live meetings or upload audio to get instant transcripts, concise summaries, and clear action items. You can even "ask" your meetings specific questions to find decisions made months ago.
+
+### Document Intelligence
+Drown in paperwork no more. Upload complex PDFs or documents to extract key insights instantly. Our AI handles the heavy lifting of reading through circulars and reports, allowing you to focus on the numbers that matter.
+
+### Constituency Command
+Keep track of every grievance and infrastructure project in your ward. From entry to resolution, you can monitor the health of your constituency with detailed analytics and a comprehensive stakeholder directory.
+
+### Legislative Speechwriter
+Draft speeches, press statements, and formal letters in minutes. With built-in tone control and a rich text editor, you can generate professional drafts that match your voice and the occasion perfectly.
+
+---
+
+## Technical Architecture
+
+Neeti AI is built on a modern, high-performance stack referred to as the **Zinc Architecture**.
+
+- **Frontend**: A lightning-fast React 18 interface powered by Vite and styled with a custom Tailwind CSS system.
+- **AI Inference**: Sub-second responses powered by Groq Cloud, utilizing Llama 3.3-70B for reasoning and Whisper-Large-V3 for speech processing.
+- **Backend**: Real-time data synchronization and secure storage provided by Google Firebase (Firestore, Auth, and Storage).
+
+---
+
+## Getting Started
+
+### 1. Environment Configuration
+Create a `.env` file in your root directory and populate it with the following keys. These are essential for the AI, database, and communication features to function.
+
+**Required Variables:**
+```env
+# AI & Inference (Groq Cloud)
+VITE_GROQ_API_KEY=your_groq_key
+
+# Backend & Database (Google Firebase)
+VITE_FIREBASE_API_KEY=your_api_key
+VITE_FIREBASE_AUTH_DOMAIN=your_project.firebaseapp.com
+VITE_FIREBASE_PROJECT_ID=your_project_id
+VITE_FIREBASE_STORAGE_BUCKET=your_project.firebasestorage.app
+VITE_FIREBASE_MESSAGING_SENDER_ID=your_sender_id
+VITE_FIREBASE_APP_ID=your_app_id
+
+# Media Management (Cloudinary)
+VITE_CLOUDINARY_CLOUD_NAME=your_cloud_name
+VITE_CLOUDINARY_UPLOAD_PRESET=your_preset
+VITE_CLOUDINARY_API_KEY=your_api_key
+
+# Email Communications (EmailJS)
+VITE_EMAILJS_SERVICE_ID=your_service_id
+VITE_EMAILJS_TEMPLATE_ID=your_template_id
+VITE_EMAILJS_ACCOUNT_DELETE_TEMPLATE_ID=your_delete_template_id
+VITE_EMAILJS_PUBLIC_KEY=your_public_key
+```
+
+### 2. Local Deployment
 ```bash
-# Clone
+# Clone the repository
 git clone https://github.com/dear-asutosh/neeti-ai.git
 
-# Install
+# Install dependencies
 npm install
 
-# Launch
+# Start the development server
 npm run dev
 ```
 
 ---
 
-**Neeti AI** | Built with precision for the leaders of New India. 🇮🇳
+Built with precision for the leaders of today.
