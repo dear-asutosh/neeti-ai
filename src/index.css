@@ -101,15 +101,25 @@
 :root {
   --bg-app: #f9fafb; /* gray-50 */
   --bg-card: #ffffff;
+  --bg-subtle: #f3f4f6; /* gray-100 */
   --text-main: #0A1628;
+  --text-muted: #374151; /* gray-700 */
+  --text-dim: #6b7280; /* gray-500 */
   --border-main: #e5e7eb; /* gray-200 */
+  --border-subtle: #f3f4f6; /* gray-100 */
+  --accent-primary: #4f46e5; /* indigo-600 */
 }
 
 [data-theme="dark"] {
   --bg-app: #09090b; /* zinc-950 */
-  --bg-card: #18181b; /* zinc-900 */
+  --bg-card: #111113; /* zinc-900ish custom */
+  --bg-subtle: #18181b; /* zinc-900 */
   --text-main: #f4f4f5; /* zinc-100 */
+  --text-muted: #a1a1aa; /* zinc-400 */
+  --text-dim: #52525b; /* zinc-600 */
   --border-main: #27272a; /* zinc-800 */
+  --border-subtle: #18181b; /* zinc-900 */
+  --accent-primary: #6366f1; /* indigo-500 */
 }
 
 body {

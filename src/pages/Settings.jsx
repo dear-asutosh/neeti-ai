@@ -29,6 +29,7 @@ export default function Settings() {
   // UI states
   const [uploading, setUploading] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [notifPermission, setNotifPermission] = useState(Notification.permission);
   const fileInputRef = useRef(null);
 
   const handleUpdateProfile = async (e) => {
@@ -105,30 +106,30 @@ export default function Settings() {
         title: 'Begin Account Deletion?',
         html: `
           <div class="space-y-4 text-left">
-            <p class="text-sm text-zinc-600 dark:text-zinc-400 leading-relaxed mb-6">
+            <p class="text-sm text-zinc-600 dark:text-[var(--text-muted)] leading-relaxed mb-6">
               To ensure the security of your administrative data, the deletion process follows a <strong>two-step verification protocol</strong>:
             </p>
             <div class="space-y-3">
-              <div class="flex items-start gap-4 p-4 bg-gray-50 dark:bg-zinc-800/40 rounded-2xl border border-gray-100 dark:border-zinc-800/60 transition-all hover:bg-white dark:hover:bg-zinc-800 group shadow-sm">
+              <div class="flex items-start gap-4 p-4 bg-gray-50 dark:bg-zinc-800/40 rounded-2xl border border-[var(--border-main)] dark:border-zinc-800/60 transition-all hover:bg-white dark:hover:bg-zinc-800 group shadow-sm">
                 <div class="bg-indigo-600/10 dark:bg-indigo-400/10 p-2.5 rounded-xl group-hover:scale-110 transition-transform flex-shrink-0">
                   <span class="text-indigo-600 dark:text-indigo-400 font-black text-xs px-1">01</span>
                 </div>
                 <div>
                   <h4 class="text-sm font-bold text-zinc-900 dark:text-white">Account Verification</h4>
-                  <p class="text-[11px] text-zinc-500 dark:text-zinc-400 leading-normal mt-0.5">Verify your session via your linked provider (Google or Account Password).</p>
+                  <p class="text-[11px] text-[var(--text-dim)] dark:text-[var(--text-muted)] leading-normal mt-0.5">Verify your session via your linked provider (Google or Account Password).</p>
                 </div>
               </div>
-              <div class="flex items-start gap-4 p-4 bg-gray-50 dark:bg-zinc-800/40 rounded-2xl border border-gray-100 dark:border-zinc-800/60 transition-all hover:bg-white dark:hover:bg-zinc-800 group shadow-sm">
+              <div class="flex items-start gap-4 p-4 bg-gray-50 dark:bg-zinc-800/40 rounded-2xl border border-[var(--border-main)] dark:border-zinc-800/60 transition-all hover:bg-white dark:hover:bg-zinc-800 group shadow-sm">
                 <div class="bg-indigo-600/10 dark:bg-indigo-400/10 p-2.5 rounded-xl group-hover:scale-110 transition-transform flex-shrink-0">
                   <span class="text-indigo-600 dark:text-indigo-400 font-black text-xs px-1">02</span>
                 </div>
                 <div>
                   <h4 class="text-sm font-bold text-zinc-900 dark:text-white">OTP Confirmation</h4>
-                  <p class="text-[11px] text-zinc-500 dark:text-zinc-400 leading-normal mt-0.5">Enter the security code sent to your registered email to confirm the data wipe.</p>
+                  <p class="text-[11px] text-[var(--text-dim)] dark:text-[var(--text-muted)] leading-normal mt-0.5">Enter the security code sent to your registered email to confirm the data wipe.</p>
                 </div>
               </div>
             </div>
-            <div class="mt-6 pt-4 border-t border-gray-100 dark:border-zinc-800">
+            <div class="mt-6 pt-4 border-t border-[var(--border-main)] dark:border-zinc-800">
                <p class="text-[10px] text-red-500 font-black uppercase tracking-widest pl-1">⚠ This action is permanent and completely irreversible.</p>
             </div>
           </div>
@@ -286,6 +287,21 @@ export default function Settings() {
       setSaving(false);
     }
   };
+  
+  const handleAllowNotifications = async () => {
+    try {
+      const permission = await Notification.requestPermission();
+      setNotifPermission(permission);
+      if (permission === 'granted') {
+        toast.success("Notifications enabled successfully!");
+      } else if (permission === 'denied') {
+        toast.error("Notifications blocked by browser.");
+      }
+    } catch (err) {
+      console.error("Error requesting notification permission:", err);
+      toast.error("Failed to request notification permission.");
+    }
+  };
 
   const currentPhotoURL = dbUser?.photoURL || currentUser?.photoURL;
   const currentDisplayName = dbUser?.displayName || currentUser?.displayName || '';
@@ -297,13 +313,13 @@ export default function Settings() {
       <div className="max-w-5xl mx-auto space-y-8">
         
         {/* Page Header */}
-        <div className="flex items-center gap-4 border-b border-gray-200 dark:border-zinc-800 pb-6">
-          <div className="bg-white dark:bg-zinc-900 rounded-xl p-3 shadow-sm border border-gray-200 dark:border-zinc-800 transition-all duration-300">
+        <div className="flex items-center gap-4 border-b border-[var(--border-main)] dark:border-zinc-800 pb-6">
+          <div className="bg-white dark:bg-zinc-900 rounded-xl p-3 shadow-sm border border-[var(--border-main)] dark:border-zinc-800 transition-all duration-300">
             <SettingsIcon className="w-8 h-8 text-indigo-600 dark:text-indigo-400" />
           </div>
           <div>
             <h2 className="text-3xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50">Account Settings</h2>
-            <p className="text-sm text-zinc-400 mt-1">Refine your administrative profile and platform preferences.</p>
+            <p className="text-sm text-[var(--text-muted)] mt-1">Refine your administrative profile and platform preferences.</p>
           </div>
         </div>
         
@@ -313,11 +329,11 @@ export default function Settings() {
           
           <div className="lg:col-span-2 space-y-8">
             {/* Profile Detail Form */}
-            <form onSubmit={handleUpdateProfile} className="bg-white dark:bg-zinc-900/40 rounded-3xl shadow-sm border border-gray-100 dark:border-zinc-800/50 backdrop-blur-xl overflow-hidden transition-all duration-300">
-              <div className="p-6 border-b border-gray-100 dark:border-zinc-800/60 bg-gray-50/50 dark:bg-zinc-900/50 flex items-center justify-between">
+            <form onSubmit={handleUpdateProfile} className="bg-white dark:bg-zinc-900/40 rounded-3xl shadow-sm border border-[var(--border-main)] dark:border-zinc-800/50 backdrop-blur-xl overflow-hidden transition-all duration-300">
+              <div className="p-6 border-b border-[var(--border-main)] dark:border-zinc-800/60 bg-gray-50/50 dark:bg-zinc-900/50 flex items-center justify-between">
                 <div>
                   <h3 className="text-lg font-bold text-zinc-900 dark:text-white">Profile Details</h3>
-                  <p className="text-xs text-zinc-400 mt-0.5 tracking-wide">Update your administrative credentials and designation.</p>
+                  <p className="text-xs text-[var(--text-muted)] mt-0.5 tracking-wide">Update your administrative credentials and designation.</p>
                 </div>
                 <button 
                   type="submit"
@@ -372,35 +388,35 @@ export default function Settings() {
                 {/* Input Fields */}
                 <div className="flex-1 w-full space-y-6">
                   <div className="space-y-2">
-                     <label className="block text-xs font-black text-zinc-400 dark:text-zinc-500 uppercase tracking-[0.2em] pl-1">Full Name</label>
+                     <label className="block text-xs font-black text-[var(--text-muted)] dark:text-[var(--text-dim)] uppercase tracking-[0.2em] pl-1">Full Name</label>
                      <input 
                        value={fullName}
                        onChange={(e) => setFullName(e.target.value)}
                        placeholder="Hon. Rahul Sharma"
-                       className="w-full px-5 py-4 bg-gray-50/50 dark:bg-zinc-950/50 border border-gray-200 dark:border-zinc-800 rounded-2xl text-zinc-900 dark:text-white font-medium focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all" 
+                       className="w-full px-5 py-4 bg-gray-50/50 dark:bg-zinc-950/50 border border-[var(--border-main)] dark:border-zinc-800 rounded-2xl text-zinc-900 dark:text-white font-medium focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all" 
                      />
                   </div>
 
                   <div className="space-y-2">
-                     <label className="block text-xs font-black text-zinc-400 dark:text-zinc-500 uppercase tracking-[0.2em] pl-1">Official Designation</label>
+                     <label className="block text-xs font-black text-[var(--text-muted)] dark:text-[var(--text-dim)] uppercase tracking-[0.2em] pl-1">Official Designation</label>
                      <input 
                        value={designation}
                        onChange={(e) => setDesignation(e.target.value)}
                        placeholder="e.g. District Magistrate, MLA"
-                       className="w-full px-5 py-4 bg-gray-50/50 dark:bg-zinc-950/50 border border-gray-200 dark:border-zinc-800 rounded-2xl text-zinc-900 dark:text-white font-medium focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all" 
+                       className="w-full px-5 py-4 bg-gray-50/50 dark:bg-zinc-950/50 border border-[var(--border-main)] dark:border-zinc-800 rounded-2xl text-zinc-900 dark:text-white font-medium focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all" 
                      />
                   </div>
 
                   <div className="space-y-2 opacity-60">
-                     <label className="block text-xs font-black text-zinc-400 dark:text-zinc-500 uppercase tracking-[0.2em] pl-1">Email Address (Locked)</label>
+                     <label className="block text-xs font-black text-[var(--text-muted)] dark:text-[var(--text-dim)] uppercase tracking-[0.2em] pl-1">Email Address (Locked)</label>
                      <input 
                        disabled 
                        value={currentUser?.email || ''} 
-                       className="w-full px-5 py-4 bg-gray-100/50 dark:bg-zinc-950/20 border border-gray-200 dark:border-zinc-800/50 rounded-2xl text-zinc-500 dark:text-zinc-400 font-medium cursor-not-allowed focus:outline-none" 
+                       className="w-full px-5 py-4 bg-gray-100/50 dark:bg-zinc-950/20 border border-[var(--border-main)] dark:border-zinc-800/50 rounded-2xl text-[var(--text-dim)] dark:text-[var(--text-muted)] font-medium cursor-not-allowed focus:outline-none" 
                      />
                   </div>
                   
-                  <p className="text-[10px] text-zinc-500 dark:text-zinc-600 font-bold uppercase tracking-widest flex items-center gap-2 pt-2">
+                  <p className="text-[10px] text-[var(--text-dim)] dark:text-zinc-600 font-bold uppercase tracking-widest flex items-center gap-2 pt-2">
                      <ShieldCheck className="w-4 h-4 text-emerald-500" />
                      Encrypted Administrative Core
                   </p>
@@ -433,25 +449,47 @@ export default function Settings() {
 
           <div className="space-y-8">
             {/* System Preferences */}
-            <div className="bg-white dark:bg-zinc-900/40 rounded-3xl shadow-sm border border-gray-100 dark:border-zinc-800/50 backdrop-blur-xl p-8 flex flex-col h-[280px]">
+            <div className="bg-white dark:bg-zinc-900/40 rounded-3xl shadow-sm border border-[var(--border-main)] dark:border-zinc-800/50 backdrop-blur-xl p-8 flex flex-col h-[280px]">
               <h3 className="text-lg font-bold text-zinc-900 dark:text-white flex items-center gap-3 mb-2">
                 <svg className="w-5 h-5 text-indigo-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg>
                 Notifications
               </h3>
-              <p className="text-sm text-zinc-400 mb-6">Receive alerts for summaries and schedule updates.</p>
+              <p className="text-sm text-[var(--text-muted)] mb-6">Receive alerts for summaries and schedule updates.</p>
               
-              <div className="flex-1 flex items-center justify-center border-2 border-dashed border-zinc-200 dark:border-zinc-800 rounded-2xl bg-gray-50/50 dark:bg-zinc-950/30">
-                 <span className="text-zinc-400 dark:text-zinc-600 text-[10px] font-black uppercase tracking-[0.2em]">Deployment Pending</span>
+              <div className="flex-1 flex flex-col items-center justify-center border-2 border-dashed border-zinc-200 dark:border-zinc-800 rounded-2xl bg-gray-50/50 dark:bg-zinc-950/30 p-4 text-center">
+                {notifPermission === 'granted' ? (
+                  <div className="flex flex-col items-center gap-2 animate-in fade-in zoom-in duration-500">
+                    <div className="bg-emerald-500/10 p-3 rounded-full">
+                      <ShieldCheck className="w-6 h-6 text-emerald-500" />
+                    </div>
+                    <span className="text-emerald-600 dark:text-emerald-400 text-xs font-bold uppercase tracking-widest">all notifications allowed</span>
+                  </div>
+                ) : (
+                  <div className="flex flex-col items-center gap-4">
+                    <button 
+                      onClick={handleAllowNotifications}
+                      className="px-6 py-3 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold rounded-xl shadow-lg shadow-indigo-500/20 transition-all active:scale-[0.98] flex items-center gap-2 group"
+                    >
+                      <svg className="w-4 h-4 group-hover:shake" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg>
+                      Allow Notifications
+                    </button>
+                    {notifPermission === 'denied' && (
+                      <p className="text-[10px] text-red-500 font-bold uppercase tracking-tight">
+                        Notifications are blocked by your browser settings
+                      </p>
+                    )}
+                  </div>
+                )}
               </div>
             </div>
 
             {/* Appearance Preferences */}
-            <div className="bg-white dark:bg-zinc-900/40 rounded-3xl shadow-sm border border-gray-100 dark:border-zinc-800/50 backdrop-blur-xl p-8">
+            <div className="bg-white dark:bg-zinc-900/40 rounded-3xl shadow-sm border border-[var(--border-main)] dark:border-zinc-800/50 backdrop-blur-xl p-8">
               <h3 className="text-lg font-bold text-zinc-900 dark:text-white flex items-center gap-3 mb-2">
                 <svg className="w-5 h-5 text-indigo-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
                 Appearance
               </h3>
-              <p className="text-sm text-zinc-400 mb-6">Select your UI personality.</p>
+              <p className="text-sm text-[var(--text-muted)] mb-6">Select your UI personality.</p>
               
               <div className="flex flex-col gap-3">
                 <button 
@@ -460,7 +498,7 @@ export default function Settings() {
                     theme === 'dark' ? 'bg-zinc-950 border-indigo-500/50' : 'bg-zinc-800/50 border-transparent'
                   }`}
                 >
-                   <span className={`text-xs font-bold uppercase tracking-widest ${theme === 'dark' ? 'text-white' : 'text-zinc-500'}`}>Dark Mode</span>
+                   <span className={`text-xs font-bold uppercase tracking-widest ${theme === 'dark' ? 'text-white' : 'text-[var(--text-dim)]'}`}>Dark Mode</span>
                    {theme === 'dark' && <div className="absolute right-4 top-1/2 -translate-y-1/2 w-1.5 h-1.5 rounded-full bg-indigo-500 shadow-[0_0_10px_rgba(99,102,241,0.5)]"></div>}
                 </button>
                 <button 
@@ -469,7 +507,7 @@ export default function Settings() {
                     theme === 'light' ? 'bg-white border-indigo-500/50 shadow-xl shadow-indigo-500/5' : 'bg-gray-50 border-transparent'
                   }`}
                 >
-                   <span className={`text-xs font-bold uppercase tracking-widest ${theme === 'light' ? 'text-zinc-900' : 'text-zinc-500'}`}>Light Mode</span>
+                   <span className={`text-xs font-bold uppercase tracking-widest ${theme === 'light' ? 'text-zinc-900' : 'text-[var(--text-dim)]'}`}>Light Mode</span>
                    {theme === 'light' && <div className="absolute right-4 top-1/2 -translate-y-1/2 w-1.5 h-1.5 rounded-full bg-indigo-500"></div>}
                 </button>
               </div>
