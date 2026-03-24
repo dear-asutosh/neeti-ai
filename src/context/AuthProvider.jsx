@@ -15,7 +15,7 @@ export const AuthProvider = ({ children }) => {
     let unsubscribeDoc = null;
 
     // Listen to Firebase auth state changes
-    const unsubscribeAuth = onAuthStateChanged(auth, async (user) => {
+    const unsubscribeAuth = onAuthStateChanged(auth, (user) => {
       try {
         if (user) {
           setCurrentUser(user);
@@ -29,19 +29,30 @@ export const AuthProvider = ({ children }) => {
             setJwtToken(null);
           }
           
+          // Cleanup previous listener if it exists
+          if (unsubscribeDoc) {
+            unsubscribeDoc();
+            unsubscribeDoc = null;
+          }
+
           // Fetch user data from Firestore
           const docRef = doc(db, 'users', user.uid);
           unsubscribeDoc = onSnapshot(docRef, (docSnap) => {
             if (docSnap.exists()) {
-              setUserRole(docSnap.data().role);
-              setDbUser(docSnap.data());
+              const data = docSnap.data();
+              setUserRole(data.role || null);
+              setDbUser(data);
             } else {
+              console.log("No user document found in Firestore for UID:", user.uid);
               setUserRole(null);
               setDbUser(null);
             }
             setLoading(false);
           }, (error) => {
-            console.error("Error fetching user role:", error);
+            console.error("Error fetching user data/role from Firestore:", error);
+            // Even if metadata fetch fails, we have the Auth user
+            setUserRole(null);
+            setDbUser(null);
             setLoading(false);
           });
         } else {

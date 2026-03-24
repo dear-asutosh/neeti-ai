@@ -33,19 +33,25 @@ export default function Dashboard() {
     // Listen to Documents
     const qDocs = query(collection(db, 'users', currentUser.uid, 'documents'), orderBy('createdAt', 'desc'), limit(5));
     const unsubDocs = onSnapshot(qDocs, (snap) => {
-      setDocCount(snap.size); // Basic count of recent/all if we don't use Server count, but for simplicity we rely on snap size for now, or just get full count.
+      setDocCount(snap.size); 
+    }, (error) => {
+      console.error("Dashboard Docs Listener Error:", error);
     });
 
     // Listen to Meetings
     const qMeetings = query(collection(db, 'users', currentUser.uid, 'meetings'), orderBy('createdAt', 'desc'), limit(5));
     const unsubMeetings = onSnapshot(qMeetings, (snap) => {
       setMeetingCount(snap.size);
+    }, (error) => {
+      console.error("Dashboard Meetings Listener Error:", error);
     });
 
     // Listen to Constituents (Assuming this collection might exist later)
-    const qConst = query(collection(db, 'users', currentUser.uid, 'constituents'), limit(5));
+    const qConst = query(collection(db, 'users', currentUser.uid, 'people'), limit(5));
     const unsubConst = onSnapshot(qConst, (snap) => {
       setConstituentCount(snap.size);
+    }, (error) => {
+      console.error("Dashboard People Listener Error:", error);
     });
 
     // Listen to Next Schedule Event
@@ -67,6 +73,8 @@ export default function Dashboard() {
       } else {
         setNextEvent(null);
       }
+    }, (error) => {
+      console.error("Dashboard Upcoming Event Listener Error:", error);
     });
 
     return () => {
@@ -115,6 +123,8 @@ export default function Dashboard() {
         };
       });
       updateActivity();
+    }, (error) => {
+      console.error("Dashboard Recent Docs Listener Error:", error);
     });
 
     const qMeetings = query(collection(db, 'users', currentUser.uid, 'meetings'), orderBy('createdAt', 'desc'), limit(3));
@@ -132,6 +142,8 @@ export default function Dashboard() {
         };
       });
       updateActivity();
+    }, (error) => {
+      console.error("Dashboard Recent Meetings Listener Error:", error);
     });
 
     const updateActivity = () => {
