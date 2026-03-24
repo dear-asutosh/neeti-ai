@@ -460,7 +460,7 @@ export default function Settings() {
                     theme === 'dark' ? 'bg-zinc-950 border-indigo-500/50' : 'bg-zinc-800/50 border-transparent'
                   }`}
                 >
-                   <span className={`text-xs font-bold uppercase tracking-widest ${theme === 'dark' ? 'text-white' : 'text-zinc-500'}`}>Command (Dark)</span>
+                   <span className={`text-xs font-bold uppercase tracking-widest ${theme === 'dark' ? 'text-white' : 'text-zinc-500'}`}>Dark Mode</span>
                    {theme === 'dark' && <div className="absolute right-4 top-1/2 -translate-y-1/2 w-1.5 h-1.5 rounded-full bg-indigo-500 shadow-[0_0_10px_rgba(99,102,241,0.5)]"></div>}
                 </button>
                 <button 
@@ -469,7 +469,7 @@ export default function Settings() {
                     theme === 'light' ? 'bg-white border-indigo-500/50 shadow-xl shadow-indigo-500/5' : 'bg-gray-50 border-transparent'
                   }`}
                 >
-                   <span className={`text-xs font-bold uppercase tracking-widest ${theme === 'light' ? 'text-zinc-900' : 'text-zinc-500'}`}>Official (Light)</span>
+                   <span className={`text-xs font-bold uppercase tracking-widest ${theme === 'light' ? 'text-zinc-900' : 'text-zinc-500'}`}>Light Mode</span>
                    {theme === 'light' && <div className="absolute right-4 top-1/2 -translate-y-1/2 w-1.5 h-1.5 rounded-full bg-indigo-500"></div>}
                 </button>
               </div>
