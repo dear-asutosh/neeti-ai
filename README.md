@@ -103,4 +103,15 @@ npm run dev
 
 ---
 
+## Meet our Team 💝
+
+| Name | LinkedIn |
+| :--- | :--- |
+| **Asutosh Sahoo** | [![LinkedIn](https://img.shields.io/badge/LinkedIn-Profile-blue?style=flat&logo=linkedin)](https://www.linkedin.com/in/asutoshsahoo/) |
+| **Jyoti Prakash Samal** | [![LinkedIn](https://img.shields.io/badge/LinkedIn-Profile-blue?style=flat&logo=linkedin)](https://www.linkedin.com/in/jyotiprakashsamal/) |
+| **Debasish Dash** | [![LinkedIn](https://img.shields.io/badge/LinkedIn-Profile-blue?style=flat&logo=linkedin)](https://www.linkedin.com/in/debasish-dash-74b8b4244/) |
+| **Rudra Narayan Jena** | [![LinkedIn](https://img.shields.io/badge/LinkedIn-Profile-blue?style=flat&logo=linkedin)](https://www.linkedin.com/in/rudra-narayan-jena/) |
+
+---
+
 Built with precision for the leaders of today.
