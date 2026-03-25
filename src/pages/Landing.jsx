@@ -557,8 +557,6 @@ export default function Landing() {
 
           <FadeInSection>
             <div className="relative">
-              {/* Connecting Line between steps (desktop only) */}
-              <div className="hidden lg:block absolute top-6 left-[12%] right-[12%] h-px bg-[#FF9933]/40 z-0"></div>
               
               <div className="grid grid-cols-1 lg:grid-cols-4 gap-12 lg:gap-6 relative z-10">
                 <StepCard 
@@ -794,16 +792,20 @@ function FeatureCard({ id, icon, title, description, index }) {
 }
 
 function StepCard({ number, title, description, hindiTag }) {
+  const isLast = number === "4" || number === 4;
   return (
-    <div className="flex flex-col items-center text-center lg:items-start lg:text-left group">
-      <div className="flex flex-col items-center lg:items-start mb-6">
-        <div className="w-12 h-12 rounded-none bg-[#FF9933] text-[#0D1B2A] font-bold text-xl flex items-center justify-center z-10 shadow-lg font-heading transition-transform duration-500 group-hover:scale-110 group-hover:rotate-3" style={{ borderRadius: '2px' }}>
+    <div className="flex flex-col items-center text-center group w-full relative">
+      <div className="flex flex-col items-center mb-6 relative w-full">
+        {!isLast && (
+           <div className="hidden lg:block absolute top-6 left-1/2 w-[calc(100%+1.5rem)] h-px bg-[#FF9933]/40 z-0 pointer-events-none"></div>
+        )}
+        <div className="w-12 h-12 rounded-none bg-[#FF9933] text-[#0D1B2A] font-bold text-xl flex items-center justify-center z-10 shadow-lg font-heading transition-transform duration-500 group-hover:scale-110 group-hover:rotate-3 relative" style={{ borderRadius: '2px' }}>
           {number}
         </div>
         <span className="font-hindi italic text-xs text-[#FF9933]/60 mt-2 transition-opacity duration-500 group-hover:opacity-100">{hindiTag}</span>
       </div>
-      <h3 className="text-xl font-bold text-[#F8F4ED] mb-3 font-heading uppercase tracking-tight">{title}</h3>
-      <p className="text-[#8BA3BC] leading-relaxed lg:pr-4">{description}</p>
+      <h3 className="text-xl font-bold text-[#F8F4ED] mb-3 font-heading uppercase tracking-tight relative z-10">{title}</h3>
+      <p className="text-[#8BA3BC] leading-relaxed lg:px-4 relative z-10">{description}</p>
     </div>
   );
 }
