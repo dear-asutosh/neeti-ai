@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { Outlet, useNavigate, useLocation } from 'react-router-dom';
-import { Menu, User, LogOut, ChevronDown, Map, Sparkles, FileText, Calendar, BarChart3 } from 'lucide-react';
+import { Menu, User, LogOut, ChevronDown, Map, Sparkles, FileText, Calendar, BarChart3, Sun, Moon } from 'lucide-react';
 import Sidebar from './Sidebar';
 import { useAuth } from '../../hooks/useAuth';
+import { useTheme } from '../../context/ThemeContext';
 import { auth, clearAuthToken } from '../../services/firebase';
 import { useNotifications } from '../../hooks/useNotifications';
 import { StyledSwal } from '../../utils/sweetalert';
@@ -12,6 +13,7 @@ export default function AppShell() {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [currentTime, setCurrentTime] = useState(new Date());
   const { currentUser, dbUser } = useAuth();
+  const { theme, toggleTheme } = useTheme();
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -136,8 +138,17 @@ export default function AppShell() {
             </div>
           </div>
 
-          {/* User Profile Area (Top Right) */}
-          <div className="relative shrink-0">
+          {/* User Profile & Theme Area (Top Right) */}
+          <div className="relative shrink-0 flex items-center gap-3">
+            {/* Theme Toggle */}
+            <button
+              onClick={() => toggleTheme(theme === 'dark' ? 'light' : 'dark')}
+              className="p-2 text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-zinc-800 rounded-lg transition-colors border border-transparent focus:outline-none"
+              title={theme === 'dark' ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
+            >
+              {theme === 'dark' ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
+            </button>
+
             <button
               onClick={() => setDropdownOpen(!dropdownOpen)}
               className="flex items-center gap-3 px-2 py-1.5 rounded-md hover:bg-gray-100 dark:hover:bg-zinc-900 transition-colors border border-transparent focus:outline-none"
@@ -159,7 +170,7 @@ export default function AppShell() {
                   className="fixed inset-0 z-40"
                   onClick={() => setDropdownOpen(false)}
                 ></div>
-                <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 rounded-md shadow-xl py-1 z-50">
+                <div className="absolute right-0 top-full mt-2 w-48 bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 rounded-md shadow-xl py-1 z-50">
                   <div className="px-4 py-2 border-b border-gray-100 dark:border-zinc-800 mb-1">
                     <p className="text-sm text-zinc-900 dark:text-white font-medium truncate">{dbUser?.displayName || currentUser?.displayName}</p>
                     <p className="text-[10px] text-indigo-500 dark:text-indigo-400 font-bold uppercase tracking-wider truncate mb-0.5">

@@ -483,35 +483,6 @@ export default function Settings() {
               </div>
             </div>
 
-            {/* Appearance Preferences */}
-            <div className="bg-white dark:bg-zinc-900/40 rounded-3xl shadow-sm border border-[var(--border-main)] dark:border-zinc-800/50 backdrop-blur-xl p-8">
-              <h3 className="text-lg font-bold text-zinc-900 dark:text-white flex items-center gap-3 mb-2">
-                <svg className="w-5 h-5 text-indigo-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
-                Appearance
-              </h3>
-              <p className="text-sm text-[var(--text-muted)] mb-6">Select your UI personality.</p>
-              
-              <div className="flex flex-col gap-3">
-                <button 
-                  onClick={() => toggleTheme('dark')}
-                  className={`px-5 py-4 rounded-2xl text-left relative overflow-hidden transition-all duration-300 border-2 ${
-                    theme === 'dark' ? 'bg-zinc-950 border-indigo-500/50' : 'bg-zinc-800/50 border-transparent'
-                  }`}
-                >
-                   <span className={`text-xs font-bold uppercase tracking-widest ${theme === 'dark' ? 'text-white' : 'text-[var(--text-dim)]'}`}>Dark Mode</span>
-                   {theme === 'dark' && <div className="absolute right-4 top-1/2 -translate-y-1/2 w-1.5 h-1.5 rounded-full bg-indigo-500 shadow-[0_0_10px_rgba(99,102,241,0.5)]"></div>}
-                </button>
-                <button 
-                  onClick={() => toggleTheme('light')}
-                  className={`px-5 py-4 rounded-2xl text-left relative overflow-hidden transition-all duration-300 border-2 ${
-                    theme === 'light' ? 'bg-white border-indigo-500/50 shadow-xl shadow-indigo-500/5' : 'bg-gray-50 border-transparent'
-                  }`}
-                >
-                   <span className={`text-xs font-bold uppercase tracking-widest ${theme === 'light' ? 'text-zinc-900' : 'text-[var(--text-dim)]'}`}>Light Mode</span>
-                   {theme === 'light' && <div className="absolute right-4 top-1/2 -translate-y-1/2 w-1.5 h-1.5 rounded-full bg-indigo-500"></div>}
-                </button>
-              </div>
-            </div>
           </div>
         </div>
       </div>

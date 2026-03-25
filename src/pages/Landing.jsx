@@ -1,14 +1,14 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Menu, X, FileText, Mic, PenTool, Map, Calendar, Zap, Quote, User, ChevronDown, Sparkles, Mail, Twitter, Linkedin, Github, ArrowUp, Globe } from 'lucide-react';
+import { Menu, X, FileText, Mic, PenTool, Map, Calendar, Zap, Quote, User, ChevronDown, Sparkles, Sun, Moon } from 'lucide-react';
 import FadeInSection from '../components/FadeInSection';
 import { useAuth } from '../hooks/useAuth';
+import { useTheme } from '../context/ThemeContext';
 import { StyledSwal } from '../utils/sweetalert';
 
-function AshokaChakra({ size, className = "" }) {
-  const finalSize = size || "100%";
+function AshokaChakra({ size = 100, className = "" }) {
   return (
-    <svg width={finalSize} height={finalSize} viewBox="0 0 200 200" className={className}>
+    <svg width={size} height={size} viewBox="0 0 200 200" className={className}>
       <circle cx="100" cy="100" r="90" fill="none" 
         stroke="currentColor" strokeWidth="4"/>
       <circle cx="100" cy="100" r="14" fill="currentColor"/>
@@ -35,6 +35,7 @@ export default function Landing() {
   const dropdownRef = useRef(null);
   const profileDropdownRef = useRef(null);
   const { currentUser, dbUser } = useAuth();
+  const { theme, toggleTheme } = useTheme();
   const navigate = useNavigate();
 
   const scrollToTop = () => {
@@ -218,6 +219,15 @@ export default function Landing() {
             <a href="#how-it-works" onClick={(e) => handleSmoothScroll(e, 'how-it-works')} className="text-[#8BA3BC] hover:text-white transition-colors text-sm font-medium uppercase tracking-wider font-heading">How It Works</a>
             <a href="#testimonials" onClick={(e) => handleSmoothScroll(e, 'testimonials')} className="text-[#8BA3BC] hover:text-white transition-colors text-sm font-medium uppercase tracking-wider font-heading">Testimonials</a>
             
+            {/* Theme Toggle Desktop */}
+            <button
+              onClick={() => toggleTheme(theme === 'dark' ? 'light' : 'dark')}
+              className="flex items-center justify-center p-2 text-[#8BA3BC] hover:text-[#FF9933] transition-colors rounded-full hover:bg-white/5"
+              title={theme === 'dark' ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
+            >
+              {theme === 'dark' ? <Sun size={20} /> : <Moon size={20} />}
+            </button>
+            
             {currentUser ? (
               <div className="flex items-center gap-4 pl-4 border-l border-white/20">
                 <div className="relative" ref={profileDropdownRef}>
@@ -330,6 +340,20 @@ export default function Landing() {
 
               <a href="#how-it-works" onClick={(e) => handleSmoothScroll(e, 'how-it-works')} className="text-[#F8F4ED] text-lg font-heading uppercase tracking-tight">How It Works</a>
               <a href="#testimonials" onClick={(e) => handleSmoothScroll(e, 'testimonials')} className="text-[#F8F4ED] text-lg font-heading uppercase tracking-tight">Testimonials</a>
+              
+              <button 
+                onClick={() => {
+                  toggleTheme(theme === 'dark' ? 'light' : 'dark');
+                  setMobileMenuOpen(false);
+                }}
+                className="flex items-center gap-3 text-[#F8F4ED] text-lg font-heading uppercase tracking-tight text-left"
+              >
+                {theme === 'dark' ? (
+                  <><Sun size={20} className="text-[#FF9933]" /> <span className="mt-1">Switch to Light Mode</span></>
+                ) : (
+                  <><Moon size={20} className="text-[#FF9933]" /> <span className="mt-1">Switch to Dark Mode</span></>
+                )}
+              </button>
               
               {currentUser ? (
                 <>
