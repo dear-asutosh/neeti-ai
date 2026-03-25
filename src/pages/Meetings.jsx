@@ -356,7 +356,7 @@ ${manualAgenda.trim() ? `\nMEETING AGENDA/CONTEXT (use this to help guide your s
       setProcessingStatus("Saving to database...");
 
       const meetingData = {
-        title: `Meeting — ${new Date().toLocaleDateString([], {
+        title: `Meeting - ${new Date().toLocaleDateString([], {
           day: "2-digit",
           month: "short",
           year: "numeric"
@@ -445,7 +445,7 @@ ${manualAgenda.trim() ? `\nMEETING AGENDA/CONTEXT (use this to help guide your s
 
       setProcessingStatus('Saving to database...');
       const meetingData = {
-        title: `Uploaded — ${file.name}`,
+        title: `Uploaded - ${file.name}`,
         transcript: fullTranscript,
         textContext: fullTranscript.substring(0, 80000),
         duration: null,

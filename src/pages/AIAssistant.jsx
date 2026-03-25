@@ -228,7 +228,7 @@ ${upcomingEvents || 'No upcoming events.'}
       // Show welcome message for a new, empty chat
       setMessages([{
         role: 'assistant',
-        content: "Welcome to Neeti AI Assistant. I have access to your workspace — your documents, meetings, schedule, constituency complaints, and projects. How can I help you today?",
+        content: "Welcome to Neeti AI Assistant. I have access to your workspace: your documents, meetings, schedule, constituency complaints, and projects. How can I help you today?",
         timestamp: Date.now()
       }]);
       return;

@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Menu, X, FileText, Mic, PenTool, Map, Calendar, Zap, Quote, User, ChevronDown, Sparkles, Sun, Moon } from 'lucide-react';
+import { Menu, X, FileText, Mic, PenTool, Map, Calendar, Zap, Quote, User, ChevronDown, Sparkles, Sun, Moon, Mail, ArrowUp } from 'lucide-react';
 import FadeInSection from '../components/FadeInSection';
 import { useAuth } from '../hooks/useAuth';
 import { useTheme } from '../context/ThemeContext';
@@ -410,7 +410,7 @@ export default function Landing() {
             </div>
 
             <p className="text-lg md:text-xl text-[#8BA3BC] mb-10 max-w-3xl mx-auto leading-relaxed font-medium">
-              Neeti AI assists government officials, administrators, and public representatives in making faster, informed, and impactful decisions — securely and intelligently.
+              Neeti AI helps government leaders make faster, smarter, and more impactful decisions with complete security and ease.
             </p>
             
             <div className="flex flex-col sm:flex-row items-center justify-center gap-6 mt-10">
@@ -485,7 +485,7 @@ export default function Landing() {
               In One Secure Platform.
             </h2>
             <p className="text-[#8BA3BC] max-w-3xl mx-auto text-lg leading-relaxed">
-              From drafting official communications to tracking constituency data in real time — Neeti AI is purpose-built for the demands of public administration.
+              Whether you are writing important letters or tracking community growth as it happens, Neeti AI is built to make public service simpler and far more effective.
             </p>
           </FadeInSection>
 
@@ -495,42 +495,42 @@ export default function Landing() {
               index={0}
               icon={<FileText size={32} />}
               title="Intelligent Document Summarization"
-              description="Process hundreds of pages of reports, circulars, and policy documents in seconds. Neeti AI extracts key decisions, action points, and critical information — so you focus on governance, not paperwork."
+              description="Read through hundreds of pages of reports and policy documents in seconds. Neeti AI instantly pulls out the vital insights so you can focus on serving people instead of doing paperwork."
             />
             <FeatureCard 
               id="feature-transcription"
               index={1}
               icon={<Mic size={32} />}
               title="Meeting Transcription & Briefing"
-              description="Automatically transcribe, summarize, and generate action items from official meetings and conferences. Every word captured. Nothing missed."
+              description="Automatically transcribe, summarize, and create clear action plans from your meetings. We capture every detail, ensuring nothing slips through the cracks."
             />
             <FeatureCard 
               id="feature-drafting"
               index={2}
               icon={<PenTool size={32} />}
               title="Speech & Official Response Drafting"
-              description="Generate contextually accurate speeches, press statements, and official correspondence in your voice — reviewed, refined, and ready to deliver."
+              description="Create powerful speeches, press statements, and official letters that sound just like you. Everything is reviewed, beautifully polished, and ready to share."
             />
             <FeatureCard 
               id="feature-tracking"
               index={3}
               icon={<Map size={32} />}
               title="Constituency & Community Data Tracking"
-              description="Monitor development indices, grievance statuses, and demographic data across your jurisdiction — all on a single, real-time intelligence dashboard."
+              description="Track local development, respond to public needs, and view vital community data instantly on one beautifully simple, real-time dashboard."
             />
             <FeatureCard 
               id="feature-calendar"
               index={4}
               icon={<Calendar size={32} />}
               title="Schedule & Priority Management"
-              description="Intelligently organise your calendar, flag urgent matters, and ensure no critical appointment, deadline, or follow-up ever goes unattended."
+              description="Keep your calendar perfectly organized, prioritize urgent tasks seamlessly, and make sure you never miss a meaningful meeting or follow-up."
             />
             <FeatureCard 
               id="feature-assistant"
               index={5}
               icon={<Sparkles size={32} />}
               title="Workplace AI Assistant & Copilot"
-              description="Interact with your documents, transcriptions, and constituency data using natural language. Draft responses, ask questions, and get intelligent insights across your entire workspace."
+              description="Chat directly with your documents, notes, and data just like you would with a brilliant assistant. Ask questions and get incredibly smart answers in seconds."
             />
           </div>
         </div>
@@ -551,7 +551,7 @@ export default function Landing() {
               Serious in Purpose.
             </h2>
             <p className="text-[#8BA3BC] max-w-2xl mx-auto text-lg leading-relaxed">
-              Neeti AI is designed so that any government official — regardless of technical background — can be fully operational within minutes.
+              Neeti AI is so remarkably simple to use that absolutely anyone can understand it and see real results within minutes, zero technical skills needed.
             </p>
           </FadeInSection>
 
@@ -565,25 +565,25 @@ export default function Landing() {
                   number="1"
                   hindiTag="पंजीकरण"
                   title="Register & Verify"
-                  description="Sign up using your official government credentials. Your identity is verified through a secure, multi-layer authentication process."
+                  description="Sign up in a breeze using your official ID. We swiftly verify your identity with top-tier security to keep your account totally safe."
                 />
                 <StepCard 
                   number="2"
                   hindiTag="स्थापना"
                   title="Set Up Your Profile"
-                  description="Define your department, jurisdiction, and areas of priority. Neeti AI personalises your dashboard based on your role and responsibilities."
+                  description="Tell us about your role, your local area, and what truly matters to you. Neeti AI customizes your entire experience to fit your exact needs."
                 />
                 <StepCard 
                   number="3"
                   hindiTag="अपलोड"
                   title="Upload, Interact & Decide"
-                  description="Upload documents, ask questions in plain language, schedule meetings, and receive intelligent recommendations — all within a single interface."
+                  description="Add your files, ask questions simply and naturally, coordinate your day, and enjoy bright, helpful suggestions all in one unified place."
                 />
                 <StepCard 
                   number="4"
                   hindiTag="निर्णय"
                   title="Act with Confidence"
-                  description="With accurate summaries, reliable data, and AI-drafted communications at hand, take decisions faster and govern with greater impact."
+                  description="Rely on crystal-clear summaries, trusted data, and ready-to-use drafts to make phenomenal decisions and create a massive impact in your community."
                 />
               </div>
             </div>
@@ -808,10 +808,7 @@ function StepCard({ number, title, description, hindiTag }) {
   );
 }
 
-function TestimonialCard({ quote, author, index }) {
-  const borderColors = ['border-[#FF9933]', 'border-white', 'border-[#138808]'];
-  const borderColor = borderColors[index % 3];
-
+function TestimonialCard({ quote, author }) {
   return (
     <div className={`bg-[#0D1B2A] p-6 sm:p-8 rounded-none h-full flex flex-col relative shadow-xl group hover:-translate-y-2 hover:shadow-2xl hover:shadow-[#FF9933]/5 transition-all duration-500`}>
       <span className="text-6xl text-[#FF9933]/20 font-hindi leading-none absolute top-4 left-4 pointer-events-none select-none transition-transform duration-500 group-hover:scale-110 group-hover:-translate-y-1">“</span>
