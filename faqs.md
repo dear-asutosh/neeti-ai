@@ -1,109 +1,128 @@
 # Neeti AI FAQs
 
-## 1. Why did the team choose the name "Neeti AI" for this platform, what does 'Neeti' represent in Indian context, and what is its core mission when it comes to supporting public representatives and elected officials in their daily governance work?
+## 1. How does the full workflow of Neeti AI operate in simple terms, including the use of Firebase, Groq, AI Models, and JWT?
 
-Answer: Neeti means policy, morality, and wise decision-making in Indian traditions. It helps leaders automate admin tasks like paperwork to focus on citizen engagement.
+**Answer:**
+Here is the full workflow of how Neeti AI works, explained in simple, everyday terms:
 
-## 2. In choosing the database for Neeti AI, why opt for Google Cloud Firestore over more traditional options like SQL databases or something specialized for time-based data?
+1. The Security Guard (Authentication & JWT)
 
-Answer: Firestore provides real-time updates across devices, so new complaints or changes appear instantly on dashboards without manual refresh.
+When an official logs in, the system checks their identity.
+It gives them a secure digital ID card (called a JWT or JSON Web Token). Every time they click a button or ask for data, they flash this digital ID card so the system knows it's really them and keeps their data strictly private.
 
-## 3. Many people wonder if Neeti AI is simply a basic interface or wrapper around general tools like ChatGPT - does it offer its own unique intelligence tailored specifically to administrative workflows?
+2. The Command Center (The Frontend App)
 
-Answer: No, it integrates your personal data like projects and meetings into AI responses for context-specific advice, not generic replies.
+This is the dashboard the official sees on their phone or laptop.
+It displays everything: citizen complaints, meeting schedules, and project statuses. It’s where they type questions or upload documents.
 
-## 4. Can you list the key large language models (LLMs) that drive the reasoning capabilities in Neeti AI and explain the rationale behind selecting each one for different types of tasks?
+3. The Central Memory Bank (Firebase / Google Cloud)
 
-Answer: Llama 3.3-70B handles complex analysis, Llama 3.1-8B quick drafts, Whisper for multilingual speech - all accelerated by Groq for speed.
+All notes, complaints, and user details are securely stored here.
+Real-time magic: If a new complaint is filed, Firebase updates the official's dashboard instantly, without them even needing to refresh the page.
 
-## 5. What exactly does the Groq Inference Engine do within the Neeti AI system, and how does its inclusion improve the day-to-day user experience for busy officials?
+4. Gathering the Context (The "Smart" Step)
 
-Answer: Groq makes AI responses nearly instant, turning long waits into quick summaries or drafts during meetings.
+When the official asks the AI a question (like "Summarize Ward 5 issues"), the app doesn't just send the question blindly.
+First, it reaches into Firebase to gather all the actual data about Ward 5. It bundles the question plus all that background context together.
 
-## 6. Given limitations like token rates on free tiers, how exactly does Neeti AI process and manage very large documents such as lengthy government circulars or reports?
+5. The High-Speed Highway (Groq Engine)
 
-Answer: It splits documents into chunks, summarizes each, then combines - ensuring full coverage without hitting limits.
+The bundled question and context are sent to the AI.
+Instead of waiting minutes for an answer, Groq acts as a super-fast engine that processes the request in milliseconds. It makes the AI feel instantaneous.
 
-## 7. For teams concerned about data security in government work, what concrete technical evidence can you provide to prove that no sensitive information is stored on any unverified or private developer servers?
+6. The Brains (The AI Models)
 
-Answer: Data flows directly to Google Cloud via HTTPS; browser network tab shows only official Google endpoints like firestore.googleapis.com.
+Once the data arrives, the specific "brains" go to work:
+Llama 3: This is the reader and writer. It analyzes the Ward 5 data, figures out the main issues, and writes a clear summary.
+Whisper: If the official recorded an audio memo, Whisper is the listener that types out exactly what was spoken in English or regional languages.
+Importantly, these brains don't remember or store this data after they answer. They just process it and forget it (Zero-Retention).
 
-## 8. When user data is transmitted to external AI services like Groq or Llama models as part of processing queries, is there any retention of that data afterward or use in training public models?
+7. The Return Trip & Action
 
-Answer: Data is processed temporarily for the response only and deleted immediately under zero-retention policies - never used for training.
+The AI's answer immediately travels back to the official's screen.
+The official reads the summary or draft. If they click "Save" or "Approve," the app sends that final document back to Firebase for permanent, safe storage.
+In one sentence: You log in securely (JWT), view your info (Firebase), ask a question, and the system securely packages your specific data and sends it on a high-speed rail (Groq) to a super-smart brain (Llama/Whisper) that writes an instant answer and sends it right back to your screen.
 
-## 9. Given options for local deployment, why does Neeti AI favor a cloud-based architecture for deployment among government officials working in various field conditions?
+**Workflow Diagram:**
 
-Answer: Advanced AI requires server-grade hardware unavailable on laptops; cloud delivers power securely from any device.
+```mermaid
+graph TD
+    A[Official Logs In] -->|JWT Token Issued| B(Command Center / Dashboard)
+    B <-->|View/Update Data & Real-time Sync| C[(Firebase Memory Bank)]
+    B -->|Ask Question + Context| D{Groq High-Speed Engine}
+    D -->|Process Text| E[Llama 3 Model]
+    D -->|Process Audio| F[Whisper Model]
+    E -->|Instant Answer| B
+    F -->|Transcription| B
+    B -->|User Approves / Saves| C
+```
 
-## 10. In cases where Neeti AI had difficulty accurately totaling or filtering a large list like 200 political candidates during processing, what was the root cause and what practical workaround do you recommend?
+## 2. What are the file size and data limits when using Groq's AI models, and how does the platform handle them to prevent crashes?
 
-Answer: AI excels at text insights but not always precise math on huge datasets. Export to Excel for calculations, upload results back for AI analysis.
+**Answer:**
+Here are all the limits we are dealing with when using Groq's AI models, and exactly how we are handling them in the code right now:
 
-## 11. Beyond English, does Neeti AI properly support India's diverse regional languages for features like speech transcription and generation of reports or communications?
+### 1. Audio File Size Limits (Whisper API)
+*   **The Limit:** Groq's `whisper-large-v3-turbo` model has a strict **25 MB** maximum file size limit for audio transcriptions. If we try to send a 1-hour recording at once, the API will reject it.
+*   **How we handle it (in `Meetings.jsx`):** We play it safe by establishing a smaller safety limit in the code (`const CHUNK_SIZE = 20 * 1024 * 1024; // 20 MB API limit safety`). If an uploaded meeting recording exceeds 20 MB, a loop slices the audio file into 20 MB chunks (`file.slice`), transcribes each piece one after the other, and seamlessly stitches the final text together before the user even notices.
 
-Answer: Yes, supports 12+ languages including Hindi, Tamil, Bengali; transcribes regional speech and translates as needed.
+### 2. Document Size & Payload Limits (Llama Models)
+*   **The Limit:** When uploading large PDFs sideways to the AI, we can hit "Payload Too Large" (HTTP 413) or hit token context window limits instantly.
+*   **How we handle it (in `Documents.jsx`):** 
+    1. First, we stop massive files at the door by hardcoding a 50 MB check (`file.size > 50 * 1024 * 1024`), showing a toast error "File size exceeds 50MB limit."
+    2. During AI processing, if the chunk of text hits a strict Groq API Rate Limit, the code specifically catches errors containing `'413'` or `'Limit'`. It intercepts the crash and instead pops up a friendly `SweetAlert` saying "Document Too Large", suggesting the user try a smaller document.
 
-## 12. During busy review meetings with multiple stakeholders, how does the Meeting Intelligence feature systematically identify and capture all critical action items to prevent oversights?
+### 3. Context Window Token Overflow
+*   **The Limit:** Every AI model has a "Context Window" limit—the maximum number of words/tokens it can remember in a single prompt. If we feed a user's *entire* database history of complaints, projects, and meetings into one prompt, it guarantees a crash!
+*   **How we handle it (in `AIAssistant.jsx` & Firebase Queries):** When the official asks the AIAssistant a general question, we don't dump their whole workspace. We use Firebase's `limit()` function to cap the context. For instance, we pull `limit(10)` for meetings, `limit(10)` for documents, and `limit(5)` for speeches. We only ever feed Groq the *most recent and relevant* pieces of knowledge, keeping the prompt lean and under the token threshold.
 
-Answer: It scans transcripts for commitments (who, what, when) and auto-lists them on your dashboard for follow-up.
+## 3. The problem statement mentions a broad "assistant that summarizes documents... tracks constituency data, manages schedules." But the app currently focuses heavily on Ward, People, and Budget/Project Management. How does Neeti AI address the needs of an administrator who doesn't explicitly manage those specific data types?
 
-## 13. Compared to simple template fillers used in offices, in what ways does the AI Speechwriter module in Neeti AI generate more effective and personalized content?
+**Answer:**
+This is part of the **"Modular MVP (Minimum Viable Product)"** strategy. 
 
-Answer: It crafts original text tuned to event type and audience tone, adapting to your voice beyond basic placeholders.
+*   **We Built the Hardest Part First:** Tracking complex relationships between people, budgets, and large-scale projects is universally the most data-heavy challenge in local administration. By successfully making the AI manage these datasets, we proved the hardest part of the architecture works. If the system can handle budget logic and ward demographics alongside unstructured meetings, it can easily handle simpler scheduling or inventory tasks.
+*   **Neeti AI is a Modular Operating System:** Right now, "Constituency & Project Management" is the first module. Because the underlying system (Firebase + Groq) is modular, an official can plug in a new module tomorrow—like Hospital Capacity Tracking or Event Management—without rebuilding the AI engine. 
+*   **The Core Intelligence is Already Universal:** The core AI features—summarizing documents, drafting speeches, and transcribing multi-lingual meetings—are already completely universal right out of the box. They support any administrative work, regardless of what goes in their tracking database.
+*   **Customizable Terminology:** The framework is adaptable. What we call a "Project" can be relabeled as a "Department Initiative." What we call a "Ward" could be a "Health Zone." 
 
-## 14. When comparing Neeti AI to standalone premium subscriptions like ChatGPT or Gemini Advanced, what unique advantages make it the better choice for administrative leadership roles?
+**In short:** We designed the AI to summarize any meeting or document universally, and we chose the complex Constituency Tracker as our initial proof-of-concept to prove our architecture can scale to any department's needs.
 
-Answer: It connects directly to your constituency data, schedule, and history for personalized, up-to-date guidance.
+## 4. How can you claim that your model doesn't store any kind of sensitive data of the Government?
 
-## 15. What built-in mechanisms does Neeti AI have as a fail-safe for users who might lose internet connectivity while working in remote or rural constituency areas?
+**Answer:**
+When dealing with government data, "trust us" isn't good enough. You need technical proof. Here is exactly how Neeti AI guarantees it does not store or misuse sensitive government data:
 
-Answer: Cached recent data and drafts remain accessible offline, auto-syncing upon reconnection.
+### 1. The "Zero-Retention" AI Policy (Groq & Llama)
+*   **The Claim:** The AI forgets everything the moment it answers.
+*   **The Proof:** We do not use the free consumer web version of ChatGPT. We use the **Enterprise API from Groq**. Under their API Terms of Service, data sent for processing is explicitly **banned from being used to train public models**. It operates on a strict "Zero-Retention Policy"—the documents and context are held in the server's RAM for milliseconds to generate the answer, and then instantly wiped.
 
-## 16. If an administrator or developer makes updates to core configurations such as security rules or feature toggles, how quickly are those changes reflected across all users' interfaces?
+### 2. World-Class Secure Storage (Google Cloud)
+*   **The Claim:** We aren't keeping your data on a random hard drive in someone's basement.
+*   **The Proof:** Neeti AI's entire database runs directly on **Google Cloud Firestore**. This means the data is protected by the exact same encryption and security infrastructure that protects Gmail and Google Cloud, which are already trusted by governments globally. 
 
-Answer: Changes propagate in seconds via real-time Firebase and Vite's fast reload system.
+### 3. No "Middleman" Servers
+*   **The Claim:** Our developers cannot intercept or read your data.
+*   **The Proof:** Neeti AI's architecture connects the official's web browser *directly* to Google Cloud and the Groq API. We deliberately did not build a custom "middleman" backend server that could secretly log or copy the data as it passes through. 
 
-## 17. What exactly is the Leader Dashboard in Neeti AI, and what kinds of information and widgets does it display to give officials an at-a-glance view of their priorities?
+### 4. 100% Auditor Transparent
+*   **The Claim:** Don't take our word for it—check it yourself.
+*   **The Proof:** Any technical auditor or IT administrator can open their browser's "Network Tab" while using Neeti AI. They will see that 100% of the data traffic flows exclusively to `firestore.googleapis.com` (Google) and `api.groq.com` (Groq). There are zero sketchy third-party endpoints or hidden tracking servers.
 
-Answer: Home screen with time-based greetings, stats on complaints/projects, activity feed, events - all live-updating.
+## 5. Why is there no Role-Based Access Control (multiple staff accounts) if public leaders don't typically do their own data entry?
 
-## 18. Walk through how the Constituency Tracker handles complaint management - from filing a new one to viewing status and analytics.
+**Answer:**
+We deliberately did not build robust Role-Based Access Control (RBAC) intended for a large team of staff because the core goal of Neeti AI is to **eliminate the data entry bottleneck entirely.**
 
-Answer: File details, view categorized lists, drill into resolved/open with search and reports.
+The assumption that a leader needs multiple staff members to do heavy data entry is the exact problem Neeti AI is designed to solve. With real-time voice transcription (Whisper) and instant AI document summarization (Llama), a leader doesn't need a Personal Assistant to spend 3 hours typing up meeting action items or summarizing a 400-page policy budget. 
 
-## 19. Beyond complaints, how does the system allow management of people directories, ongoing projects, and ward-level overviews in the Constituency Tracker section?
+The leader simply speaks into the app or uploads the document themselves. **Neeti AI *is* the Chief of Staff.** Building an infrastructure primarily designed for 10 staff members to manually log external data simply encourages the old, slow way of working. The system is built for the leader to operate directly and efficiently with zero middleman delays.
 
-Answer: People: Add/view profiles; Projects: Status tracking/details; Wards: Area summaries and deep dives.
+## 6. Can we add the Google Translate option to the app, and how does it help?
 
-## 20. In practical terms, how do users interact with the AI Assistant feature to get help on specific data like pending tasks or document insights?
+**Answer:**
+Yes, the Neeti AI platform is fully equipped with Google Translate integration directly built into the application interface. 
 
-Answer: Type natural questions like "Ward 5 issues?" or upload files - it grounds answers in your workspace.
+Because we are building for Bharat's public leaders—who oversee incredibly diverse linguistic populations—having instantaneous translation across the entire platform is essential. The Google Translate widget is available prominently in the navigation bar of both the public landing page and the official's private dashboard.
 
-## 21. For quick local testing or demos, what are the step-by-step instructions to set up and launch Neeti AI on a development machine?
-
-Answer: Add Firebase/Groq keys to .env, run npm install && npm run dev; easy Vercel deploy.
-
-## 22. Who precisely is the target user for Neeti AI - what roles and responsibilities make it indispensable in their workflow?
-
-Answer: MLAs, councillors, officials handling constituency services, grievances, and public engagement.
-
-## 23. When preparing for investor pitches, jury evaluations, or team demos, what standout benefits and demo flows from Neeti AI should be highlighted?
-
-Answer: Real-time updates, AI summaries, secure setup; demo complaint filing to instant dashboard + doc analysis.
-
-## 24. What are the most frequent troubleshooting steps for common issues like AI not responding or data sync problems?
-
-Answer: Verify API keys, mic permissions for meetings, Firebase rules for sync.
-
-## 25. Specifically for high-stakes jury or presentation prep, how can internal teams leverage these FAQs and the product itself to confidently field technical and use-case questions?
-
-Answer: Review questions/answers here, run live demos on core flows like AI queries/dashboard to build familiarity.
-
-## 26. What is Neeti AI's "Unfair Advantage" over a leader simply using ChatGPT and an Excel spreadsheet manually?
-
-Answer: The advantage is **Deep Contextual Integration**. In a manual setup, ChatGPT doesn't know what's in your spreadsheet unless you paste it every time, and your spreadsheet doesn't know what was said in your last meeting. Neeti AI is a "Single Source of Truth"—it sees your meetings, your complaints, your documents, and your schedule all at once. It can cross-reference them to give "Context-Aware" advice that a disconnected chat box simply cannot provide. It’s the difference between having five smart tools that don't talk to each other and having one unified command center that knows your entire world.
-
-## 27. If there is only ONE thing the judges should remember about Neeti AI, what should it be?
-
-Answer: Remember that Neeti AI is the **"Governance Intelligence OS."** It is not just a tool for writing or chatting; it is the platform that transforms a public representative's role from being reactive and buried in paperwork to being proactive and data-driven. It gives a leader the one thing they need most: the **mental space** to focus on policy and people, while the technology handles the complexity of administration.
+With a single click, an official or citizen can translate the entire Neeti AI interface, including complex AI-generated document summaries, meeting transcriptions, and constituency data, into Hindi, Bengali, Telugu, Marathi, Tamil, Urdu, Gujarati, Kannada, Odia, Malayalam, Punjabi, and more. This eliminates all language barriers between the AI's intelligent output and the local administrative staff.

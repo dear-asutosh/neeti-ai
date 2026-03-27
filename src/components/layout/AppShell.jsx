@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Outlet, useNavigate, useLocation } from 'react-router-dom';
-import { Menu, User, LogOut, ChevronDown, Map, Sparkles, FileText, Calendar, BarChart3, Sun, Moon } from 'lucide-react';
+import { Menu, User, LogOut, ChevronDown, Map, Sparkles, FileText, Calendar, BarChart3, Sun, Moon, Settings } from 'lucide-react';
 import Sidebar from './Sidebar';
 import { useAuth } from '../../hooks/useAuth';
 import { useTheme } from '../../context/ThemeContext';
@@ -74,8 +74,6 @@ export default function AppShell() {
       context = { icon: Calendar, title: "Schedule Manager", subtitle: "Manage appointments and events." };
     } else if (location.pathname.startsWith('/assistant')) {
       context = { icon: Sparkles, title: "Neeti AI Assistant", subtitle: "Your legislative and administrative copilot." };
-    } else if (location.pathname.startsWith('/settings')) {
-      context = { icon: User, title: "Account Settings", subtitle: "Manage your profile and preferences." };
     } else {
       return null;
     }
@@ -89,7 +87,9 @@ export default function AppShell() {
         </div>
         <div>
           <h1 className="text-sm md:text-base font-bold text-zinc-900 dark:text-zinc-100 leading-tight">{context.title}</h1>
-          <p className="text-[10px] md:text-xs text-zinc-400 leading-none mt-0.5 hidden sm:block">{context.subtitle}</p>
+          {context.subtitle && (
+            <p className="text-[10px] md:text-xs text-zinc-400 leading-none mt-0.5 hidden sm:block">{context.subtitle}</p>
+          )}
         </div>
       </div>
     );
@@ -119,7 +119,7 @@ export default function AppShell() {
           </div>
 
           {/* Live Time and Date Display */}
-          <div className="hidden md:flex flex-col items-end text-right mr-4">
+          <div className="hidden md:flex flex-col items-end text-right mr-4 notranslate" translate="no">
             <div className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">
               {currentTime.toLocaleTimeString('en-US', {
                 hour: '2-digit',

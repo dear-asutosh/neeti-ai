@@ -189,6 +189,19 @@
       });
     </script>
     <div id="root"></div>
+
+    <!-- Fixed Google Translate Widget outside React Tree -->
+    <div id="google_translate_element" style="position: fixed; bottom: 20px; left: 20px; z-index: 99999;"></div>
+
+    <script type="text/javascript">
+      function googleTranslateElementInit() {
+        new google.translate.TranslateElement({
+          pageLanguage: 'en',
+          includedLanguages: 'en,hi,bn,te,mr,ta,ur,gu,kn,or,ml,pa'
+        }, 'google_translate_element');
+      }
+    </script>
+    <script async defer src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
     <script type="module" src="/src/main.jsx"></script>
   </body>
 </html>

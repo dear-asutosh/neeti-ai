@@ -467,7 +467,7 @@ Do not include any text before or after the JSON.`
           </div>
           <span className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium ${isProcessing ? 'bg-indigo-500/10 text-indigo-400 border-indigo-500/20' : 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20'}`}>
             {isProcessing ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <CheckCircle className="w-3.5 h-3.5" />}
-            {isProcessing ? 'Analyzing...' : 'Complete'}
+            <span>{isProcessing ? 'Analyzing...' : 'Complete'}</span>
           </span>
         </div>
 
@@ -625,7 +625,7 @@ Do not include any text before or after the JSON.`
               return (
                 <div key={s.id} className="flex items-center shrink-0">
                   <div className={`flex items-center justify-center w-5 h-5 rounded-full border text-[10px] transition-all duration-300 ${statusClass}`}>
-                    {step > s.id ? <CheckCircle className="w-3 h-3" /> : s.id}
+                    {step > s.id ? <CheckCircle className="w-3 h-3" /> : <span>{s.id}</span>}
                   </div>
                   <span className={`ml-1.5 text-[11px] whitespace-nowrap transition-colors duration-300 ${step === s.id ? 'text-indigo-600 dark:text-indigo-300 font-medium block' : 'text-[var(--text-muted)] dark:text-[var(--text-dim)] hidden lg:block'}`}>{s.label}</span>
                   {idx < STEPS.length - 1 && <div className={`w-3 lg:w-6 h-px mx-1 lg:mx-2 transition-colors duration-300 ${lineClass}`} />}

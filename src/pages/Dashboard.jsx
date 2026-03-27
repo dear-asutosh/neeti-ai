@@ -180,10 +180,10 @@ export default function Dashboard() {
 
   const getGreeting = () => {
     const hour = new Date().getHours();
-    if (hour >= 4 && hour < 12) return "Good morning";
-    if (hour >= 12 && hour < 17) return "Good afternoon";
-    if (hour >= 17 && hour < 21) return "Good evening";
-    return "Good night";
+    if (hour >= 4 && hour < 12) return "A fresh morning";
+    if (hour >= 12 && hour < 17) return "A productive afternoon";
+    if (hour >= 17 && hour < 21) return "A calm evening";
+    return "It's late night";
   };
 
   const greeting = getGreeting();

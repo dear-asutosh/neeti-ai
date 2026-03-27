@@ -1,5 +1,5 @@
 import React, { useState, useRef } from 'react';
-import { Settings as SettingsIcon, Camera, Loader2, User, ShieldCheck, AlertTriangle, Trash2, Mail } from 'lucide-react';
+import { Settings as SettingsIcon, Camera, Loader2, User, ShieldCheck, AlertTriangle, Trash2, Mail, Globe } from 'lucide-react';
 import { 
   updateProfile, 
   deleteUser, 
@@ -31,6 +31,33 @@ export default function Settings() {
   const [saving, setSaving] = useState(false);
   const [notifPermission, setNotifPermission] = useState(Notification.permission);
   const fileInputRef = useRef(null);
+
+  // Language State
+  const getCookieLanguage = () => {
+    const match = document.cookie.match(/googtrans=\/en\/([a-z]{2,3})/);
+    return match ? match[1] : 'en';
+  };
+  const [appLanguage, setAppLanguage] = useState(getCookieLanguage());
+
+  const handleLanguageChange = (e) => {
+    const langCode = e.target.value;
+    setAppLanguage(langCode);
+    const domain = window.location.hostname;
+    
+    // Clear existing to prevent conflicts
+    document.cookie = `googtrans=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`;
+    document.cookie = `googtrans=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; domain=${domain};`;
+    document.cookie = `googtrans=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; domain=.${domain};`;
+
+    if (langCode !== 'en') {
+      document.cookie = `googtrans=/en/${langCode}; path=/;`;
+      document.cookie = `googtrans=/en/${langCode}; path=/; domain=${domain};`;
+    }
+    
+    setTimeout(() => {
+      window.location.reload();
+    }, 100);
+  };
 
   const handleUpdateProfile = async (e) => {
     e.preventDefault();
@@ -480,6 +507,43 @@ export default function Settings() {
                     )}
                   </div>
                 )}
+              </div>
+            </div>
+
+            {/* System Language Preference */}
+            <div className="bg-white dark:bg-zinc-900/40 rounded-3xl shadow-sm border border-[var(--border-main)] dark:border-zinc-800/50 backdrop-blur-xl p-8 flex flex-col h-[280px]">
+              <h3 className="text-lg font-bold text-zinc-900 dark:text-white flex items-center gap-3 mb-2">
+                <Globe className="w-5 h-5 text-indigo-500" />
+                Regional Language
+              </h3>
+              <p className="text-sm text-[var(--text-muted)] mb-6">Translate the entire application interface.</p>
+              
+              <div className="flex-1 flex flex-col justify-center gap-2 relative">
+                <label className="text-xs font-black text-[var(--text-muted)] dark:text-[var(--text-dim)] uppercase tracking-[0.2em] pl-1">Global Language</label>
+                <div className="relative">
+                  <select 
+                    value={appLanguage}
+                    onChange={handleLanguageChange}
+                    className="w-full px-5 py-4 bg-gray-50/50 dark:bg-zinc-950/50 border border-[var(--border-main)] dark:border-zinc-800 rounded-2xl text-zinc-900 dark:text-white font-bold focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all appearance-none cursor-pointer"
+                  >
+                    <option value="en">English (Default)</option>
+                    <option value="hi">Hindi (हिंदी)</option>
+                    <option value="bn">Bengali (বাংলা)</option>
+                    <option value="te">Telugu (తెలుగు)</option>
+                    <option value="mr">Marathi (मराठी)</option>
+                    <option value="ta">Tamil (தமிழ்)</option>
+                    <option value="ur">Urdu (اردو)</option>
+                    <option value="gu">Gujarati (ગુજરાતી)</option>
+                    <option value="kn">Kannada (ಕನ್ನಡ)</option>
+                    <option value="or">Odia (ଓଡ଼ିଆ)</option>
+                    <option value="ml">Malayalam (മലയാളം)</option>
+                    <option value="pa">Punjabi (ਪੰਜਾਬੀ)</option>
+                  </select>
+                  <div className="absolute inset-y-0 right-5 flex items-center pointer-events-none">
+                     <svg className="w-4 h-4 text-zinc-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path></svg>
+                  </div>
+                </div>
+                <p className="text-[10px] text-[var(--text-dim)] mt-2 font-bold uppercase tracking-widest pl-1 opacity-70">Changing language will auto-reload the app.</p>
               </div>
             </div>
 
