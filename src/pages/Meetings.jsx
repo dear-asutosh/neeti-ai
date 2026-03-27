@@ -469,6 +469,9 @@ ${manualAgenda.trim() ? `\nMEETING AGENDA/CONTEXT (use this to help guide your s
     } finally {
       setIsProcessing(false);
       setProcessingStatus('');
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
     }
   };
 
@@ -649,22 +652,26 @@ ${manualAgenda.trim() ? `\nMEETING AGENDA/CONTEXT (use this to help guide your s
               </p>
 
               <input
+                id="audio-upload-input"
                 type="file"
                 className="hidden"
                 ref={fileInputRef}
                 accept="audio/*,video/*"
                 onChange={(e) => {
-                  if (e.target.files?.[0]) processUpload(e.target.files[0]);
+                  if (e.target.files?.[0]) {
+                    processUpload(e.target.files[0]);
+                    e.target.value = '';
+                  }
                 }}
               />
 
               {!isProcessing && (
-                <button
-                  onClick={() => fileInputRef.current?.click()}
-                  className="mt-4 px-4 py-2 bg-white dark:bg-zinc-800 border border-[var(--border-main)] dark:border-zinc-700 rounded-lg text-xs font-medium text-zinc-700 dark:text-zinc-200 hover:bg-[var(--bg-app)] dark:hover:bg-zinc-700 hover:text-zinc-900 dark:hover:text-white transition-colors shadow-sm"
+                <label
+                  htmlFor="audio-upload-input"
+                  className="mt-4 px-4 py-2 bg-white dark:bg-zinc-800 border border-[var(--border-main)] dark:border-zinc-700 rounded-lg text-xs font-medium inline-block text-zinc-700 dark:text-zinc-200 hover:bg-[var(--bg-app)] dark:hover:bg-zinc-700 hover:text-zinc-900 dark:hover:text-white transition-colors shadow-sm cursor-pointer"
                 >
                   Browse Files
-                </button>
+                </label>
               )}
             </div>
           </>
