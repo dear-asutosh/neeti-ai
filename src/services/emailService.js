@@ -31,11 +31,13 @@ export const generateOTP = () => {
  * @param {string} userName 
  * @returns {Promise<boolean>}
  */
-export const sendOTPEmail = async (toEmail, otp, userName, templateId = TEMPLATE_ID) => {
+export const sendOTPEmail = async (toEmail, otp, userName, requestedTemplateId) => {
+  const finalTemplateId = requestedTemplateId || TEMPLATE_ID;
+
   // Check if credentials are set (not using default placeholders)
-  if (!SERVICE_ID || !templateId || !PUBLIC_KEY) {
+  if (!SERVICE_ID || !finalTemplateId || !PUBLIC_KEY) {
     console.warn("[EMAIL SERVICE] EmailJS credentials not configured. Falling back to console mock.");
-    console.log(`%c[EMAIL MOCK] Sending OTP ${otp} to ${toEmail} for ${userName} using template ${templateId}`, "color: #4f46e5; font-weight: bold;");
+    console.log(`%c[EMAIL MOCK] Sending OTP ${otp} to ${toEmail} for ${userName} using template ${finalTemplateId}`, "color: #4f46e5; font-weight: bold;");
     await new Promise(resolve => setTimeout(resolve, 1000));
     return true;
   }
@@ -50,10 +52,12 @@ export const sendOTPEmail = async (toEmail, otp, userName, templateId = TEMPLATE
     time: expiryTime
   };
 
+  console.log(`[EMAIL DISPATCH] Sending to ${toEmail} with template: ${finalTemplateId}`);
+
   try {
     const result = await emailjs.send(
       SERVICE_ID,
-      templateId,
+      finalTemplateId,
       templateParams,
       PUBLIC_KEY
     );

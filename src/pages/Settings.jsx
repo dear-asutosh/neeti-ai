@@ -216,7 +216,7 @@ export default function Settings() {
       const emailSent = await sendOTPEmail(
         userEmail,
         otp,
-        dbUser?.displayName || currentUser?.displayName || 'User',
+        (dbUser?.displayName || currentUser?.displayName || 'User').toString(),
         EMAIL_TEMPLATES.ACCOUNT_DELETE
       );
 
