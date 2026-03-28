@@ -118,6 +118,73 @@ The assumption that a leader needs multiple staff members to do heavy data entry
 
 The leader simply speaks into the app or uploads the document themselves. **Neeti AI *is* the Chief of Staff.** Building an infrastructure primarily designed for 10 staff members to manually log external data simply encourages the old, slow way of working. The system is built for the leader to operate directly and efficiently with zero middleman delays.
 
+## 6. What exactly happens under the hood when an official uploads a document (like a PDF) for analysis?
+
+**Answer:**
+Here is the step-by-step workflow of how Neeti AI securely processes a document upload:
+
+1. **Safety Check (The Gatekeeper):** The frontend first checks the file size. If it's over 50MB, it instantly blocks it to prevent the browser from crashing.
+2. **Text Extraction (The Translator):** Instead of saving a heavy PDF file directly, the browser uses specialized tools (`pdf.js` for digital PDFs, or Tesseract OCR for scanned images) to pull all the raw text from the document, page by page.
+3. **The High-Speed Dispatch (Groq Pipeline):** That raw text is bundled up with a prompt (e.g., "Summarize this budget report") and fired over a secure connection to the Groq API.
+4. **The Brain Processing (Llama 3):** The `llama-3.3` model reads the text in milliseconds, extracts key action items or writes a comprehensive summary, and then immediately "forgets" the document (Zero-Retention Policy).
+5. **The Safe Deposit (Firebase Cloud):** The final AI summary, along with the original extracted text and title, is saved directly into Google Cloud Firestore under the official's specific, secure User ID.
+6. **Real-Time Delivery:** Firestore instantly pings the dashboard, sliding the newly processed document right into the recent files list without the user ever needing to refresh the page.
+
+**Under-the-Hood Sequence Diagram:**
+```mermaid
+sequenceDiagram
+    participant User
+    participant Browser
+    participant TextExtractor as OCR / PDF.js
+    participant AI as Groq (Llama 3)
+    participant Database as Firebase Cloud
+    
+    User->>Browser: Uploads Document (e.g., Budget Policy)
+    Browser->>Browser: Check File Size (<50MB)
+    Browser->>TextExtractor: Send Document for Reading
+    TextExtractor-->>Browser: Returns Raw Text Strings
+    Browser->>AI: Send Text + "Summarize" Prompt
+    Note over AI: Llama 3 processes text<br/>(Zero-Retention)
+    AI-->>Browser: Returns Intelligent Summary
+    Browser->>Database: Save {Title, Text, Summary} securely
+    Database-->>Browser: Real-time UI Sync Trigger
+    Browser->>User: Displays Summary on Dashboard
+```
+
+## 7. What exactly happens under the hood when an official records audio or uploads a meeting recording?
+
+**Answer:**
+Audio processing uses a slightly different "Ear-to-Brain" pipeline to handle large files. Here is the step-by-step workflow:
+
+1. **Audio Capture (The Mic / Upload):** The browser uses its `MediaRecorder` API to listen to the microphone in real-time, or securely accepts an audio file upload (MP3, WAV, etc.).
+2. **The Slicer (Chunking Logic):** Groq's transcription API has a strict 25MB limit. To prevent crashes, the app safely slices the audio file into 20MB "chunks."
+3. **The Ear (Whisper Transcription):** Each 20MB chunk is sent sequentially to the `whisper-large-v3-turbo` model. Whisper translates the raw soundwaves into English or regional language text with near-perfect accuracy and instantly forgets the audio file.
+4. **The Assembly Line:** The browser waits for all chunks to finish transcribing and seamlessly stitches the text back together into one massive transcript.
+5. **The Brain (Llama 3):** Now that the text is assembled, the *entire* transcript is sent to the `llama-3.3-70b-versatile` text model, along with a prompt to "Generate Action Items, Summary, and Key Decisions."
+6. **The Safe Deposit (Firebase Cloud):** Both the raw transcript and the polished AI summary/action items are securely saved to Google Cloud Firestore under the official's ID.
+7. **Real-Time Delivery:** Just like documents, the meeting instantly appears on the dashboard for the official to review.
+
+**Under-the-Hood Sequence Diagram:**
+```mermaid
+sequenceDiagram
+    participant User
+    participant Browser as MediaRecorder
+    participant Slicer as Chunking Logic
+    participant Ear as Groq (Whisper)
+    participant Brain as Groq (Llama 3)
+    participant Database as Firebase Cloud
+    
+    User->>Browser: Records/Uploads Audio
+    Browser->>Slicer: Slices into 20MB Chunks (if large)
+    Slicer->>Ear: Send Audio Chunk #1
+    Ear-->>Slicer: Return Transcript #1
+    Note over Slicer: Loop until all<br/>chunks transcribed
+    Slicer->>Brain: Send Full Transcript + "Summarize" Prompt
+    Brain-->>Browser: Returns Summary & Action Items
+    Browser->>Database: Save {Transcript, Summary} securely
+    Database-->>Browser: Real-time Sync Trigger
+```
+
 ## 6. Can we add the Google Translate option to the app, and how does it help?
 
 **Answer:**
