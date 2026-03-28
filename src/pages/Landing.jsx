@@ -217,7 +217,6 @@ export default function Landing() {
             </div>
 
             <a href="#how-it-works" onClick={(e) => handleSmoothScroll(e, 'how-it-works')} className="text-[#8BA3BC] hover:text-white transition-colors text-sm font-medium uppercase tracking-wider font-heading">How It Works</a>
-            <a href="#testimonials" onClick={(e) => handleSmoothScroll(e, 'testimonials')} className="text-[#8BA3BC] hover:text-white transition-colors text-sm font-medium uppercase tracking-wider font-heading">Testimonials</a>
             
             {/* Theme Toggle Desktop */}
             <button
@@ -339,7 +338,6 @@ export default function Landing() {
               </div>
 
               <a href="#how-it-works" onClick={(e) => handleSmoothScroll(e, 'how-it-works')} className="text-[#F8F4ED] text-lg font-heading uppercase tracking-tight">How It Works</a>
-              <a href="#testimonials" onClick={(e) => handleSmoothScroll(e, 'testimonials')} className="text-[#F8F4ED] text-lg font-heading uppercase tracking-tight">Testimonials</a>
               
               <button 
                 onClick={() => {
@@ -442,38 +440,7 @@ export default function Landing() {
         </div>
       </section>
 
-      {/* --- [3] STATS BAR --- */}
-      <section className="bg-[#112236] py-12 border-b border-[#1E3A5F] relative z-20 shadow-2xl overflow-hidden">
-        {/* Subtle Horizontal Glow */}
-        <div className="absolute top-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-[#FF9933]/20 to-transparent"></div>
-        
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <FadeInSection>
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-0 divide-y lg:divide-y-0 lg:divide-x divide-[#1E3A5F] text-center">
-              <div className="p-4">
-                <div className="text-3xl lg:text-4xl font-bold text-[#F8F4ED] mb-2 font-heading tracking-tight">500+</div>
-                <p className="font-hindi italic text-base text-[#FF9933]/70 mb-1">अधिकारी</p>
-                <div className="text-[#8BA3BC] text-[10px] uppercase tracking-normal font-normal font-heading">Officials Onboarded</div>
-              </div>
-              <div className="p-4">
-                <div className="text-3xl lg:text-4xl font-bold text-[#F8F4ED] mb-2 font-heading tracking-tight">10,000+</div>
-                <p className="font-hindi italic text-base text-[#FF9933]/70 mb-1">दस्तावेज़</p>
-                <div className="text-[#8BA3BC] text-[10px] uppercase tracking-normal font-normal font-heading">Documents Processed</div>
-              </div>
-              <div className="p-4">
-                <div className="text-3xl lg:text-4xl font-bold text-[#F8F4ED] mb-2 font-heading tracking-tight">40+</div>
-                <p className="font-hindi italic text-base text-[#FF9933]/70 mb-1">जिले</p>
-                <div className="text-[#8BA3BC] text-[10px] uppercase tracking-normal font-normal font-heading">Districts Covered</div>
-              </div>
-              <div className="p-4">
-                <div className="text-3xl lg:text-4xl font-bold text-[#F8F4ED] mb-2 font-heading tracking-tight">99.9%</div>
-                <p className="font-hindi italic text-base text-[#FF9933]/70 mb-1">विश्वसनीयता</p>
-                <div className="text-[#8BA3BC] text-[10px] uppercase tracking-normal font-normal font-heading">Uptime Guaranteed</div>
-              </div>
-            </div>
-          </FadeInSection>
-        </div>
-      </section>
+
 
       {/* --- [4] KEY FEATURES SECTION --- */}
       <section id="features" className="py-24 bg-[#0A1628] relative">
@@ -589,41 +556,7 @@ export default function Landing() {
         </div>
       </section>
 
-      {/* --- [6] TESTIMONIALS SECTION --- */}
-      <section id="testimonials" className="py-24 bg-[#112236] relative">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <FadeInSection className="text-center mb-16">
-            <span className="text-[#FF9933] text-sm font-bold uppercase tracking-[0.3em] block mb-4 font-heading">TRUSTED BY LEADERS</span>
-            <h2 className="text-3xl md:text-4xl font-heading font-bold text-[#F8F4ED] uppercase tracking-tight">
-              What Public Officials Are Saying.
-            </h2>
-          </FadeInSection>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <FadeInSection className="h-full">
-              <TestimonialCard 
-                index={0}
-                quote="Neeti AI has fundamentally changed how I prepare for district reviews. What used to take my team three days now takes three hours."
-                author="District Collector, Rajasthan"
-              />
-            </FadeInSection>
-            <FadeInSection className="h-full">
-              <TestimonialCard 
-                index={1}
-                quote="The document summarisation feature alone has saved countless hours of administrative effort. Every official should have access to this."
-                author="Additional Secretary, Ministry of Rural Development"
-              />
-            </FadeInSection>
-            <FadeInSection className="h-full">
-              <TestimonialCard 
-                index={2}
-                quote="For the first time, I have a real-time view of grievance redressal across my entire constituency. Neeti AI delivers what governance demands."
-                author="Member of Legislative Assembly, Maharashtra"
-              />
-            </FadeInSection>
-          </div>
-        </div>
-      </section>
 
       {/* --- [7] FINAL CTA SECTION --- */}
       <section className="py-24 bg-[#0D1B2A] relative">
@@ -810,12 +743,3 @@ function StepCard({ number, title, description, hindiTag }) {
   );
 }
 
-function TestimonialCard({ quote, author }) {
-  return (
-    <div className={`bg-[#0D1B2A] p-6 sm:p-8 rounded-none h-full flex flex-col relative shadow-xl group hover:-translate-y-2 hover:shadow-2xl hover:shadow-[#FF9933]/5 transition-all duration-500`}>
-      <span className="text-6xl text-[#FF9933]/20 font-hindi leading-none absolute top-4 left-4 pointer-events-none select-none transition-transform duration-500 group-hover:scale-110 group-hover:-translate-y-1">“</span>
-      <p className="text-[#8BA3BC] text-lg italic font-hindi leading-relaxed mb-8 grow relative z-10 pt-4 group-hover:text-[#F8F4ED] transition-colors duration-500">"{quote}"</p>
-      <p className="text-[#FF9933]/60 text-[10px] font-bold tracking-[0.2em] font-heading uppercase group-hover:text-[#FF9933] transition-colors duration-500">{author}</p>
-    </div>
-  );
-}
