@@ -185,6 +185,25 @@ sequenceDiagram
     Database-->>Browser: Real-time Sync Trigger
 ```
 
+## 8. What are the core features and pillars of the Neeti AI platform that make it an indispensable tool for public leaders?
+
+**Answer:**
+Neeti AI is built on three core pillars: **AI Intelligence, Constituency Management, and Security**. Here is the master list of features that drive the platform:
+
+### Pillar 1: AI Intelligence (The "Smart" Features)
+1. **AI Meeting Summarizer:** Records live audio or accepts uploaded recordings. Uses Groq's Whisper API to transcribe the audio and Llama 3 to instantly pull out summaries and automatically log "Action Items" so nothing is forgotten.
+2. **Document Intelligence (Docu-Chat):** Allows leaders to upload massive government circulars or heavy budget PDFs. The AI instantly extracts the key points, summarizes the jargon, and allows the official to "chat" with the document to find specific clauses without reading the whole thing.
+3. **Multi-Lingual AI Speechwriter:** Generates highly personalized speeches, official letters, and public responses tailored to the specific event and audience tone. Crucially, it supports multiple regional Indian languages (Hindi, Bengali, Tamil, etc.).
+4. **Global AI Assistant (The Command Node):** A chat interface that is grounded strictly in the leader's own data. It acts as a Chief of Staff—able to cross-reference past meetings, constituent profiles, and uploaded documents to give answers specific to that politician, rather than generic internet answers.
+
+### Pillar 2: Constituency Management (The "Tracker" Features)
+5. **Ward & People Directory:** A centralized CRM (Customer Relationship Management) system specifically designed for politics. It maps citizens to their specific wards and tracks demographic networks.
+6. **Project & Budget Management:** Tracks ongoing infrastructure projects, their allocated budgets, and current completion statuses, giving leaders immediate oversight over where public money is moving.
+7. **Real-Time Live Dashboard:** An instantly updating "Command Center" powered by Firebase. It gives a one-glance view of the daily schedule, recent documents, and the highest priority action items the second the leader logs in.
+
+### Pillar 3: Infrastructure (The "Unfair Advantage" Features)
+8. **Enterprise-Grade Security (Zero-Retention):** No government data is saved on unverified developer servers. The AI explicitly deletes all data immediately after processing, and the database runs entirely on Google Cloud's encrypted infrastructure with secure JWT Authentication.
+
 ## 6. Can we add the Google Translate option to the app, and how does it help?
 
 **Answer:**
